@@ -1,0 +1,57 @@
+/* Level Selection Specific Styles */
+@import url('global.css');
+
+.large-card {
+    max-width: 800px;
+}
+
+.selection-context {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    font-size: 18px;
+}
+.level-options {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+.level-card {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.level-card:hover, .level-card.active {
+    border-color: var(--primary);
+}
+.level-card .icon { font-size: 40px; margin-bottom: 1rem; display: inline-block; }
+.level-card h4 { font-size: 18px; margin-bottom: 10px; }
+.level-card p { font-size: 14px; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.5;}
+.score-badge {
+    background-color: var(--bg-light);
+    color: var(--text-muted);
+    font-size: 13px;
+    padding: 6px 16px;
+    border-radius: 20px;
+}
+
+.bottom-actions {
+    display: flex;
+    gap: 1rem;
+}
+.bottom-actions .btn { flex: 1; }
+
+@media (max-width: 768px) {
+    .level-options {
+        flex-direction: column;
+    }
+    .bottom-actions {
+        flex-direction: column;
+    }
+}

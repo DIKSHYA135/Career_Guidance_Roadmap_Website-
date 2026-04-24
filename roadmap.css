@@ -1,0 +1,113 @@
+/* Roadmap CSS */
+@import url('global.css');
+
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar shared styles */
+.sidebar { width: 250px; background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 1.5rem 0; }
+.sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 0 1.5rem; margin-bottom: 2.5rem; font-weight: 700; font-size: 18px; color: var(--primary-active); }
+.nav-menu { display: flex; flex-direction: column; gap: 5px; padding: 0 1rem; flex: 1; }
+.nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; color: var(--text-muted); font-size: 15px; font-weight: 500; transition: all 0.2s; }
+.nav-item:hover { background: var(--bg-light); color: var(--text-dark); }
+.nav-item.active { background: var(--primary-active); color: var(--text-dark); }
+
+.main-content {
+    flex: 1;
+    padding: 3rem 4rem;
+    background: var(--bg-light);
+}
+
+.page-header {
+    margin-bottom: 2rem;
+}
+.page-header h2 { font-size: 28px; margin-bottom: 8px; }
+.page-header p { color: var(--text-muted); font-size: 15px; }
+
+.roadmap-wrapper {
+    padding: 3rem;
+}
+
+/* Roadmap Timeline Map (Pinpoint design) */
+.roadmap-timeline {
+    position: relative;
+    padding-left: 3rem;
+}
+
+/* The vertical dashed line */
+.roadmap-timeline::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: repeating-linear-gradient(
+        to bottom,
+        var(--border) 0,
+        var(--border) 10px,
+        transparent 10px,
+        transparent 20px
+    );
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 3rem;
+}
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+/* The pinpoint circle */
+.timeline-item::after {
+    content: '';
+    position: absolute;
+    left: -3rem;
+    top: 0.5rem;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--white);
+    border: 3px solid var(--border);
+    transition: all 0.3s;
+    z-index: 2;
+}
+
+.timeline-item.completed::after { background: var(--success); border-color: var(--success-bg); outline: 3px solid var(--success); }
+.timeline-item.active::after { background: var(--primary-active); border-color: #EEF2FF; outline: 3px solid var(--primary-hover); }
+.timeline-item.capstone::after { border-radius: 4px; transform: rotate(45deg); width: 20px; height: 20px; left: -2.85rem;}
+
+.timeline-content {
+    background: var(--white);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+
+.timeline-content h4 { font-size: 18px; margin-bottom: 0.5rem; color: var(--text-dark); }
+.timeline-content p { font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem; }
+
+.timeline-pill {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.completed .timeline-pill { background: var(--success-bg); color: var(--success); }
+.active .timeline-pill { background: #EEF2FF; color: var(--primary-active); }
+.locked .timeline-pill { background: var(--bg-light); color: var(--text-light); }
+
+@media (max-width: 768px) {
+    .app-layout { flex-direction: column; }
+    .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); padding: 1rem 0; }
+    .main-content { padding: 2rem 1rem; }
+    .roadmap-wrapper { padding: 1rem; }
+    .timeline-item::after { left: -2.7rem; width: 20px; height: 20px; }
+    .timeline-item.capstone::after { left: -2.6rem; width: 16px; height: 16px; }
+    .roadmap-timeline::before { left: 9px; }
+}

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roadmap - Xyverra</title>
+    <link rel="stylesheet" href="roadmap.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-brain" style="font-size:24px;"></i>
+                Xyverra
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item">
+                    <i class="fas fa-th-large"></i> Dashboard
+                </a>
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-map"></i> Roadmap &nbsp; >
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-book-open"></i> Skills
+                </a>
+                <a href="progress.html" class="nav-item">
+                    <i class="fas fa-check-circle"></i> Progress Tracker
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header" style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <h2>Your Learning Path</h2>
+                    <p>Follow the points below from beginning to end to progress towards job-readiness.</p>
+                </div>
+                <a href="quiz.html" class="btn btn-primary" style="width:auto; padding: 10px 20px;">
+                    Take Module Quiz <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="roadmap-wrapper card-box">
+                <div class="roadmap-timeline" id="roadmap-timeline">
+                    <!-- Nodes -->
+                    <div class="timeline-item completed">
+                        <div class="timeline-content">
+                            <h4>HTML Fundamentals</h4>
+                            <p>Understand the structure of web pages and semantic tags.</p>
+                            <span class="timeline-pill">Completed</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item active">
+                        <div class="timeline-content">
+                            <h4>CSS & Responsive Design</h4>
+                            <p>Master layouts, flexbox, grid, and making designs look great.</p>
+                            <span class="timeline-pill current">Current Module</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item locked">
+                        <div class="timeline-content">
+                            <h4>JavaScript Essentials</h4>
+                            <p>Learn core programming logic, DOM manipulation, and APIs.</p>
+                            <span class="timeline-pill">Locked</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item locked">
+                        <div class="timeline-content">
+                            <h4>Frontend Frameworks (React)</h4>
+                            <p>Build modern single-page applications efficiently.</p>
+                            <span class="timeline-pill">Locked</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item locked capstone">
+                        <div class="timeline-content">
+                            <h4>Capstone Project</h4>
+                            <p>Build an end-to-end project to prove job readiness.</p>
+                            <span class="timeline-pill">Requires 90% completion</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </main>
+    </div>
+
+</body>
+</html>
