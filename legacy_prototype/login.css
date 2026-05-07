@@ -1,0 +1,61 @@
+/* Login Specific Styles */
+@import url('global.css');
+
+.auth-card {
+    max-width: 440px;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+}
+.input-wrapper {
+    position: relative;
+}
+.input-wrapper i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+}
+.input-wrapper input {
+    width: 100%;
+    padding: 12px 14px 12px 40px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    color: var(--text-dark);
+    outline: none;
+    transition: border-color 0.2s;
+}
+.input-wrapper input:focus {
+    border-color: var(--primary-hover);
+}
+.input-wrapper .eye-icon {
+    left: auto;
+    right: 14px;
+    cursor: pointer;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 1.5rem 0;
+    color: var(--text-light);
+    font-size: 12px;
+}
+.divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border);
+}
+.divider:not(:empty)::before { margin-right: 1rem; }
+.divider:not(:empty)::after { margin-left: 1rem; }

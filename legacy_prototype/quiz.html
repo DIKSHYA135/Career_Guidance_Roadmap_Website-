@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Assessment - Xyverra</title>
+    <link rel="stylesheet" href="quiz.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-brain" style="font-size:24px;"></i>
+                Xyverra
+            </div>
+            <nav class="nav-menu">
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-th-large"></i> Dashboard
+                </a>
+                <a href="roadmap.html" class="nav-item">
+                    <i class="fas fa-map"></i> Roadmap
+                </a>
+                <a href="skills.html" class="nav-item">
+                    <i class="fas fa-book-open"></i> Skills
+                </a>
+                <a href="skill-gaps.html" class="nav-item">
+                    <i class="fas fa-compass"></i> Skill Gaps
+                </a>
+                <a href="progress.html" class="nav-item active">
+                    <i class="fas fa-check-circle"></i> Progress / Quiz
+                </a>
+            </nav>
+            <div class="user-profile">
+                <div class="profile-info">
+                    <div class="avatar" id="user-avatar">U</div>
+                    <div class="profile-text">
+                        <h4 id="user-display-name">User</h4>
+                        <p>Frontend Developer</p>
+                    </div>
+                </div>
+                <div class="signout">
+                    <i class="fas fa-sign-out-alt"></i> Sign out
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="quiz-container">
+                <div class="quiz-header">
+                    <h2>Module Assessment</h2>
+                    <div class="timer" id="quiz-timer">
+                        <i class="fas fa-stopwatch"></i>
+                        <span id="timer-text">20s Reading Time</span>
+                    </div>
+                </div>
+                
+                <div class="quiz-body">
+                    <h3 id="quiz-question">What is the primary purpose of semantic HTML tags?</h3>
+                    
+                    <div class="quiz-options disabled" id="quiz-options-container">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div class="quiz-footer">
+                    <p id="quiz-status" class="warning">Read the question carefully. Answer options will unlock shortly.</p>
+                    <div style="display:flex; gap: 1rem;">
+                        <button class="btn btn-outline" id="btn-exit-quiz" style="width: auto; padding: 10px 20px;">Exit Quiz</button>
+                        <button class="btn btn-primary" id="btn-next-question" style="display: none; width: auto; padding: 10px 20px;">Next Question</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="user.js"></script>
+    <script src="quiz.js"></script>
+</body>
+</html>
