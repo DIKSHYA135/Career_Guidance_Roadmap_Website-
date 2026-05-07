@@ -65,6 +65,41 @@
                         <p style="margin:0; font-size:12px; color:#6b7280;">Frontend Developer</p>
                     </div>
                 </div>
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-brain" style="font-size:24px;"></i>
+                Xyverra
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item">
+                    <i class="fas fa-th-large"></i> Dashboard
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-map"></i> Roadmap
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-book-open"></i> Skills
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-compass"></i> Skill Gaps
+                </a>
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-check-circle"></i> Progress Tracker &nbsp; >
+                </a>
+            </nav>
+            
+            <div class="user-profile">
+                <div class="profile-info">
+                    <div class="avatar">EM</div>
+                    <div class="profile-text">
+                        <h4>emmanual macron</h4>
+                        <p>Frontend Developer</p>
+                    </div>
+                </div>
+                <div class="signout">
+                    <i class="fas fa-sign-out-alt"></i> Sign out
+                </div>
             </div>
         </aside>
 
@@ -230,5 +265,71 @@
     </div>
 
     <script src="global-sidebar.js"></script>
+            <div class="page-header">
+                <h2>Progress Tracker</h2>
+                <p>A timeline of your learning journey and verified skills.</p>
+            </div>
+
+            <div class="history-card">
+                <div class="history-header">
+                    <i class="fas fa-chart-line" style="color: var(--primary-active);"></i>
+                    Learning History
+                </div>
+                
+                <div class="history-item">
+                    <div class="item-icon success">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="item-details">
+                        <h4>HTML Fundamentals</h4>
+                        <div class="item-meta">
+                            <span><i class="far fa-calendar-alt"></i> Apr 8, 2026</span>
+                            <span style="color: var(--primary-active);"><i class="fas fa-medal"></i> Score: 80%</span>
+                        </div>
+                    </div>
+                    <div class="item-action">
+                        <span class="item-badge completed">Completed</span>
+                    </div>
+                </div>
+
+                <div class="history-item">
+                    <div class="item-icon success">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="item-details">
+                        <h4>CSS & Responsive Design</h4>
+                        <div class="item-meta">
+                            <span><i class="far fa-calendar-alt"></i> Apr 3, 2026</span>
+                            <span style="color: var(--primary-active);"><i class="fas fa-medal"></i> Score: 80%</span>
+                        </div>
+                    </div>
+                    <div class="item-action">
+                        <span class="item-badge completed">Completed</span>
+                    </div>
+                </div>
+
+                <div class="history-item">
+                    <div class="item-icon fail">
+                        <i class="fas fa-times"></i>
+                    </div>
+                    <div class="item-details">
+                        <h4>JavaScript Essentials</h4>
+                        <div class="item-meta">
+                            <span style="color: var(--primary-active);"><i class="fas fa-medal"></i> Score: 20%</span>
+                        </div>
+                    </div>
+                    <div class="item-action">
+                        <span class="item-badge revision">Needs Revision</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Made with Replit watermark can just be added as a floating div if needed -->
+            <div style="position: absolute; bottom: 20px; right: 20px; background: rgba(0,0,0,0.4); color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; display: flex; align-items:center; gap: 6px;">
+                 Made with Replit
+            </div>
+        </main>
+    </div>
+    <script src="progress.js"></script>
 </body>
 </html>

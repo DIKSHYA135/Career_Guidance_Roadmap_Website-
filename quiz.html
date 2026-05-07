@@ -66,6 +66,26 @@
                     </div>
                 </div>
             </div>
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-brain" style="font-size:24px;"></i>
+                Xyverra
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item">
+                    <i class="fas fa-th-large"></i> Dashboard
+                </a>
+                <a href="roadmap.html" class="nav-item">
+                    <i class="fas fa-map"></i> Roadmap
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-book-open"></i> Skills
+                </a>
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-check-circle"></i> Progress / Quiz
+                </a>
+            </nav>
         </aside>
 
         <!-- Main Content -->
@@ -93,6 +113,11 @@
                         Next Question <i class="fas fa-arrow-right"></i>
                     </button>
                     <button class="btn btn-outline" id="btn-exit-quiz" style="width:auto; padding: 10px 24px;">Exit Assessment</button>
+                    <p id="quiz-status" class="warning">Read the question carefully. Answer options will unlock shortly.</p>
+                    <div style="display:flex; gap: 1rem;">
+                        <button class="btn btn-outline" id="btn-exit-quiz" style="width: auto; padding: 10px 20px;">Exit Quiz</button>
+                        <button class="btn btn-primary" id="btn-next-question" style="display: none; width: auto; padding: 10px 20px;">Next Question</button>
+                    </div>
                 </div>
             </div>
         </main>

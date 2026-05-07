@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // You can dynamically update the tracker here based on `localStorage`
     const path = localStorage.getItem('xyverra_selected_path');
+    const path = localStorage.getItem('pathfinder_selected_path');
     if(path) {
         // e.g. change some text to reflect the path
         // document.querySelector('.page-header p').textContent = `Tracking progress for ${path}`;

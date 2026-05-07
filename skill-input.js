@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+
     const levelBtns = document.querySelectorAll('.level-btn');
     const skillInput = document.getElementById('skill-input-field');
     const tagContainer = document.getElementById('tag-container');
@@ -10,162 +11,241 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentLevel = "Beginner";
     let userSkills = [];
 
-    // Focus input when clicking anywhere on the tag container
+    // Focus input when clicking tag area
     tagContainer.addEventListener('click', () => {
         skillInput.focus();
     });
 
-    // Initialize from LocalStorage (optional but good UX if user returns)
+    // =========================
+    // Load Saved Data
+    // =========================
+
     try {
+
         const storedLevel = localStorage.getItem('userLevel');
         if (storedLevel) {
             currentLevel = storedLevel;
-            updateLevelUI();
         }
-        
+
         const storedSkills = localStorage.getItem('userSkills');
         if (storedSkills) {
             userSkills = JSON.parse(storedSkills);
-            renderTags();
         }
 
         const storedExp = localStorage.getItem('userExperience');
         if (storedExp) {
             experienceField.value = storedExp;
         }
-    } catch(e) {
-        console.error("Error loading saved data", e);
+
+    } catch (e) {
+        console.error("Error loading localStorage:", e);
     }
 
+    // =========================
     // Level Selection
+    // =========================
+
     levelBtns.forEach(btn => {
+
         btn.addEventListener('click', () => {
-            currentLevel = btn.getAttribute('data-level');
+
+            currentLevel = btn.dataset.level;
+
             updateLevelUI();
             validateForm();
         });
     });
 
     function updateLevelUI() {
+
         levelBtns.forEach(btn => {
-            if (btn.getAttribute('data-level') === currentLevel) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
+
+            btn.classList.toggle(
+                'active',
+                btn.dataset.level === currentLevel
+            );
         });
     }
 
-    // Tag Input Logic
+    // =========================
+    // Skill Input Logic
+    // =========================
+
     skillInput.addEventListener('keydown', (e) => {
+
         if (e.key === 'Enter') {
+
             e.preventDefault();
+
             addSkill(skillInput.value);
-        } else if (e.key === 'Backspace' && skillInput.value === '' && userSkills.length > 0) {
-            // Remove last tag if backspace is pressed on empty input
+        }
+
+        // Remove last skill with backspace
+        if (
+            e.key === 'Backspace' &&
+            skillInput.value === '' &&
+            userSkills.length > 0
+        ) {
+
             removeSkill(userSkills.length - 1);
         }
     });
 
-    // Handle comma separated values
+    // Add by comma
     skillInput.addEventListener('keyup', (e) => {
+
         if (e.key === ',') {
-            addSkill(skillInput.value.replace(',', ''));
+
+            addSkill(
+                skillInput.value.replace(',', '')
+            );
         }
     });
 
+    // Add on blur
     skillInput.addEventListener('blur', () => {
+
         if (skillInput.value.trim() !== '') {
+
             addSkill(skillInput.value);
         }
     });
 
-    function addSkill(skillName) {
-        const name = skillName.trim();
-        if (name === '') return;
+    // =========================
+    // Add Skill
+    // =========================
 
-        // Prevent duplicates (case insensitive)
-        const isDuplicate = userSkills.some(s => s.toLowerCase() === name.toLowerCase());
-        if (!isDuplicate) {
+    function addSkill(skillName) {
+
+        const name = skillName.trim();
+
+        if (!name) return;
+
+        // Prevent duplicates
+        const exists = userSkills.some(
+            skill => skill.toLowerCase() === name.toLowerCase()
+        );
+
+        if (!exists) {
+
             userSkills.push(name);
+
             renderTags();
             validateForm();
         }
-        
+
         skillInput.value = '';
     }
 
+    // =========================
+    // Remove Skill
+    // =========================
+
     function removeSkill(index) {
+
         userSkills.splice(index, 1);
+
         renderTags();
         validateForm();
     }
 
+    // =========================
+    // Render Tags
+    // =========================
+
     function renderTags() {
+
         tagsWrapper.innerHTML = '';
+
         userSkills.forEach((skill, index) => {
+
             const tag = document.createElement('div');
+
             tag.className = 'tag';
+
             tag.innerHTML = `
-                ${skill}
-                <span class="tag-remove" data-index="${index}">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </span>
+                <span>${skill}</span>
+
+                <button class="tag-remove" data-index="${index}">
+                    ×
+                </button>
             `;
+
+            tag.querySelector('.tag-remove')
+                .addEventListener('click', (e) => {
+
+                    e.stopPropagation();
+
+                    removeSkill(index);
+                });
+
             tagsWrapper.appendChild(tag);
         });
-
-        // Add event listeners to remove buttons
-        document.querySelectorAll('.tag-remove').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation(); // prevent focusing input
-                const index = parseInt(e.currentTarget.getAttribute('data-index'));
-                removeSkill(index);
-            });
-        });
     }
 
-    // Validation Logic
+    // =========================
+    // Validation
+    // =========================
+
     function validateForm() {
-        let isValid = true;
-        errorMessage.style.display = 'none';
 
-        if (userSkills.length === 0) {
-            isValid = false;
-            if (currentLevel === "Beginner") {
-                errorMessage.style.display = 'flex';
-            } else {
-                errorMessage.style.display = 'flex';
-            }
-        }
+        const isValid = userSkills.length > 0;
 
-        if (isValid) {
-            generateBtn.classList.remove('disabled');
-            generateBtn.removeAttribute('disabled');
-        } else {
-            generateBtn.classList.add('disabled');
-            generateBtn.setAttribute('disabled', 'true');
-        }
+        errorMessage.style.display =
+            isValid ? 'none' : 'flex';
+
+        generateBtn.disabled = !isValid;
+
+        generateBtn.classList.toggle(
+            'disabled',
+            !isValid
+        );
     }
 
-    // Submission
+    // =========================
+    // Generate Button
+    // =========================
+
     generateBtn.addEventListener('click', () => {
+
         validateForm();
-        if (generateBtn.classList.contains('disabled') || userSkills.length === 0) return;
 
-        // Store data
-        localStorage.setItem('userLevel', currentLevel);
-        localStorage.setItem('userSkills', JSON.stringify(userSkills));
-        localStorage.setItem('userExperience', experienceField.value);
+        if (generateBtn.disabled) return;
 
-        // Redirect
+        // Save Data
+        localStorage.setItem(
+            'userLevel',
+            currentLevel
+        );
+
+        localStorage.setItem(
+            'userSkills',
+            JSON.stringify(userSkills)
+        );
+
+        localStorage.setItem(
+            'userExperience',
+            experienceField.value
+        );
+
+        // Page transition
         document.body.style.opacity = '0';
-        document.body.style.transition = 'opacity 0.3s ease';
+        document.body.style.transition =
+            'opacity 0.3s ease';
+
         setTimeout(() => {
+
             window.location.href = 'roadmap.html';
+
         }, 300);
     });
 
-    // Initial validation
+    // =========================
+    // Initialize UI
+    // =========================
+
+    updateLevelUI();
+    renderTags();
     validateForm();
+
 });

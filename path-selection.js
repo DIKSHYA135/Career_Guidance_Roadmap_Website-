@@ -1,42 +1,57 @@
 // Path Selection JS
 document.addEventListener("DOMContentLoaded", () => {
+
     const cards = document.querySelectorAll('.grid-card');
     const continueBtn = document.getElementById('path-continue-btn');
 
-    // Restore previously selected path if user navigates back
+    // Restore previously selected path
     const savedPath = localStorage.getItem('xyverra_selected_path');
+
     if (savedPath) {
         cards.forEach(card => {
-            if (card.querySelector('h4') && card.querySelector('h4').innerText === savedPath) {
+            const titleElement = card.querySelector('h4');
+
+            if (titleElement && titleElement.innerText === savedPath) {
                 cards.forEach(c => c.classList.remove('active'));
                 card.classList.add('active');
-                if (continueBtn) continueBtn.style.opacity = '1';
+
+                if (continueBtn) {
+                    continueBtn.style.opacity = '1';
+                }
             }
         });
     }
 
+    // Card click event
     cards.forEach(card => {
         card.addEventListener('click', () => {
-            // Remove active from all
+
+            // Remove active class from all cards
             cards.forEach(c => c.classList.remove('active'));
-            // Add active to clicked
+
+            // Add active class to clicked card
             card.classList.add('active');
-            
-            // Re-enable continue button (visually)
-            if (continueBtn) continueBtn.style.opacity = '1';
-            
-            // Store selection in local state
+
+            // Enable continue button visually
+            if (continueBtn) {
+                continueBtn.style.opacity = '1';
+            }
+
+            // Save selected path
             const title = card.querySelector('h4').innerText;
             localStorage.setItem('xyverra_selected_path', title);
         });
     });
 
+    // Continue button validation
     if (continueBtn) {
         continueBtn.addEventListener('click', (e) => {
+
             if (!localStorage.getItem('xyverra_selected_path')) {
                 e.preventDefault();
                 alert("Please select a learning path to continue.");
             }
         });
     }
+
 });
