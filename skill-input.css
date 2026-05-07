@@ -1,0 +1,205 @@
+/* Skill Input Specific Styles */
+.form-card {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 1.75rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-main);
+    font-size: 0.95rem;
+}
+
+.field-hint {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    margin-top: -0.25rem;
+}
+
+/* Level Selector */
+.level-selector {
+    display: flex;
+    gap: 1rem;
+}
+
+.level-btn {
+    flex: 1;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    background-color: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 1rem;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+}
+
+.level-btn:hover {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+}
+
+.level-btn.active {
+    border-color: var(--primary-color);
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(90, 75, 250, 0.1);
+}
+
+@media (max-width: 640px) {
+    .level-selector {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* Tag Input */
+.tag-input-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.5rem;
+    background-color: #fff;
+    min-height: 52px;
+    gap: 0.5rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.tag-input-container:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(90, 75, 250, 0.1);
+}
+
+.tags-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.75rem;
+    background-color: var(--bg-color);
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+}
+
+.tag-remove {
+    cursor: pointer;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.tag-remove:hover {
+    background-color: #e5e7eb;
+    color: #ef4444;
+}
+
+#skill-input-field {
+    border: none;
+    outline: none;
+    flex: 1;
+    min-width: 150px;
+    padding: 0.25rem 0.5rem;
+    font-size: 1rem;
+    font-family: inherit;
+    background: transparent;
+    color: var(--text-main);
+}
+
+#skill-input-field::placeholder {
+    color: #9ca3af;
+}
+
+/* Textarea */
+#experience-field {
+    width: 100%;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    color: var(--text-main);
+}
+
+#experience-field:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(90, 75, 250, 0.1);
+}
+
+#experience-field::placeholder {
+    color: #9ca3af;
+}
+
+/* Error Message */
+.error-message {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    color: #b91c1c;
+    background-color: #fef2f2;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    border: 1px solid #fecaca;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Actions */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1.5rem;
+}
+
+.generate-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+}
+
+.generate-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Sidebar Logo Fix */
+.sidebar-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    object-fit: cover;
+}

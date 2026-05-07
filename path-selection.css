@@ -1,0 +1,112 @@
+/* Path Selection Specific Styles */
+@import url('global.css');
+
+.large-card {
+    max-width: 900px;
+}
+
+/* Onboarding Step Indicator */
+.onboarding-steps-ps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.ps-step {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-light);
+    padding: 6px 14px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.ps-step.active {
+    color: white;
+    background: var(--primary);
+}
+
+.ps-step.done {
+    color: var(--primary);
+    background: #EEF2FF;
+}
+
+.ps-step-div {
+    height: 1px;
+    width: 28px;
+    background: var(--border);
+    flex-shrink: 0;
+}
+
+/* Path Card Grid */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.grid-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    background: white;
+}
+
+.grid-card:hover {
+    border-color: var(--primary);
+    background: #F8F7FF;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.08);
+}
+
+.grid-card.active {
+    border-color: var(--primary);
+    background: #EEF2FF;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.12);
+}
+
+.grid-card .icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.7);
+    flex-shrink: 0;
+}
+
+.grid-card-content h4 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 2px;
+    color: var(--text-dark);
+}
+
+.grid-card.active .grid-card-content h4 {
+    color: var(--primary);
+}
+
+.grid-card-content p {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+@media (max-width: 640px) {
+    .grid-container {
+        grid-template-columns: 1fr;
+    }
+    .onboarding-steps-ps {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .ps-step-div { display: none; }
+}

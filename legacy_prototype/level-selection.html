@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level Selection - Xyverra</title>
+    <link rel="stylesheet" href="level-selection.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="centered-layout">
+        
+        <div class="brand-header">
+            <div class="brand-icon">
+                <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" />
+            </div>
+            <h1>What do you want to learn?</h1>
+            <p>This helps us build your perfect roadmap</p>
+        </div>
+
+        <div class="card-box large-card">
+            
+            <div class="selection-context">
+                <div id="dynamic-icon-container" style="font-size: 24px;">
+                    <i class="fas fa-globe" style="color: #60A5FA;"></i>
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <span id="dynamic-title">Web Development</span>
+                    <span style="font-size: 14px; font-weight: 400; color: var(--text-muted);">How much do you already know?</span>
+                </div>
+            </div>
+
+            <div class="level-options">
+                <!-- Option 1 -->
+                <div class="level-card active" onclick="this.parentElement.children[1].classList.remove('active'); this.classList.add('active');">
+                    <span class="icon">🌱</span>
+                    <h4>I am a Beginner</h4>
+                    <p>Starting fresh — I have little or no<br>experience in this field</p>
+                    <span class="score-badge">Score: 0–20% · Level: Beginner</span>
+                </div>
+
+                <!-- Option 2 -->
+                <div class="level-card" onclick="this.parentElement.children[0].classList.remove('active'); this.classList.add('active');">
+                    <span class="icon">🚀</span>
+                    <h4>I Already Know Some</h4>
+                    <p>I have existing knowledge — let me show<br>what I know</p>
+                    <span class="score-badge">Score calculated from your skills</span>
+                </div>
+            </div>
+
+            <div class="bottom-actions">
+                <a href="path-selection.html" class="btn btn-outline" style="flex: 0 0 auto; width: auto; padding: 12px 24px;">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+                <a href="skill-input.html" class="btn btn-primary">
+                    Continue <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+        </div>
+    </div>
+    <script src="level-selection.js"></script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress Tracker - Xyverra</title>
+    <link rel="stylesheet" href="progress.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-brain" style="font-size:24px;"></i>
+                Xyverra
+            </div>
+            <nav class="nav-menu">
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-th-large"></i> Dashboard
+                </a>
+                <a href="roadmap.html" class="nav-item">
+                    <i class="fas fa-map"></i> Roadmap
+                </a>
+                <a href="skills.html" class="nav-item">
+                    <i class="fas fa-book-open"></i> Skills
+                </a>
+                <a href="skill-gaps.html" class="nav-item">
+                    <i class="fas fa-compass"></i> Skill Gaps
+                </a>
+                <a href="progress.html" class="nav-item active">
+                    <i class="fas fa-check-circle"></i> Progress Tracker
+                </a>
+            </nav>
+            
+            <div class="user-profile">
+                <div class="profile-info">
+                    <div class="avatar" id="user-avatar">EM</div>
+                    <div class="profile-text">
+                        <h4 id="user-display-name">emmanual macron</h4>
+                        <p>Frontend Developer</p>
+                    </div>
+                </div>
+                <div class="signout">
+                    <i class="fas fa-sign-out-alt"></i> Sign out
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h2>Progress Tracker</h2>
+                <p>A timeline of your learning journey and verified skills.</p>
+            </div>
+
+            <div class="history-card">
+                <div class="history-header">
+                    <i class="fas fa-chart-line" style="color: var(--primary-active);"></i>
+                    Learning History
+                </div>
+                
+                <div class="history-item">
+                    <div class="item-icon success">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="item-details">
+                        <h4>HTML Fundamentals</h4>
+                        <div class="item-meta">
+                            <span><i class="far fa-calendar-alt"></i> Apr 8, 2026</span>
+                            <span style="color: var(--primary-active);"><i class="fas fa-medal"></i> Score: 80%</span>
+                        </div>
+                    </div>
+                    <div class="item-action">
+                        <span class="item-badge completed">Completed</span>
+                    </div>
+                </div>
+
+                <div class="history-item">
+                    <div class="item-icon success">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="item-details">
+                        <h4>CSS & Responsive Design</h4>
+                        <div class="item-meta">
+                            <span><i class="far fa-calendar-alt"></i> Apr 3, 2026</span>
+                            <span style="color: var(--primary-active);"><i class="fas fa-medal"></i> Score: 80%</span>
+                        </div>
+                    </div>
+                    <div class="item-action">
+                        <span class="item-badge completed">Completed</span>
+                    </div>
+                </div>
+
+                <div class="history-item">
+                    <div class="item-icon fail">
+                        <i class="fas fa-times"></i>
+                    </div>
+                    <div class="item-details">
+                        <h4>JavaScript Essentials</h4>
+                        <div class="item-meta">
+                            <span style="color: var(--primary-active);"><i class="fas fa-medal"></i> Score: 20%</span>
+                        </div>
+                    </div>
+                    <div class="item-action">
+                        <span class="item-badge revision">Needs Revision</span>
+                    </div>
+                </div>
+            </div>
+            
+
+        </main>
+    </div>
+    <script src="user.js"></script>
+    <script src="progress.js"></script>
+</body>
+</html>
