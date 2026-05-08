@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="level-selection.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="centered-layout">
@@ -42,15 +42,13 @@
                 <i class="fas fa-globe" style="color: #60A5FA; font-size: 24px;"></i>
                 <div style="display: flex; flex-direction: column;">
                     <span id="selected-path-label">Web Development</span>
-                    <span>Web Development</span>
                     <span style="font-size: 14px; font-weight: 400; color: var(--text-muted);">How much do you already know?</span>
                 </div>
             </div>
 
             <div class="level-options">
                 <!-- Option 1 -->
-                <div class="level-card active" data-level="Beginner">
-                <div class="level-card active" onclick="this.parentElement.children[1].classList.remove('active'); this.classList.add('active');">
+                <div class="level-card active" data-level="Beginner" onclick="this.parentElement.children[1].classList.remove('active'); this.classList.add('active');">
                     <span class="icon">🌱</span>
                     <h4>I am a Beginner</h4>
                     <p>Starting fresh — I have little or no<br>experience in this field</p>
@@ -58,8 +56,7 @@
                 </div>
 
                 <!-- Option 2 -->
-                <div class="level-card" data-level="Advanced">
-                <div class="level-card" onclick="this.parentElement.children[0].classList.remove('active'); this.classList.add('active');">
+                <div class="level-card" data-level="Advanced" onclick="this.parentElement.children[0].classList.remove('active'); this.classList.add('active');">
                     <span class="icon">🚀</span>
                     <h4>I Already Know Some</h4>
                     <p>I have existing knowledge — let me show<br>what I know</p>
@@ -72,7 +69,6 @@
                     <i class="fas fa-arrow-left"></i> Back
                 </a>
                 <a href="skill-input.html" class="btn btn-primary">
-                <a href="progress.html" class="btn btn-primary">
                     Continue <i class="fas fa-arrow-right"></i>
                 </a>
             </div>

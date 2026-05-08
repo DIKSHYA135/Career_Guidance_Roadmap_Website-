@@ -36,7 +36,8 @@
     transition: border-color 0.2s;
 }
 .input-wrapper input:focus {
-    border-color: var(--primary-hover);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 .input-wrapper .eye-icon {
     left: auto;

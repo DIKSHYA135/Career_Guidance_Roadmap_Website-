@@ -203,7 +203,7 @@
     border-radius: 6px;
     object-fit: cover;
 }
-@import url('global.css');
+
 
 .large-card {
     max-width: 600px;

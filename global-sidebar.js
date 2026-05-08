@@ -16,17 +16,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ── Session Restore: Sidebar User Profile ─────────────────────────
-    const userName = localStorage.getItem('xyverra_user_name') || localStorage.getItem('userName');
-    if (userName) {
-        const initials = userName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+    const userName = localStorage.getItem('xyverra_user_name') || 'Guest User';
+    const initials = userName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
-        document.querySelectorAll('#user-display-name').forEach(el => el.textContent = userName);
-        document.querySelectorAll('#user-avatar').forEach(el => el.textContent = initials);
+    document.querySelectorAll('#user-display-name').forEach(el => el.textContent = userName);
+    document.querySelectorAll('#user-avatar').forEach(el => el.textContent = initials);
 
-        // Also update dashboard welcome message if present
-        const welcomeName = document.querySelector('header.dashboard-header p strong');
-        if (welcomeName) welcomeName.textContent = userName;
-    }
+    // Remove static "Frontend Developer" role
+    const roleText = userName === 'Guest User' ? 'Visitor' : 'Learner';
+    document.querySelectorAll('.profile-text p').forEach(el => {
+        el.textContent = roleText;
+    });
+
+    // Also update dashboard welcome message if present
+    const welcomeName = document.querySelector('header.dashboard-header p strong');
+    if (welcomeName) welcomeName.textContent = userName;
+
+    // ── Sign Out Logic ────────────────────────────────────────────────
+    document.querySelectorAll('.signout-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('xyverra_user_name');
+            window.location.href = 'login.html';
+        });
+    });
 
     // ── Set Active Nav Item Dynamically ───────────────────────────────
     const currentPath = window.location.pathname;

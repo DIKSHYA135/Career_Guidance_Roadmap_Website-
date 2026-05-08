@@ -71,10 +71,15 @@ body {
     background-color: var(--card-bg);
     border-radius: var(--card-radius);
     padding: 1.5rem;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
     border: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .metric-header {
@@ -257,7 +262,7 @@ body {
     width: 28px;
     height: 28px;
     border-radius: 6px;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 /* Content Grid (Bottom Row) */
@@ -271,10 +276,14 @@ body {
     background-color: var(--card-bg);
     border-radius: var(--card-radius);
     padding: 1.5rem;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
     border: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
+    transition: box-shadow 0.2s ease;
+}
+.content-card:hover {
+    box-shadow: var(--shadow-sm), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .card-header {
@@ -564,12 +573,14 @@ body {
         display: flex !important;
         align-items: center;
         justify-content: space-between;
+        flex-direction: row-reverse;
         padding: 1rem 1.5rem;
         background: white;
         border-bottom: 1px solid var(--border-color);
         position: sticky;
         top: 0;
         z-index: 999;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
 
     .main-content {

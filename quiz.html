@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="quiz.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="app-layout">
@@ -58,36 +58,20 @@
             
             <div style="flex: 1;"></div>
             <div class="user-profile">
-                <div class="profile-info">
-                    <div class="avatar" id="user-avatar" style="background:#E0E7FF; color:#4F46E5; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:14px;">EM</div>
-                    <div class="profile-text" style="font-size: 14px;">
-                        <h4 id="user-display-name" style="margin:0; color:#1e1e2d;">emmanual macron</h4>
-                        <p style="margin:0; font-size:12px; color:#6b7280;">Frontend Developer</p>
+                <div class="profile-info" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="avatar" id="user-avatar" style="background:#E0E7FF; color:#4F46E5; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:14px;">EM</div>
+                        <div class="profile-text" style="font-size: 14px;">
+                            <h4 id="user-display-name" style="margin:0; color:#1e1e2d;">Emmanual Macron</h4>
+                            <p style="margin:0; font-size:12px; color:#6b7280;">Frontend Developer</p>
+                        </div>
                     </div>
+                    <button class="btn signout-btn" style="background: transparent; border: none; padding: 5px; color: var(--text-muted); cursor: pointer; min-width: auto; box-shadow: none;" title="Sign Out">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
                 </div>
             </div>
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-brand">
-                <i class="fas fa-brain" style="font-size:24px;"></i>
-                Xyverra
-            </div>
-            <nav class="nav-menu">
-                <a href="#" class="nav-item">
-                    <i class="fas fa-th-large"></i> Dashboard
-                </a>
-                <a href="roadmap.html" class="nav-item">
-                    <i class="fas fa-map"></i> Roadmap
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-book-open"></i> Skills
-                </a>
-                <a href="#" class="nav-item active">
-                    <i class="fas fa-check-circle"></i> Progress / Quiz
-                </a>
-            </nav>
         </aside>
-
         <!-- Main Content -->
         <main class="main-content">
             <div class="quiz-container">
@@ -108,11 +92,6 @@
                 </div>
 
                 <div class="quiz-footer">
-                    <p class="warning" id="quiz-status">Read the question carefully. Answer options will unlock shortly.</p>
-                    <button class="btn btn-primary hidden" id="btn-next-question" style="width:auto; padding: 10px 24px;">
-                        Next Question <i class="fas fa-arrow-right"></i>
-                    </button>
-                    <button class="btn btn-outline" id="btn-exit-quiz" style="width:auto; padding: 10px 24px;">Exit Assessment</button>
                     <p id="quiz-status" class="warning">Read the question carefully. Answer options will unlock shortly.</p>
                     <div style="display:flex; gap: 1rem;">
                         <button class="btn btn-outline" id="btn-exit-quiz" style="width: auto; padding: 10px 20px;">Exit Quiz</button>

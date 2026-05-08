@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="roadmap.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="app-layout">
@@ -58,34 +58,8 @@
             
             <div style="flex: 1;"></div>
             <div class="user-profile">
-                <div class="profile-info">
-                    <div class="avatar" id="user-avatar" style="background:#E0E7FF; color:#4F46E5; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:14px;">EM</div>
-                    <div class="profile-text" style="font-size: 14px;">
-                        <h4 id="user-display-name" style="margin:0; color:#1e1e2d;">emmanual macron</h4>
-                        <p style="margin:0; font-size:12px; color:#6b7280;">Frontend Developer</p>
-                    </div>
-                </div>
+                <div class="profile-info" style="display: flex; justify-content: space-between; align-items: center; width: 100%;"><div style="display: flex; align-items: center; gap: 10px;"><div class="avatar" id="user-avatar" style="background:#E0E7FF; color:#4F46E5; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:14px;">EM</div><div class="profile-text" style="font-size: 14px;"><h4 id="user-display-name" style="margin:0; color:#1e1e2d;">Emmanual Macron</h4><p style="margin:0; font-size:12px; color:#6b7280;">Frontend Developer</p></div></div><button class="btn signout-btn" style="background: transparent; border: none; padding: 5px; color: var(--text-muted); cursor: pointer; min-width: auto; box-shadow: none;" title="Sign Out"><i class="fas fa-sign-out-alt"></i></button></div>
             </div>
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-brand">
-                <i class="fas fa-brain" style="font-size:24px;"></i>
-                Xyverra
-            </div>
-            <nav class="nav-menu">
-                <a href="#" class="nav-item">
-                    <i class="fas fa-th-large"></i> Dashboard
-                </a>
-                <a href="#" class="nav-item active">
-                    <i class="fas fa-map"></i> Roadmap &nbsp; >
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-book-open"></i> Skills
-                </a>
-                <a href="progress.html" class="nav-item">
-                    <i class="fas fa-check-circle"></i> Progress Tracker
-                </a>
-            </nav>
         </aside>
 
         <!-- Main Content -->
@@ -107,7 +81,6 @@
                         <div class="timeline-content">
                             <h4>HTML Fundamentals</h4>
                             <p>Master semantic elements, forms, and basic SEO principles.</p>
-                            <p>Understand the structure of web pages and semantic tags.</p>
                             <span class="timeline-pill">Completed</span>
                         </div>
                     </div>
@@ -116,8 +89,6 @@
                         <div class="timeline-content">
                             <h4>CSS & Responsive Design</h4>
                             <p>Flexbox, Grid, and making layouts work on all devices.</p>
-                            <span class="timeline-pill">Current Module</span>
-                            <p>Master layouts, flexbox, grid, and making designs look great.</p>
                             <span class="timeline-pill current">Current Module</span>
                         </div>
                     </div>
@@ -126,26 +97,18 @@
                         <div class="timeline-content">
                             <h4>JavaScript Essentials</h4>
                             <p>Functions, DOM manipulation, and basic application logic.</p>
-                            <p>Learn core programming logic, DOM manipulation, and APIs.</p>
                             <span class="timeline-pill">Locked</span>
                         </div>
                     </div>
 
                     <div class="timeline-item locked">
                         <div class="timeline-content">
-                            <h4>Advanced React</h4>
-                            <p>Hooks, state management, and component patterns.</p>
                             <h4>Frontend Frameworks (React)</h4>
                             <p>Build modern single-page applications efficiently.</p>
                             <span class="timeline-pill">Locked</span>
                         </div>
                     </div>
 
-                    <div class="timeline-item capstone locked">
-                        <div class="timeline-content">
-                            <h4>Capstone Project</h4>
-                            <p>Building a full-scale portfolio application.</p>
-                            <span class="timeline-pill">Final Step</span>
                     <div class="timeline-item locked capstone">
                         <div class="timeline-content">
                             <h4>Capstone Project</h4>
@@ -159,9 +122,6 @@
     </div>
 
     <script src="global-sidebar.js"></script>
-            
-        </main>
-    </div>
-
 </body>
 </html>
+
