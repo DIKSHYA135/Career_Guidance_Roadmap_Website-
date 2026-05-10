@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Knowledge assessment quiz for your current learning module on Xyverra.">
     <title>Quiz Assessment - Xyverra</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="quiz.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -19,7 +20,7 @@
                 <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" class="sidebar-logo">
                 Xyverra
             </div>
-            <button id="sidebar-toggle-btn" class="btn" style="padding: 5px; background: transparent;">
+            <button id="sidebar-toggle-btn" class="btn" style="padding: 5px; background: transparent;" aria-label="Toggle sidebar">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
         </div>
@@ -47,7 +48,7 @@
                     Skill Gap Analysis
                 </a>
                 <a href="skill-input.html" class="nav-item nav-skill-input">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                     Create Roadmap
                 </a>
                 <a href="progress.html" class="nav-item nav-progress">
@@ -55,54 +56,88 @@
                     Progress
                 </a>
             </nav>
-            
+
             <div style="flex: 1;"></div>
             <div class="user-profile">
                 <div class="profile-info" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <div class="avatar" id="user-avatar" style="background:#E0E7FF; color:#4F46E5; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:14px;">EM</div>
-                        <div class="profile-text" style="font-size: 14px;">
-                            <h4 id="user-display-name" style="margin:0; color:#1e1e2d;">Emmanual Macron</h4>
-                            <p style="margin:0; font-size:12px; color:#6b7280;">Frontend Developer</p>
+                        <div class="avatar" id="user-avatar">U</div>
+                        <div class="profile-text">
+                            <h4 id="user-display-name">User</h4>
+                            <p id="user-role">Learner</p>
                         </div>
                     </div>
-                    <button class="btn signout-btn" style="background: transparent; border: none; padding: 5px; color: var(--text-muted); cursor: pointer; min-width: auto; box-shadow: none;" title="Sign Out">
+                    <button class="btn signout-btn" id="signout-btn" style="background: transparent; border: none; padding: 5px; color: var(--text-muted); cursor: pointer; min-width: auto; box-shadow: none;" title="Sign Out">
                         <i class="fas fa-sign-out-alt"></i>
                     </button>
                 </div>
             </div>
         </aside>
+
         <!-- Main Content -->
         <main class="main-content">
             <div class="quiz-container">
+
+                <!-- Quiz Header -->
                 <div class="quiz-header">
-                    <h2>Module Assessment</h2>
-                    <div class="timer" id="quiz-timer">
-                        <i class="fas fa-stopwatch"></i>
-                        <span id="timer-text">20s Reading Time</span>
-                    </div>
+                    <a href="roadmap.html" class="quiz-back-link">
+                        <i class="fas fa-arrow-left"></i> Back to Roadmap
+                    </a>
+                    <h1 id="quiz-module-title">Module Assessment</h1>
+                    <p>Answer correctly (70%+) to mark this module as completed on your roadmap.</p>
                 </div>
-                
-                <div class="quiz-body">
-                    <h3 id="quiz-question">What is the primary purpose of semantic HTML tags?</h3>
-                    
-                    <div class="quiz-options disabled" id="quiz-options-container">
-                        <!-- Populated by JS -->
+
+                <!-- Quiz Card -->
+                <div class="quiz-card" id="quiz-card">
+
+                    <!-- Timer Progress Bar (top edge) -->
+                    <div class="timer-container">
+                        <div class="timer-bar" id="quiz-timer" style="width: 100%;"></div>
+                    </div>
+
+                    <!-- Question Meta Row -->
+                    <div class="question-meta">
+                        <span id="question-meta-text">Question 1 of 1</span>
+                        <span id="timer-text" class="timer-badge">20s Reading Time</span>
+                    </div>
+
+                    <!-- Question & Options (quiz body) -->
+                    <div id="quiz-body">
+                        <h3 class="question-text" id="quiz-question">Loading question...</h3>
+
+                        <div class="options-grid disabled" id="quiz-options-container">
+                            <!-- Populated dynamically by quiz.js -->
+                        </div>
+                    </div>
+
+                    <!-- Result Screen (hidden initially) -->
+                    <div class="result-container" id="quiz-result-container" style="display: none;">
+                        <div class="result-icon success" id="result-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="score-display" id="score-display">0%</div>
+                        <div class="score-text" id="score-text">Results loading...</div>
+                    </div>
+
+                    <!-- Footer with status & buttons -->
+                    <div class="quiz-footer">
+                        <p id="quiz-status" class="quiz-status warning">Read the question carefully. Options will unlock shortly.</p>
+                        <div class="quiz-footer-actions">
+                            <button class="btn btn-outline" id="btn-exit-quiz">
+                                <i class="fas fa-times"></i> Exit Quiz
+                            </button>
+                            <button class="btn btn-primary" id="btn-next-question" style="display: none;">
+                                Next Question <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <div class="quiz-footer">
-                    <p id="quiz-status" class="warning">Read the question carefully. Answer options will unlock shortly.</p>
-                    <div style="display:flex; gap: 1rem;">
-                        <button class="btn btn-outline" id="btn-exit-quiz" style="width: auto; padding: 10px 20px;">Exit Quiz</button>
-                        <button class="btn btn-primary" id="btn-next-question" style="display: none; width: auto; padding: 10px 20px;">Next Question</button>
-                    </div>
-                </div>
             </div>
         </main>
     </div>
 
-    <script src="quiz.js"></script>
     <script src="global-sidebar.js"></script>
+    <script src="quiz.js"></script>
 </body>
 </html>

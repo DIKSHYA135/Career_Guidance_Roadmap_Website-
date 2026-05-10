@@ -1,152 +1,179 @@
-/* Level Selection Specific Styles */
+/* =====================================================
+   LEVEL SELECTION PAGE — Xyverra
+   ===================================================== */
 @import url('global.css');
 
+/* Wider card */
 .large-card {
-    max-width: 800px;
+    max-width: 640px;
+    width: 100%;
 }
 
-/* Onboarding Step Indicator */
+/* ── Progress Steps ── */
 .onboarding-steps {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 0;
+    gap: 6px;
     margin-bottom: 2rem;
+    flex-wrap: wrap;
 }
-
 .step {
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 600;
-    color: var(--text-light);
-    padding: 6px 14px;
-    border-radius: 20px;
+    color: var(--text-muted);
+    padding: 5px 14px;
+    border-radius: 999px;
+    background: var(--bg-light);
+    border: 1.5px solid var(--border);
     white-space: nowrap;
+    transition: all 0.2s;
 }
-
-.step.done {
-    color: var(--primary);
-    background: #EEF2FF;
-}
-
 .step.active {
-    color: white;
-    background: var(--primary);
+    color: var(--primary);
+    background: rgba(99, 102, 241, 0.08);
+    border-color: rgba(99, 102, 241, 0.35);
 }
-
+.step.done {
+    color: var(--success);
+    background: rgba(16, 185, 129, 0.06);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+.step.done i {
+    margin-right: 4px;
+    font-size: 0.7rem;
+}
 .step-divider {
-    height: 1px;
-    width: 32px;
+    flex: 1;
+    min-width: 16px;
+    height: 1.5px;
     background: var(--border);
-    flex-shrink: 0;
 }
 
-/* Path context label */
+/* ── Context bar (shows selected path) ── */
 .selection-context {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-    font-weight: 600;
-    font-size: 18px;
-    padding: 12px 16px;
-    background: #F8FAFC;
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    gap: 0.85rem;
+    padding: 0.9rem 1.1rem;
+    background: rgba(96, 165, 250, 0.07);
+    border: 1.5px solid rgba(96, 165, 250, 0.2);
+    border-radius: 14px;
+    margin-bottom: 1.75rem;
+}
+.context-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+#selected-path-label {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+.context-sub {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
 }
 
-/* Level Option Cards */
-
+/* ── Level option cards ── */
 .level-options {
     display: flex;
-    gap: 1.5rem;
+    flex-direction: column;
+    gap: 1rem;
     margin-bottom: 2rem;
 }
 
 .level-card {
-    flex: 1;
-    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.4rem;
     border-radius: 16px;
-    padding: 2.5rem 1.5rem;
-    text-align: center;
+    border: 1.5px solid var(--border);
+    background: rgba(255, 255, 255, 0.6);
     cursor: pointer;
-    transition: all 0.2s ease;
-    background: white;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
 }
-
 .level-card:hover {
-    border-color: var(--primary);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(79, 70, 229, 0.1);
+    border-color: rgba(99, 102, 241, 0.4);
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateX(4px);
+    box-shadow: var(--shadow-md);
 }
-
 .level-card.active {
     border-color: var(--primary);
-    background: #EEF2FF;
-    box-shadow: 0 8px 24px rgba(79, 70, 229, 0.12);
+    background: rgba(99, 102, 241, 0.05);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
-
-.level-card .icon {
-    font-size: 44px;
-    margin-bottom: 1rem;
-    display: inline-block;
-}
-
-.level-card h4 {
-    font-size: 18px;
-    margin-bottom: 10px;
-    color: var(--text-dark);
-}
-
-.level-card.active h4 {
+.level-card.active::after {
+    content: '\f058';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    top: 14px;
+    right: 14px;
     color: var(--primary);
+    font-size: 1rem;
 }
 
+.level-card-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+.level-emoji {
+    font-size: 2rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+.level-card h4 {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 3px;
+}
 .level-card p {
-    font-size: 14px;
+    font-size: 0.8125rem;
     color: var(--text-muted);
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
+    line-height: 1.45;
 }
 
 .score-badge {
-    display: inline-block;
-    background-color: var(--bg-light);
-    color: var(--text-muted);
-    font-size: 12px;
-    font-weight: 500;
-    padding: 6px 16px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-}
-
-.level-card.active .score-badge {
-    background: white;
-    border-color: var(--primary);
+    font-size: 0.72rem;
+    font-weight: 600;
     color: var(--primary);
+    background: rgba(99, 102, 241, 0.08);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    padding: 4px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
-/* Bottom Actions */
+/* ── Bottom navigation ── */
 .bottom-actions {
     display: flex;
-    gap: 1rem;
+    gap: 0.85rem;
+    align-items: center;
+}
+.back-btn {
+    flex: 0 0 auto;
+    width: auto;
+    padding: 12px 22px;
 }
 
-.bottom-actions .btn {
-    flex: 1;
-}
-
-@media (max-width: 768px) {
-    .level-options {
+@media (max-width: 560px) {
+    .level-card {
         flex-direction: column;
+        align-items: flex-start;
     }
-    .bottom-actions {
-        flex-direction: column;
+    .score-badge {
+        align-self: flex-start;
     }
-    .onboarding-steps {
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-    .step-divider {
-        display: none;
+    .level-card.active::after {
+        top: 12px;
+        right: 12px;
     }
 }

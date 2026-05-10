@@ -66,62 +66,24 @@
         <main class="main-content">
             <div class="page-header" style="display:flex; justify-content:space-between; align-items:center;">
                 <div>
-                    <h2>Your Learning Path</h2>
+                    <h2 id="roadmap-header-title">Your Learning Path</h2>
                     <p>Follow the points below from beginning to end to progress towards job-readiness.</p>
                 </div>
-                <a href="quiz.html" class="btn btn-primary" style="width:auto; padding: 10px 20px;">
+                <a href="quiz.html" id="top-quiz-btn" class="btn btn-primary" style="width:auto; padding: 10px 20px; display: none;">
                     Take Module Quiz <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
 
             <div class="roadmap-wrapper card-box">
                 <div class="roadmap-timeline" id="roadmap-timeline">
-                    <!-- Nodes -->
-                    <div class="timeline-item completed">
-                        <div class="timeline-content">
-                            <h4>HTML Fundamentals</h4>
-                            <p>Master semantic elements, forms, and basic SEO principles.</p>
-                            <span class="timeline-pill">Completed</span>
-                        </div>
-                    </div>
-
-                    <div class="timeline-item active">
-                        <div class="timeline-content">
-                            <h4>CSS & Responsive Design</h4>
-                            <p>Flexbox, Grid, and making layouts work on all devices.</p>
-                            <span class="timeline-pill current">Current Module</span>
-                        </div>
-                    </div>
-
-                    <div class="timeline-item locked">
-                        <div class="timeline-content">
-                            <h4>JavaScript Essentials</h4>
-                            <p>Functions, DOM manipulation, and basic application logic.</p>
-                            <span class="timeline-pill">Locked</span>
-                        </div>
-                    </div>
-
-                    <div class="timeline-item locked">
-                        <div class="timeline-content">
-                            <h4>Frontend Frameworks (React)</h4>
-                            <p>Build modern single-page applications efficiently.</p>
-                            <span class="timeline-pill">Locked</span>
-                        </div>
-                    </div>
-
-                    <div class="timeline-item locked capstone">
-                        <div class="timeline-content">
-                            <h4>Capstone Project</h4>
-                            <p>Build an end-to-end project to prove job readiness.</p>
-                            <span class="timeline-pill">Requires 90% completion</span>
-                        </div>
-                    </div>
+                    <!-- Nodes will be dynamically populated here by roadmap.js -->
                 </div>
             </div>
         </main>
     </div>
 
-    <script src="global-sidebar.js"></script>
+    <script src="app-data.js"></script>`n    <script src="global-sidebar.js"></script>
+    <script src="roadmap.js"></script>
 </body>
 </html>
 
