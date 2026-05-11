@@ -100,8 +100,8 @@
 
 .history-card { background: var(--glass-bg); backdrop-filter: blur(16px); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow-md); border: 1px solid var(--glass-border); }
 .history-header { font-size: 1.25rem; font-weight: 800; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-dark); }
-.history-item { display: flex; align-items: center; gap: 1rem; padding: 1.25rem; border-radius: 16px; background: rgba(255,255,255,0.6); margin-bottom: 1rem; transition: transform 0.2s; border: 1px solid transparent; }
-.history-item:hover { transform: translateX(5px); background: var(--white); border-color: var(--border); box-shadow: var(--shadow-sm); }
+.history-item { display: flex; align-items: center; gap: 1rem; padding: 1.25rem; border-radius: 16px; background: rgba(255,255,255,0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.6); margin-bottom: 1rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.history-item:hover { transform: translateX(5px); background: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.9); box-shadow: var(--shadow-sm); }
 .item-icon.success { width: 40px; height: 40px; border-radius: 50%; background: rgba(16,185,129,0.1); color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
 .item-details h4 { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.25rem; }
 .item-meta { display: flex; gap: 1rem; font-size: 0.85rem; color: var(--text-muted); }

@@ -1,6 +1,19 @@
 // Signup JS
 document.addEventListener("DOMContentLoaded", () => {
-    const form = document.getElementById('auth-form');
+    // ── Password visibility toggle ──
+    const toggleBtn = document.getElementById('toggle-password');
+    const passwordInput = document.getElementById('signup-password');
+    if (toggleBtn && passwordInput) {
+        toggleBtn.addEventListener('click', () => {
+            const isText = passwordInput.type === 'text';
+            passwordInput.type = isText ? 'password' : 'text';
+            toggleBtn.className = isText
+                ? 'far fa-eye eye-icon'
+                : 'far fa-eye-slash eye-icon';
+        });
+    }
+
+    const form = document.getElementById('signup-form');
     if (form) {
         form.addEventListener('submit', (e) => {
             e.preventDefault();

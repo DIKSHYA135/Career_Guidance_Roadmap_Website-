@@ -15,6 +15,7 @@
     margin-bottom: 0.35rem;
     background: linear-gradient(135deg, var(--text-dark), var(--primary));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 .page-header p {
@@ -28,7 +29,7 @@
 }
 .roadmap-container { max-width: 900px; margin: 0 auto; padding: 2rem; position: relative; }
 .roadmap-header { text-align: center; margin-bottom: 4rem; animation: fadeInDown 0.8s ease-out; }
-.roadmap-header h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem; background: linear-gradient(135deg, var(--text-dark), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.roadmap-header h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem; background: linear-gradient(135deg, var(--text-dark), var(--primary)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 .roadmap-header p { color: var(--text-muted); font-size: 1.1rem; }
 
 .timeline-container { position: relative; display: flex; flex-direction: column; gap: 2rem; padding: 1rem 0; }
@@ -97,9 +98,9 @@
 #roadmap-timeline {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 1.5rem;
     position: relative;
-    padding: 1rem 0;
+    padding: 1.5rem 0;
 }
 
 /* Vertical connecting line */
@@ -108,20 +109,21 @@
     position: absolute;
     top: 0; bottom: 0;
     left: 28px;
-    width: 3px;
-    background: linear-gradient(to bottom, var(--primary), rgba(99,102,241,0.1));
+    width: 4px;
+    background: linear-gradient(to bottom, var(--primary), rgba(99,102,241,0.05));
     border-radius: 4px;
     z-index: 0;
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
 }
 
 /* Each roadmap step card */
 .timeline-item {
     display: flex;
     align-items: flex-start;
-    gap: 1.25rem;
+    gap: 1.5rem;
     position: relative;
     z-index: 1;
-    animation: fadeInUp 0.5s ease-out forwards;
+    animation: fadeInUp 0.6s ease-out forwards;
     opacity: 0;
 }
 .timeline-item:nth-child(1) { animation-delay: 0.05s; }
@@ -133,71 +135,90 @@
 /* Circle node on the left */
 .timeline-item::before {
     content: '';
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     background: var(--white);
-    border: 3px solid var(--border);
+    border: 4px solid var(--border);
     flex-shrink: 0;
-    margin-top: 1.1rem;
+    margin-top: 1.25rem;
     box-shadow: var(--shadow-sm);
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     z-index: 2;
 }
 .timeline-item.active::before {
     background: var(--primary);
     border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(99,102,241,0.2);
+    box-shadow: 0 0 0 5px rgba(99,102,241,0.2), 0 0 20px rgba(99, 102, 241, 0.6);
+    animation: pulseGlow 2s infinite;
 }
 .timeline-item.completed::before {
     background: var(--success);
     border-color: var(--success);
-    box-shadow: 0 0 0 4px rgba(16,185,129,0.15);
+    box-shadow: 0 0 0 4px rgba(16,185,129,0.15), 0 0 15px rgba(16, 185, 129, 0.4);
 }
 .timeline-item.locked::before {
-    background: var(--bg-light);
+    background: var(--bg-main);
     border-color: var(--border);
 }
 
 /* Content bubble */
 .timeline-content {
     flex: 1;
-    background: var(--glass-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border: 1px solid var(--glass-border);
-    border-radius: 18px;
-    padding: 1.5rem 1.75rem;
+    border-radius: 20px;
+    padding: 1.75rem 2rem;
     box-shadow: var(--shadow-md);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    overflow: hidden;
 }
+.timeline-content::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+}
+.timeline-content > * { position: relative; z-index: 1; }
+
 .timeline-content:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lg), var(--shadow-glow);
+    transform: translateX(8px) translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), var(--shadow-glow);
+    background: rgba(255, 255, 255, 0.85);
 }
 .timeline-item.active .timeline-content {
-    border-color: rgba(99,102,241,0.25);
-    background: rgba(255,255,255,0.9);
+    border: 1.5px solid rgba(99,102,241,0.3);
+    background: rgba(255,255,255,0.95);
+    box-shadow: 0 10px 25px rgba(99,102,241,0.15);
 }
 .timeline-item.completed .timeline-content {
-    border-color: rgba(16,185,129,0.2);
-    background: rgba(240,253,249,0.8);
+    border: 1.5px solid rgba(16,185,129,0.25);
+    background: rgba(240,253,249,0.9);
 }
 .timeline-item.locked .timeline-content {
-    opacity: 0.65;
+    opacity: 0.6;
+    background: rgba(255, 255, 255, 0.4);
+}
+.timeline-item.locked .timeline-content:hover {
+    transform: none;
+    box-shadow: var(--shadow-md);
 }
 
 .timeline-content h4 {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: 800;
     color: var(--text-dark);
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.5rem;
 }
 .timeline-content > p {
     color: var(--text-muted);
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     line-height: 1.6;
     margin-bottom: 0;
 }
@@ -206,58 +227,66 @@
 .timeline-pill {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    margin-top: 1rem;
-    padding: 4px 12px;
+    gap: 6px;
+    margin-top: 1.25rem;
+    padding: 6px 14px;
     border-radius: 999px;
-    font-size: 0.72rem;
-    font-weight: 700;
+    font-size: 0.75rem;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     background: rgba(148,163,184,0.1);
     color: var(--text-muted);
     border: 1px solid var(--border);
+    transition: all 0.2s;
 }
 .timeline-pill.current {
-    background: rgba(99,102,241,0.1);
+    background: rgba(99,102,241,0.12);
     color: var(--primary);
-    border-color: rgba(99,102,241,0.25);
+    border-color: rgba(99,102,241,0.3);
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
 }
 .timeline-item.completed .timeline-pill {
-    background: rgba(16,185,129,0.1);
+    background: rgba(16,185,129,0.12);
     color: var(--success);
-    border-color: rgba(16,185,129,0.25);
+    border-color: rgba(16,185,129,0.3);
 }
 
 /* Course suggestions block */
 .course-suggestions {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border);
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px dashed var(--border);
 }
 .course-suggestions strong {
-    font-size: 0.8rem;
-    font-weight: 700;
+    font-size: 0.82rem;
+    font-weight: 800;
     color: var(--text-dark);
     text-transform: uppercase;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.04em;
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
 }
 .course-suggestions ul {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.5rem;
 }
 .course-suggestions li {
-    font-size: 0.875rem;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
 }
 .course-suggestions a {
     color: var(--primary);
     font-weight: 600;
-    transition: opacity 0.2s;
+    transition: all 0.2s;
+    text-decoration: none;
 }
-.course-suggestions a:hover { opacity: 0.75; text-decoration: underline; }
+.course-suggestions a:hover { 
+    color: var(--primary-active);
+    transform: translateX(3px);
+}
 
 @media (max-width: 640px) {
     #roadmap-timeline::before { left: 18px; }

@@ -39,7 +39,7 @@
 }
 .input-wrapper input {
     width: 100%;
-    padding: 13px 1rem 13px 2.85rem;
+    padding: 13px 2.5rem 13px 2.85rem;
     background: var(--bg-light);
     border: 1.5px solid var(--border);
     border-radius: 12px;

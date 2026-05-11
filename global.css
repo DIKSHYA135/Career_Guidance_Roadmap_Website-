@@ -98,6 +98,7 @@ a { text-decoration: none; color: inherit; transition: color 0.2s; }
     margin-bottom: 0.5rem;
     background: linear-gradient(135deg, var(--text-dark), var(--primary));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 .brand-header p {
