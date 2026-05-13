@@ -107,6 +107,10 @@ document.addEventListener("DOMContentLoaded", () => {
     _setText('.stat-item:nth-child(4) .stat-value', completedCount);
     _setText('.stat-item:nth-child(5) .stat-value', `${completedCount}/${totalSteps}`);
 
+    // Update streak dynamically
+    const streak = localStorage.getItem('xyverra_user_streak') || '0';
+    _setText('.stat-item:nth-child(2) .badge', `${streak} Days`);
+
     // ── Helper functions ────────────────────────────────────
     function _setText(selector, text) {
         const el = document.querySelector(selector);

@@ -43,9 +43,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const summaryValues = document.querySelectorAll('.summary-value');
     if (summaryValues.length >= 4) {
         summaryValues[0].textContent = `${completedStepsCount} / ${totalSteps}`;
-        // summaryValues[1] is Current Streak
+        // Streak
+        const streak = localStorage.getItem('xyverra_user_streak') || '0';
+        summaryValues[1].textContent = `${streak} Days`;
         summaryValues[2].textContent = `${skillScore} / 100`;
-        summaryValues[3].textContent = `${skillScore}%`;
+        let skillLevel = "Beginner";
+        if (skillScore >= 20 && skillScore < 40) skillLevel = "Intermediate";
+        else if (skillScore >= 40 && skillScore < 60) skillLevel = "Advanced";
+        else if (skillScore >= 60 && skillScore < 80) skillLevel = "Professional";
+        else if (skillScore >= 80) skillLevel = "Capstone";
+        summaryValues[3].textContent = skillLevel;
     }
 
     // Progress Bar

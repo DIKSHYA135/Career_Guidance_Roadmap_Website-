@@ -451,7 +451,8 @@ document.addEventListener("DOMContentLoaded", () => {
         quizOptionsCont.classList.add('disabled');
 
         // Render option buttons (hidden during reading)
-        q.opts.forEach((opt, i) => {
+        const optionsToRender = q.opts || [];
+        optionsToRender.forEach((opt, i) => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
             btn.id = `option-${i}`;
@@ -464,29 +465,29 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         // Status: reading phase
-        quizStatus.textContent = 'Read the question carefully. Options will unlock in 20 seconds.';
+        quizStatus.textContent = 'Read the question carefully. Options will unlock in 10 seconds.';
         quizStatus.className = 'quiz-status warning';
 
-        // Timer: 20s reading, then 30s answering
-        timeLeft = 20;
-        updateTimerBar(timeLeft, 20, timerBar);
+        // Timer: 10s reading, then 5s answering
+        timeLeft = 10;
+        updateTimerBar(timeLeft, 10, timerBar);
         timerText.textContent = `${timeLeft}s Reading Time`;
 
         quizTimerInterval = setInterval(() => {
             timeLeft--;
-            updateTimerBar(timeLeft, quizPhase === 'read' ? 20 : 30, timerBar);
+            updateTimerBar(timeLeft, quizPhase === 'read' ? 10 : 5, timerBar);
 
             if (quizPhase === 'read') {
                 timerText.textContent = `${timeLeft}s Reading Time`;
                 if (timeLeft <= 0) {
                     // Switch to answer phase
                     quizPhase = 'answer';
-                    timeLeft = 30;
+                    timeLeft = 5;
                     quizOptionsCont.classList.remove('disabled');
                     quizStatus.textContent = 'Select your answer!';
                     quizStatus.className = 'quiz-status info';
                     timerText.textContent = `${timeLeft}s to Answer`;
-                    updateTimerBar(timeLeft, 30, timerBar);
+                    updateTimerBar(timeLeft, 5, timerBar);
                 }
             } else {
                 timerText.textContent = `${timeLeft}s to Answer`;
@@ -495,11 +496,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     clearInterval(quizTimerInterval);
                     quizOptionsCont.classList.add('disabled');
                     // Highlight correct answer
-                    q.opts.forEach((opt, i) => {
-                        if (opt.correct) {
-                            document.getElementById(`option-${i}`).classList.add('correct');
-                        }
-                    });
+                    if (q.opts) {
+                        q.opts.forEach((opt, i) => {
+                            if (opt.correct) {
+                                const btn = document.getElementById(`option-${i}`);
+                                if (btn) btn.classList.add('correct');
+                            }
+                        });
+                    }
                     quizStatus.textContent = "⏰ Time's up! The correct answer is highlighted.";
                     quizStatus.className = 'quiz-status error';
                     timerText.textContent = 'Time Up!';
@@ -530,11 +534,14 @@ document.addEventListener("DOMContentLoaded", () => {
             quizStatus.textContent = '❌ Incorrect. The correct answer is highlighted.';
             quizStatus.className = 'quiz-status error';
             // Highlight correct
-            opts.forEach((opt, i) => {
-                if (opt.correct) {
-                    document.getElementById(`option-${i}`).classList.add('correct');
-                }
-            });
+            if (opts) {
+                opts.forEach((opt, i) => {
+                    if (opt.correct) {
+                        const btn = document.getElementById(`option-${i}`);
+                        if (btn) btn.classList.add('correct');
+                    }
+                });
+            }
         }
 
         timerText.textContent = 'Answered';
