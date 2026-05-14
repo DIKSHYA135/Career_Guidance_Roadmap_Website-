@@ -1,178 +1,161 @@
+/* ==========================================================
+   skills.js — Skill Inventory (fully path-driven)
+   TODO: Replace PATH_SKILLS lookup with GET /api/skills/:path
+   ========================================================== */
+
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // Initial Mock Data Structure following the exact required schema
-    const defaultSkills = [
-        { name: 'HTML', category: 'Web Fundamentals', level: 'advanced', description: 'Semantic structure and accessibility best practices.', verified: true, proficiency: 95 },
-        { name: 'CSS', category: 'Web Fundamentals', level: 'advanced', description: 'Layouts, animations, and responsive design systems.', verified: true, proficiency: 90 },
-        { name: 'JavaScript', category: 'Programming', level: 'intermediate', description: 'ES6+ features, asynchronous programming, and DOM manipulation.', verified: false, proficiency: 65 },
-        { name: 'React', category: 'Frontend', level: 'intermediate', description: 'Component-based architecture, hooks, and state management.', verified: false, proficiency: 60 },
-        { name: 'Node.js', category: 'Backend', level: 'beginner', description: 'Server-side JavaScript environment and basic API development.', verified: false, proficiency: 25 },
-        { name: 'Git', category: 'Tools', level: 'advanced', description: 'Version control, branching strategies, and collaboration.', verified: true, proficiency: 85 }
-    ];
 
-    // Load from localStorage or use defaults
-    let skillsData = [];
-    const storedSkills = localStorage.getItem('skills');
-    
-    if (storedSkills) {
-        try {
-            skillsData = JSON.parse(storedSkills);
-        } catch (e) {
-            console.error("Error parsing skills from localStorage", e);
-            skillsData = defaultSkills;
-        }
-    } else {
-        skillsData = defaultSkills;
-        // Optionally store the default data to simulate a populated state
-        localStorage.setItem('skills', JSON.stringify(skillsData));
+    // ── 1. Read selected career path ──────────────────────
+    // TODO: GET /api/user/me → { selectedPath }
+    const selectedPath = localStorage.getItem('xyverra_selected_path') || 'Web Development';
+
+    // Get path skills from the global PATH_SKILLS (loaded from app-data.js)
+    const pathSkills = (typeof PATH_SKILLS !== 'undefined' && PATH_SKILLS[selectedPath])
+        ? PATH_SKILLS[selectedPath]
+        : PATH_SKILLS['Web Development'];
+
+    // Merge with any user-overridden proficiency/verified data from localStorage
+    // TODO: GET /api/user/skills → [{ name, proficiency, verified }]
+    let userOverrides = {};
+    try {
+        const raw = localStorage.getItem('user_skill_overrides');
+        if (raw) userOverrides = JSON.parse(raw);
+    } catch { /* ignore */ }
+
+    let skillsData = pathSkills.map(skill => ({
+        ...skill,
+        proficiency: userOverrides[skill.name]?.proficiency ?? skill.proficiency,
+        verified:    userOverrides[skill.name]?.verified    ?? skill.verified,
+        level:       userOverrides[skill.name]?.level       ?? skill.level,
+    }));
+
+    // ── 2. UI Elements ────────────────────────────────────
+    const skillsContainer    = document.getElementById('skills-container');
+    const filterChips        = document.getElementById('filter-chips');
+    const searchInput        = document.getElementById('skill-search');
+    const totalSkillsEl      = document.getElementById('total-skills-count');
+    const verifiedSkillsEl   = document.getElementById('verified-skills-count');
+    const avgProficiencyEl   = document.getElementById('avg-proficiency');
+    const pathTitleEl        = document.getElementById('skills-path-title');
+
+    if (!skillsContainer) return;
+
+    // Show selected path name in header
+    if (pathTitleEl) pathTitleEl.textContent = selectedPath;
+
+    // ── 3. Build dynamic filter chips from categories ─────
+    if (filterChips) {
+        const cats = [...new Set(skillsData.map(s => s.category))];
+        filterChips.innerHTML = `<button class="chip active" data-filter="All">All</button>`;
+        cats.forEach(cat => {
+            filterChips.innerHTML += `<button class="chip" data-filter="${cat}">${cat}</button>`;
+        });
+        filterChips.addEventListener('click', e => {
+            const chip = e.target.closest('.chip');
+            if (!chip) return;
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            currentFilter = chip.dataset.filter;
+            renderSkills();
+        });
     }
 
-    const skillsContainer = document.getElementById('skills-container');
-    
-    // Error handling if container is not found
-    if (!skillsContainer) {
-        console.error("Error: Element with id 'skills-container' not found.");
-        return;
+    if (searchInput) {
+        searchInput.addEventListener('input', e => {
+            searchQuery = e.target.value.toLowerCase();
+            renderSkills();
+        });
     }
-
-    // Optional UI elements for extended functionality
-    const filterChipsContainer = document.getElementById('filter-chips');
-    const searchInput = document.getElementById('skill-search');
-    const totalSkillsEl = document.getElementById('total-skills-count');
-    const verifiedSkillsEl = document.getElementById('verified-skills-count');
 
     let currentFilter = 'All';
-    let searchQuery = '';
+    let searchQuery   = '';
 
-    // Function to calculate and update stats
+    // ── 4. Stats ──────────────────────────────────────────
     function updateStats() {
-        if (!totalSkillsEl || !verifiedSkillsEl) return;
-        const verifiedSkills = skillsData.filter(s => s.verified);
-        totalSkillsEl.textContent = skillsData.length;
-        verifiedSkillsEl.textContent = verifiedSkills.length;
+        const verified  = skillsData.filter(s => s.verified).length;
+        const avgProf   = skillsData.length
+            ? Math.round(skillsData.reduce((sum, s) => sum + (s.proficiency || 0), 0) / skillsData.length)
+            : 0;
+        if (totalSkillsEl)    totalSkillsEl.textContent    = skillsData.length;
+        if (verifiedSkillsEl) verifiedSkillsEl.textContent = verified;
+        if (avgProficiencyEl) avgProficiencyEl.textContent = `${avgProf}%`;
     }
 
-    // Function to render skills to the grid
+    // ── 5. Render ─────────────────────────────────────────
     function renderSkills() {
-        skillsContainer.innerHTML = '';
-
-        // Filter logic
-        let filteredSkills = skillsData.filter(skill => {
-            // Match category
-            let matchesFilter = false;
-            if (currentFilter === 'All') {
-                matchesFilter = true;
-            } else {
-                matchesFilter = (skill.category === currentFilter);
-            }
-
-            // Match search
-            const matchesSearch = skill.name.toLowerCase().includes(searchQuery.toLowerCase());
-
-            return matchesFilter && matchesSearch;
+        const filtered = skillsData.filter(skill => {
+            const matchCat    = currentFilter === 'All' || skill.category === currentFilter;
+            const matchSearch = skill.name.toLowerCase().includes(searchQuery)
+                             || skill.category.toLowerCase().includes(searchQuery);
+            return matchCat && matchSearch;
         });
 
-        // Generate DOM
-        filteredSkills.forEach(skill => {
-            const card = document.createElement('div');
-            // CSS dynamic classes based on level
-            const levelClass = skill.level.toLowerCase(); // 'beginner', 'intermediate', 'advanced'
-            card.className = `skill-card ${levelClass}`;
+        if (filtered.length === 0) {
+            skillsContainer.innerHTML = `
+                <div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-muted);">
+                    <i class="fas fa-search" style="font-size:2rem;margin-bottom:1rem;display:block;opacity:0.4;"></i>
+                    No skills match your search.
+                </div>`;
+            return;
+        }
 
-            // Icons
-            const verifiedIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
-            const btnIconLevelUp = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>`;
-            const btnIconMax = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+        skillsContainer.innerHTML = '';
+        filtered.forEach(skill => {
+            const lvl   = skill.level?.toLowerCase() || 'beginner';
+            const prof  = skill.proficiency || 0;
+            const card  = document.createElement('div');
+            card.className = `skill-card ${lvl}`;
 
-            // Determine button state
-            let btnHtml = '';
-            if (skill.level.toLowerCase() === 'advanced') {
-                btnHtml = `<button class="action-btn">${btnIconMax} Max Level</button>`;
-            } else {
-                btnHtml = `<button class="action-btn">${btnIconLevelUp} Level Up</button>`;
-            }
-
-            // Fallback for missing properties based on schema
-            const proficiency = skill.proficiency || 0;
-            const isVerified = skill.verified === true;
-            const category = skill.category || 'Other';
+            const badgeMap = { beginner: 'badge-beginner', intermediate: 'badge-intermediate', advanced: 'badge-advanced' };
 
             card.innerHTML = `
                 <div class="skill-header">
                     <div class="title-group">
                         <h3 class="skill-title">${skill.name}</h3>
-                        <span class="skill-category">${category}</span>
+                        <span class="skill-category">${skill.category}</span>
                     </div>
                     <div class="badge-container">
-                        <span class="badge badge-${levelClass}">${skill.level}</span>
-                        ${isVerified ? `<span class="badge badge-verified">${verifiedIcon} Verified</span>` : ''}
+                        <span class="badge ${badgeMap[lvl] || 'badge-beginner'}">${skill.level}</span>
+                        ${skill.verified ? `<span class="badge badge-verified"><i class="fas fa-check" style="font-size:0.6rem;"></i> Verified</span>` : ''}
                     </div>
                 </div>
-                
+
                 <p class="skill-description">${skill.description}</p>
-                
+
                 <div class="progress-wrapper">
                     <div class="progress-label">
                         <span>Proficiency</span>
-                        <span>${proficiency}%</span>
+                        <span>${prof}%</span>
                     </div>
                     <div class="progress-track">
-                        <div class="progress-fill" style="width: 0%" data-target-width="${proficiency}%"></div>
+                        <div class="progress-fill" style="width:0%" data-target="${prof}%"></div>
                     </div>
                 </div>
 
-                ${btnHtml}
+                <a href="${skill.courseUrl}" target="_blank" rel="noopener" class="action-btn skill-course-btn">
+                    <i class="fas fa-external-link-alt"></i> ${skill.courseName}
+                </a>
             `;
-
             skillsContainer.appendChild(card);
         });
 
-        // Trigger animations for progress bars via inline style JS
-        setTimeout(() => {
-            const progressFills = skillsContainer.querySelectorAll('.progress-fill');
-            progressFills.forEach(fill => {
-                fill.style.width = fill.getAttribute('data-target-width');
+        // Animate progress bars
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            skillsContainer.querySelectorAll('.progress-fill').forEach(el => {
+                el.style.width = el.dataset.target;
             });
-        }, 50);
+        }));
 
         updateStats();
     }
 
-    // Event Listeners (if elements exist)
-    if (filterChipsContainer) {
-        filterChipsContainer.addEventListener('click', (e) => {
-            if (e.target.classList.contains('chip')) {
-                // Remove active from all
-                document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-                // Add active to clicked
-                e.target.classList.add('active');
-                // Update filter & re-render
-                currentFilter = e.target.getAttribute('data-filter');
-                renderSkills();
-            }
-        });
-    }
-
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            searchQuery = e.target.value;
-            renderSkills();
-        });
-    }
-
-    // --- Dynamic Sidebar Active State ---
-    // If a sidebar exists, highlight the "Skills" menu
-    const navLinks = document.querySelectorAll('.nav-item, .sidebar a, nav a');
-    navLinks.forEach(link => {
-        // Remove active class from all first (optional, but good practice if coming from single page apps)
-        link.classList.remove('active');
-        
-        // If the href contains skills.html, mark it active
-        if (link.getAttribute('href') && link.getAttribute('href').includes('skills.html')) {
-            link.classList.add('active');
-        }
-    });
-
-    // Initial render
     renderSkills();
+
+    // ── 6. Add Skill button (opens quiz for current module) ─
+    const addSkillBtn = document.getElementById('btn-add-skill');
+    if (addSkillBtn) {
+        addSkillBtn.addEventListener('click', () => {
+            window.location.href = 'skill-input.html';
+        });
+    }
 });

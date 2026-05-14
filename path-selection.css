@@ -1,0 +1,150 @@
+/* =====================================================
+   PATH SELECTION PAGE — Xyverra
+   ===================================================== */
+@import url('global.css');
+
+/* Wider card for the grid */
+.large-card {
+    max-width: 780px;
+    width: 100%;
+}
+
+/* ── Progress Steps (path-selection uses .onboarding-steps-ps) ── */
+.onboarding-steps-ps {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+.ps-step {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    padding: 6px 16px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    white-space: nowrap;
+    transition: all 0.3s;
+}
+.ps-step.active {
+    color: var(--primary);
+    background: rgba(99, 102, 241, 0.1);
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+}
+.ps-step-div {
+    flex: 1;
+    min-width: 20px;
+    height: 1.5px;
+    background: var(--border);
+}
+
+/* ── Grid of career path cards ── */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+}
+
+.grid-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.4rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+}
+.grid-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+}
+.grid-card > * { position: relative; z-index: 1; }
+
+.grid-card:hover {
+    border-color: rgba(255, 255, 255, 0.9);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.06), var(--shadow-glow);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.grid-card.active {
+    border-color: rgba(99, 102, 241, 0.4);
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15), 0 10px 25px rgba(99, 102, 241, 0.1);
+}
+.grid-card.active::after {
+    content: '\f058';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    font-size: 0.75rem;
+    color: var(--primary);
+}
+
+.grid-card .icon {
+    font-size: 1.35rem;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s;
+}
+.grid-card:hover .icon { transform: scale(1.1); }
+
+.grid-card-content h4 {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 2px;
+    line-height: 1.3;
+}
+.grid-card-content p {
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    line-height: 1.35;
+}
+
+/* ── Continue button ── */
+#path-continue-btn {
+    max-width: 260px;
+    margin-left: auto;
+    transition: all 0.25s;
+}
+
+@media (max-width: 600px) {
+    .grid-container {
+        grid-template-columns: 1fr 1fr;
+    }
+    #path-continue-btn {
+        max-width: 100%;
+    }
+}
+@media (max-width: 400px) {
+    .grid-container {
+        grid-template-columns: 1fr;
+    }
+}
