@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Experience - Xyverra</title>
+    <link rel="stylesheet" href="skill-input.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="centered-layout">
+        
+        <div class="brand-header">
+            <div class="brand-icon">
+                <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" />
+            </div>
+            <h1>Tell us about your experience</h1>
+            <p>This helps Xyverra customize your starting point</p>
+        </div>
+
+        <div class="card-box large-card">
+
+            <form action="roadmap.html">
+                <div class="form-group">
+                    <label>What skills do you already have?</label>
+                    <p style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">Type a skill (e.g. HTML) and press Enter</p>
+                    <div class="input-wrapper">
+                        <input type="text" id="skill-input-field" placeholder="Search or type skills...">
+                    </div>
+                    <div class="tag-container" id="tags-container">
+                        <!-- Tags appear here -->
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 1.5rem;">
+                    <label>What projects have you built?</label>
+                    <div class="input-wrapper">
+                        <textarea placeholder="Briefly describe any relevant projects you've completed..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>GitHub Profile Link (Optional)</label>
+                    <div class="input-wrapper">
+                        <input type="url" placeholder="https://github.com/username">
+                    </div>
+                </div>
+
+                <div class="bottom-actions">
+                    <a href="path-selection.html" class="btn btn-outline" style="flex: 0 0 auto; width: auto; padding: 12px 24px;">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        Generate Roadmap <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+    <script src="skill-input.js"></script>
+</body>
+</html>

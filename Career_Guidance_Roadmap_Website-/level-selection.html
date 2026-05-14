@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Choose your experience level to get a personalised Xyverra learning roadmap.">
+    <title>Level Selection - Xyverra</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="global.css">
+    <link rel="stylesheet" href="level-selection.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="centered-layout">
+
+        <div class="brand-header">
+            <div class="brand-icon">
+                <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" />
+            </div>
+            <h1>Choose Your Starting Level</h1>
+            <p>This helps us personalise your learning roadmap</p>
+        </div>
+
+        <div class="card-box large-card">
+
+            <!-- Progress Steps -->
+            <div class="onboarding-steps">
+                <div class="step done"><i class="fas fa-check"></i> Path</div>
+                <div class="step-divider"></div>
+                <div class="step active">2 · Level</div>
+                <div class="step-divider"></div>
+                <div class="step">3 · Skills</div>
+                <div class="step-divider"></div>
+                <div class="step">4 · Roadmap</div>
+            </div>
+
+            <!-- Context: selected path -->
+            <div class="selection-context">
+                <i class="fas fa-globe" style="color: #60A5FA; font-size: 22px;"></i>
+                <div class="context-text">
+                    <span id="selected-path-label">Web Development</span>
+                    <span class="context-sub">How much do you already know?</span>
+                </div>
+            </div>
+
+            <!-- Level Cards -->
+            <div class="level-options">
+                <!-- Option 1 -->
+                <div class="level-card active" data-level="Beginner">
+                    <div class="level-card-left">
+                        <span class="level-emoji">🌱</span>
+                        <div>
+                            <h4>I am a Beginner</h4>
+                            <p>Starting fresh — I have little or no experience in this field</p>
+                        </div>
+                    </div>
+                    <span class="score-badge">Score: 0–20% · Beginner</span>
+                </div>
+
+                <!-- Option 2 -->
+                <div class="level-card" data-level="Advanced">
+                    <div class="level-card-left">
+                        <span class="level-emoji">🚀</span>
+                        <div>
+                            <h4>I Already Know Some</h4>
+                            <p>I have existing knowledge — let me show what I know via a skill quiz</p>
+                        </div>
+                    </div>
+                    <span class="score-badge">Score calculated from skills</span>
+                </div>
+            </div>
+
+            <!-- Bottom Actions -->
+            <div class="bottom-actions">
+                <a href="path-selection.html" class="btn btn-outline back-btn">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+                <a href="skill-input.html" id="level-continue-btn" class="btn btn-primary">
+                    Continue <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+        </div>
+    </div>
+    <script src="level-selection.js"></script>
+</body>
+</html>
