@@ -18,8 +18,12 @@ document.addEventListener("DOMContentLoaded", () => {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const nameInput = document.getElementById('signup-name');
+            const emailInput = document.getElementById('signup-email');
             if (nameInput && nameInput.value) {
                 localStorage.setItem('xyverra_user_name', nameInput.value);
+                if (emailInput && emailInput.value) {
+                    localStorage.setItem('xyverra_user_email', emailInput.value);
+                }
                 window.location.href = 'path-selection.html';
             }
         });

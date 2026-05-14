@@ -13,29 +13,12 @@
 </head>
 <body>
     <div class="centered-layout">
-        
-        <div class="brand-header">
-            <div class="brand-icon">
-                <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" />
-            </div>
-            <h1>What do you want to learn?</h1>
-            <p>This helps us build your perfect roadmap</p>
-        </div>
 
-        <div class="card-box large-card">
-            
-            <div class="onboarding-steps-ps">
-                <div class="ps-step active">1 · Path</div>
-                <div class="ps-step-div"></div>
-                <div class="ps-step">2 · Level</div>
-                <div class="ps-step-div"></div>
-                <div class="ps-step">3 · Skills</div>
-                <div class="ps-step-div"></div>
-                <div class="ps-step">4 · Roadmap</div>
-            </div>
 
-            <h2 class="card-title" style="text-align: left; font-size: 18px; margin-bottom: 4px;">Choose your learning path</h2>
-            <p class="card-subtitle" style="text-align: left; margin-bottom: 1.5rem;">Select the skill or domain you want to master</p>
+            <div class="path-header">
+                <h2>Choose Your Learning Path</h2>
+                <p>Select the skill or domain you want to master</p>
+            </div>
 
             <div class="grid-container">
                 <div class="grid-card active" onclick="document.querySelectorAll('.grid-card').forEach(c => c.classList.remove('active')); this.classList.add('active');">
@@ -119,12 +102,13 @@
                 </div>
             </div>
 
-            <a href="level-selection.html" id="path-continue-btn" class="btn btn-primary" style="opacity: 0.8;">
+            <a href="level-selection.html" id="path-continue-btn" class="btn btn-primary">
                 Continue <i class="fas fa-arrow-right"></i>
             </a>
 
         </div>
     </div>
+    <script src="global-sidebar.js"></script>
     <script src="path-selection.js"></script>
 </body>
 </html>

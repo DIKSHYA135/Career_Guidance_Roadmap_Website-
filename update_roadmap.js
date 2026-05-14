@@ -11,7 +11,7 @@ const newRoadmapData = `const ROADMAP_DATA = {
             id: "html", title: "HTML Fundamentals", desc: "Master semantic elements, forms, and basic SEO principles.", keywords: ["html", "html5", "markup", "web fundamentals"],
             courses: [
                 { name: "W3Schools HTML", url: "https://www.w3schools.com/html/" },
-                { name: "freeCodeCamp HTML", url: "https://www.freecodecamp.org/learn/responsive-web-design/" }
+                { name: "The Odin Project - HTML", url: "https://www.theodinproject.com/paths/foundations/courses/foundations" }
             ]
         },
         {
@@ -25,7 +25,7 @@ const newRoadmapData = `const ROADMAP_DATA = {
             id: "js", title: "JavaScript Essentials", desc: "Functions, DOM manipulation, and basic application logic.", keywords: ["javascript", "js", "es6", "dom"],
             courses: [
                 { name: "MDN JS Guide", url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide" },
-                { name: "freeCodeCamp JS", url: "https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures-v8/" }
+                { name: "JavaScript.info", url: "https://javascript.info/" }
             ]
         },
         {
@@ -40,7 +40,7 @@ const newRoadmapData = `const ROADMAP_DATA = {
     "Full Stack Development": [
         {
             id: "web-dev-basics", title: "Web Basics (HTML/CSS/JS)", desc: "The core building blocks of the web.", keywords: ["html", "css", "javascript"],
-            courses: [{ name: "freeCodeCamp Web Design", url: "https://www.freecodecamp.org/" }]
+            courses: [{ name: "The Odin Project - Full Stack", url: "https://www.theodinproject.com/paths/full-stack-javascript" }]
         },
         {
             id: "nodejs", title: "Node.js & Express", desc: "Build backend REST APIs using JavaScript.", keywords: ["node", "express", "backend"],
@@ -97,7 +97,7 @@ const newRoadmapData = `const ROADMAP_DATA = {
     "NLP / AI": [
         {
             id: "python-data", title: "Python Fundamentals", desc: "Master Python syntax and core features.", keywords: ["python"],
-            courses: [{ name: "freeCodeCamp Python", url: "https://www.youtube.com/watch?v=rfscVS0vtbw" }]
+            courses: [{ name: "Python for Everybody - Kaggle", url: "https://www.kaggle.com/learn/python" }]
         },
         {
             id: "machine-learning", title: "Machine Learning Basics", desc: "Understand foundational ML concepts.", keywords: ["ml", "machine learning"],
@@ -156,7 +156,7 @@ const newRoadmapData = `const ROADMAP_DATA = {
     "Mobile Development": [
         {
             id: "mobile-fundamentals", title: "Programming Fundamentals", desc: "JavaScript for React Native or Dart for Flutter.", keywords: ["javascript", "dart", "mobile"],
-            courses: [{ name: "freeCodeCamp JS", url: "https://www.freecodecamp.org/" }]
+            courses: [{ name: "JavaScript.info - Basics", url: "https://javascript.info/first-steps" }]
         },
         {
             id: "react-native-flutter", title: "Cross-Platform Frameworks", desc: "React Native or Flutter basics.", keywords: ["react native", "flutter"],
@@ -179,7 +179,7 @@ const newRoadmapData = `const ROADMAP_DATA = {
         },
         {
             id: "ethical-hacking", title: "Ethical Hacking", desc: "Penetration testing and vulnerability scanning.", keywords: ["pentesting", "hacking"],
-            courses: [{ name: "freeCodeCamp Ethical Hacking", url: "https://www.youtube.com/watch?v=3Kq1MIfTWCE" }]
+            courses: [{ name: "TryHackMe - Ethical Hacking", url: "https://tryhackme.com/path/outline/jrpenetrationtester" }]
         },
         { id: "capstone", title: "Security Capstone", desc: "Perform and document a penetration test.", keywords: [], courses: [] }
     ],

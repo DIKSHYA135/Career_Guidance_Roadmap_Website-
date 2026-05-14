@@ -388,6 +388,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ── Read module from URL ──
     const urlParams = new URLSearchParams(window.location.search);
     moduleId = urlParams.get('module') || 'html';
+    const isVerify = urlParams.get('verify') === 'true';
 
     // TODO: Replace with GET /api/quiz/:moduleId
     const quizData = QUIZ_DATA[moduleId] || QUIZ_DATA['html'];
@@ -409,10 +410,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const quizBody          = document.getElementById('quiz-body');
     const questionMeta      = document.getElementById('question-meta-text');
 
-    // ── Exit button — always goes back to roadmap ──
-    btnExitQuiz.addEventListener('click', () => {
+    // ── Exit button — always goes back to roadmap or verification ──
+    btnExitQuiz.addEventListener('click', (e) => {
+        // Prevent default only if we are dynamically changing href later, but for standard click, just redirect
+        e.preventDefault();
         clearInterval(quizTimerInterval);
-        window.location.href = 'roadmap.html';
+        window.location.href = isVerify ? 'skill-verification.html' : 'roadmap.html';
     });
 
     // ── Next question ──
@@ -596,8 +599,22 @@ document.addEventListener("DOMContentLoaded", () => {
         timerText.textContent = passed ? '🎉 Passed!' : '💪 Keep Learning';
         quizStatus.textContent = '';
 
-        // Exit button → always roadmap
-        btnExitQuiz.textContent = '← Back to Roadmap';
+        // Exit button → always roadmap or verification
+        btnExitQuiz.textContent = isVerify ? '← Back to Verification' : '← Back to Roadmap';
+        
+        // Remove old listeners and add a specific one for results page
+        const newBtnExit = btnExitQuiz.cloneNode(true);
+        btnExitQuiz.parentNode.replaceChild(newBtnExit, btnExitQuiz);
+        newBtnExit.addEventListener('click', () => {
+             if (isVerify && !passed) {
+                 window.location.href = `skill-verification.html?failed=${moduleId}`;
+             } else if (isVerify && passed) {
+                 window.location.href = `skill-verification.html`;
+             } else {
+                 window.location.href = `roadmap.html`;
+             }
+        });
+        
         btnNextQuestion.style.display = 'none';
 
         // Save if passed

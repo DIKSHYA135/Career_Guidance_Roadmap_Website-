@@ -57,19 +57,17 @@
             </nav>
             
             <div style="flex: 1;"></div>
-            <div class="user-profile">
-                <div class="profile-info" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div class="avatar" id="user-avatar" style="background:#E0E7FF; color:#4F46E5; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:14px;">EM</div>
-                        <div class="profile-text" style="font-size: 14px;">
-                            <h4 id="user-display-name" style="margin:0; color:#1e1e2d;">Emmanual Macron</h4>
-                            <p style="margin:0; font-size:12px; color:#6b7280;">Frontend Developer</p>
-                        </div>
+                        <div class="user-profile" style="display: flex; align-items: center; justify-content: space-between;">
+                <div class="profile-click-area" style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; cursor: pointer;" title="View Profile">
+                    <div class="avatar" id="user-avatar"></div>
+                    <div class="profile-text">
+                        <h4 id="user-display-name"></h4>
+                        <p></p>
                     </div>
-                    <button class="btn signout-btn" style="background: transparent; border: none; padding: 5px; color: var(--text-muted); cursor: pointer; min-width: auto; box-shadow: none;" title="Sign Out">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </button>
                 </div>
+                <button class="btn signout-btn" style="background: transparent; border: none; padding: 6px 8px; color: var(--text-muted); cursor: pointer; min-width: auto; box-shadow: none; flex-shrink: 0;" title="Sign Out">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
             </div>
         </aside>
 

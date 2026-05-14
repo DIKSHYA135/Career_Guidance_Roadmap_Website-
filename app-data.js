@@ -16,7 +16,7 @@ const PATH_SKILLS = {
     { name: "Responsive Design", category: "Web Fundamentals", level: "beginner", description: "Mobile-first design, media queries, and fluid layouts.", proficiency: 0, verified: false, courseUrl: "https://web.dev/learn/design/", courseName: "web.dev Responsive Design" }
   ],
   "Full Stack Development": [
-    { name: "HTML/CSS/JS", category: "Web Fundamentals", level: "beginner", description: "Core web technologies for building interfaces.", proficiency: 0, verified: false, courseUrl: "https://www.freecodecamp.org/", courseName: "freeCodeCamp Web Design" },
+    { name: "HTML/CSS/JS", category: "Web Fundamentals", level: "beginner", description: "Core web technologies for building interfaces.", proficiency: 0, verified: false, courseUrl: "https://www.theodinproject.com/paths/foundations/courses/foundations", courseName: "The Odin Project - Foundations" },
     { name: "Node.js", category: "Backend", level: "intermediate", description: "Server-side JS, event loop, and npm ecosystem.", proficiency: 0, verified: false, courseUrl: "https://www.youtube.com/watch?v=TlB_eWDSMt4", courseName: "Node.js Crash Course" },
     { name: "Express.js", category: "Backend", level: "intermediate", description: "REST API routing, middleware, and MVC pattern.", proficiency: 0, verified: false, courseUrl: "https://expressjs.com/en/guide/routing.html", courseName: "Express.js Guide" },
     { name: "React", category: "Frontend", level: "intermediate", description: "Component-based UI with hooks and context.", proficiency: 0, verified: false, courseUrl: "https://react.dev/learn", courseName: "React Official Docs" },
@@ -66,7 +66,7 @@ const PATH_SKILLS = {
     { name: "Design Systems", category: "Design", level: "advanced", description: "Component libraries, tokens, and style guides.", proficiency: 0, verified: false, courseUrl: "https://www.coursera.org/specializations/ui-ux-design", courseName: "Coursera UI/UX" }
   ],
   "Mobile Development": [
-    { name: "JavaScript", category: "Programming", level: "beginner", description: "Core JS for React Native development.", proficiency: 0, verified: false, courseUrl: "https://www.freecodecamp.org/", courseName: "freeCodeCamp JS" },
+    { name: "JavaScript", category: "Programming", level: "beginner", description: "Core JS for React Native development.", proficiency: 0, verified: false, courseUrl: "https://javascript.info/", courseName: "JavaScript.info" },
     { name: "React Native", category: "Mobile", level: "intermediate", description: "Cross-platform mobile apps with React Native.", proficiency: 0, verified: false, courseUrl: "https://www.youtube.com/watch?v=0-S5a0eXPoc", courseName: "React Native Crash Course" },
     { name: "Dart / Flutter", category: "Mobile", level: "intermediate", description: "Flutter widgets, state management, and navigation.", proficiency: 0, verified: false, courseUrl: "https://flutter.dev/learn", courseName: "Flutter Learn" },
     { name: "Mobile Navigation", category: "Mobile", level: "intermediate", description: "Stack, tab, and drawer navigators.", proficiency: 0, verified: false, courseUrl: "https://reactnavigation.org/", courseName: "React Navigation Docs" },
@@ -75,7 +75,7 @@ const PATH_SKILLS = {
   "Cybersecurity": [
     { name: "Networking", category: "Infrastructure", level: "beginner", description: "TCP/IP, DNS, HTTP/S, and the OSI model.", proficiency: 0, verified: false, courseUrl: "https://www.youtube.com/watch?v=qiQR5rTSshw", courseName: "Network+ Training" },
     { name: "Security Fundamentals", category: "Security", level: "beginner", description: "Cryptography, hashing, and security postures.", proficiency: 0, verified: false, courseUrl: "https://www.youtube.com/watch?v=9sgZGvJ22E8", courseName: "Security+ Training" },
-    { name: "Ethical Hacking", category: "Offensive", level: "intermediate", description: "Penetration testing and vulnerability scanning.", proficiency: 0, verified: false, courseUrl: "https://www.youtube.com/watch?v=3Kq1MIfTWCE", courseName: "freeCodeCamp Ethical Hacking" },
+    { name: "Ethical Hacking", category: "Offensive", level: "intermediate", description: "Penetration testing and vulnerability scanning.", proficiency: 0, verified: false, courseUrl: "https://www.youtube.com/watch?v=3Kq1MIfTWCE", courseName: "TryHackMe - Ethical Hacking" },
     { name: "Linux", category: "Systems", level: "beginner", description: "Command-line skills essential for security work.", proficiency: 0, verified: false, courseUrl: "https://www.youtube.com/watch?v=v_1oa8pu0MQ", courseName: "Linux Crash Course" },
     { name: "OWASP Top 10", category: "Security", level: "intermediate", description: "Web application security vulnerabilities and mitigations.", proficiency: 0, verified: false, courseUrl: "https://owasp.org/www-project-top-ten/", courseName: "OWASP Top 10" },
     { name: "Wireshark", category: "Tools", level: "intermediate", description: "Packet analysis and network traffic inspection.", proficiency: 0, verified: false, courseUrl: "https://www.wireshark.org/docs/", courseName: "Wireshark Docs" }

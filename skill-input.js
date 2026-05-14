@@ -234,11 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'opacity 0.3s ease';
 
         setTimeout(() => {
-            if (currentLevel === 'Intermediate') {
-                window.location.href = 'quiz.html';
-            } else {
-                window.location.href = 'roadmap.html';
-            }
+            window.location.href = 'skill-verification.html';
         }, 300);
     });
 

@@ -58,19 +58,17 @@
             </nav>
 
             <div style="flex: 1;"></div>
-            <div class="user-profile">
-                <div class="profile-info" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div class="avatar" id="user-avatar">U</div>
-                        <div class="profile-text">
-                            <h4 id="user-display-name">User</h4>
-                            <p id="user-role">Learner</p>
-                        </div>
+            <div class="user-profile" style="display: flex; align-items: center; justify-content: space-between;">
+                <div class="profile-click-area" style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; cursor: pointer;" title="View Profile">
+                    <div class="avatar" id="user-avatar"></div>
+                    <div class="profile-text">
+                        <h4 id="user-display-name"></h4>
+                        <p></p>
                     </div>
-                    <button class="btn signout-btn" id="signout-btn" style="background: transparent; border: none; padding: 5px; color: var(--text-muted); cursor: pointer; min-width: auto; box-shadow: none;" title="Sign Out">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </button>
                 </div>
+                <button class="btn signout-btn" style="background: transparent; border: none; padding: 6px 8px; color: var(--text-muted); cursor: pointer; min-width: auto; box-shadow: none; flex-shrink: 0;" title="Sign Out">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
             </div>
         </aside>
 

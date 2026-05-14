@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     .map(w => w.charAt(0).toUpperCase() + w.slice(1))
                     .join(' ');
                 localStorage.setItem('xyverra_user_name', capitalizedName);
+                localStorage.setItem('xyverra_user_email', email);
 
                 // If they already have a path selected, go to dashboard, else path selection
                 const path = localStorage.getItem('xyverra_selected_path');
