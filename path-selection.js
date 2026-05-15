@@ -40,6 +40,15 @@ document.addEventListener("DOMContentLoaded", () => {
             // Save selected path
             const title = card.querySelector('h4').innerText;
             localStorage.setItem('xyverra_selected_path', title);
+
+            // Also immediately update the user specific storage
+            const email = localStorage.getItem('xyverra_user_email');
+            if (email) {
+                const usersData = JSON.parse(localStorage.getItem('xyverra_users')) || {};
+                if (!usersData[email]) usersData[email] = {};
+                usersData[email].path = title;
+                localStorage.setItem('xyverra_users', JSON.stringify(usersData));
+            }
         });
     });
 
