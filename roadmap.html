@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="roadmap.css">
+    <link rel="stylesheet" href="ai-recommendation.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -78,9 +79,14 @@
                     <h2 id="roadmap-header-title">Your Learning Path</h2>
                     <p>Follow the points below from beginning to end to progress towards job-readiness.</p>
                 </div>
-                <a href="quiz.html" id="top-quiz-btn" class="btn btn-primary" style="width:auto; padding: 10px 20px; display: none;">
-                    Take Module Quiz <i class="fas fa-arrow-right"></i>
-                </a>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-outline ai-exit-trigger" style="width:auto; padding: 10px 20px;">
+                        <i class="fas fa-pause"></i> Pause Learning
+                    </button>
+                    <a href="quiz.html" id="top-quiz-btn" class="btn btn-primary" style="width:auto; padding: 10px 20px; display: none;">
+                        Take Module Quiz <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
             </div>
 
             <div class="roadmap-wrapper card-box">
@@ -93,6 +99,7 @@
 
     <script src="app-data.js"></script> <script src="global-sidebar.js"></script>
     <script src="roadmap.js"></script>
+    <script src="ai-recommendation.js"></script>
 </body>
 </html>
 

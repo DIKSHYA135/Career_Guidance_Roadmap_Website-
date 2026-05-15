@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-
     const levelBtns = document.querySelectorAll('.level-btn');
     const skillInput = document.getElementById('skill-input-field');
     const tagContainer = document.getElementById('tag-container');

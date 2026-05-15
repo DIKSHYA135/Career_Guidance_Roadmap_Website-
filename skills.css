@@ -15,7 +15,9 @@
     margin-bottom: 0.4rem;
     background: linear-gradient(135deg, var(--text-dark), var(--primary));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
+
 }
 .page-header p {
     color: var(--text-muted);
