@@ -4,16 +4,11 @@
 @import url('global.css');
 
 /* Auth card max-width constraint */
-.auth-card {
-    max-width: 460px;
-    width: 100%;
-    animation-delay: 0.1s;
-}
+.auth-card { max-width: 460px; width: 100%; animation-delay: 0.1s; }
 
 /* Form groups */
-.form-group {
-    margin-bottom: 1.4rem;
-}
+.form-group { margin-bottom: 1.4rem; }
+
 .form-group label {
     display: block;
     font-size: 0.875rem;
@@ -24,12 +19,9 @@
 }
 
 /* Input wrapper with icon */
-.input-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-.input-wrapper > i:first-child {
+.input-wrapper { position: relative; display: flex; align-items: center; }
+
+.input-wrapper>i:first-child {
     position: absolute;
     left: 1rem;
     color: var(--text-muted);
@@ -37,6 +29,7 @@
     z-index: 2;
     pointer-events: none;
 }
+
 .input-wrapper input {
     width: 100%;
     padding: 13px 2.5rem 13px 2.85rem;
@@ -48,9 +41,9 @@
     transition: all 0.2s ease;
     font-family: inherit;
 }
-.input-wrapper input::placeholder {
-    color: var(--text-light);
-}
+
+.input-wrapper input::placeholder { color: var(--text-light); }
+
 .input-wrapper input:focus {
     outline: none;
     background: var(--white);
@@ -69,6 +62,7 @@
     z-index: 2;
     transition: color 0.2s;
 }
+
 .eye-icon:hover { color: var(--primary); }
 
 /* Forgot password link */
@@ -82,6 +76,7 @@
     margin-bottom: 1.5rem;
     transition: opacity 0.2s;
 }
+
 .forgot-link:hover { opacity: 0.75; }
 
 /* OR divider */
@@ -95,14 +90,13 @@
     font-size: 0.8125rem;
     letter-spacing: 0.05em;
 }
+
 .divider::before,
-.divider::after {
-    content: '';
-    flex: 1;
-    border-bottom: 1px solid var(--border);
-}
+.divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--border); }
+
 .divider::before { margin-right: 0.75em; }
-.divider::after  { margin-left:  0.75em; }
+
+.divider::after { margin-left: 0.75em; }
 
 /* Demo hint text */
 .hint-text {
@@ -123,8 +117,7 @@
     font-size: 0.875rem;
     color: var(--text-muted);
 }
-.auth-footer a {
-    color: var(--primary);
-    font-weight: 600;
-}
+
+.auth-footer a { color: var(--primary); font-weight: 600; }
+
 .auth-footer a:hover { text-decoration: underline; }
