@@ -28,7 +28,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // Global sign out
     const signoutBtn = document.querySelector('.signout');
     if (signoutBtn) {
-        signoutBtn.addEventListener('click', () => {
+        signoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Clear all user data from localStorage
+            localStorage.removeItem('xyverra_token');
+            localStorage.removeItem('xyverra_user_name');
+            localStorage.removeItem('xyverra_user_email');
+            localStorage.removeItem('xyverra_user_id');
+            localStorage.removeItem('xyverra_selected_path');
+            
             window.location.href = 'login.html';
         });
     }

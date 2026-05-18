@@ -45,11 +45,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Continue button validation
     if (continueBtn) {
-        continueBtn.addEventListener('click', (e) => {
+        continueBtn.addEventListener('click', async (e) => {
+            const selectedPath = localStorage.getItem('xyverra_selected_path');
+            const email = localStorage.getItem('xyverra_user_email');
 
-            if (!localStorage.getItem('xyverra_selected_path')) {
+            if (!selectedPath) {
                 e.preventDefault();
                 alert("Please select a learning path to continue.");
+                return;
+            }
+
+            if (email) {
+                // Save to backend
+                try {
+                    const response = await fetch('http://localhost:5000/api/user/path', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email, selectedPath })
+                    });
+
+                    if (response.ok) {
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        const data = await response.json();
+                        console.error('Failed to save path:', data.message);
+                        // Fallback to local redirection
+                        window.location.href = 'dashboard.html';
+                    }
+                } catch (error) {
+                    console.error('Error saving path:', error);
+                    window.location.href = 'dashboard.html';
+                }
+            } else {
+                window.location.href = 'dashboard.html';
             }
         });
     }
