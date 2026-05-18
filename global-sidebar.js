@@ -56,6 +56,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── 3. Sign Out ─────────────────────────────────────────
     // TODO: Call POST /api/auth/logout before clearing storage
     function performSignOut() {
+        // Save current user data before clearing
+        const email = localStorage.getItem('xyverra_user_email');
+        if (email) {
+            const usersData = JSON.parse(localStorage.getItem('xyverra_users')) || {};
+            usersData[email] = {
+                name: localStorage.getItem('xyverra_user_name'),
+                path: localStorage.getItem('xyverra_selected_path'),
+                role: localStorage.getItem('xyverra_user_role'),
+                level: localStorage.getItem('userLevel'),
+                skills: localStorage.getItem('userSkills'),
+                modules: localStorage.getItem('completedModules'),
+                score: localStorage.getItem('xyverra_skill_score'),
+                streak: localStorage.getItem('xyverra_user_streak')
+            };
+            localStorage.setItem('xyverra_users', JSON.stringify(usersData));
+        }
+
         const keysToRemove = [
             'xyverra_user_name', 'xyverra_user_role', 'xyverra_selected_path',
             'userLevel', 'userSkills', 'completedModules', 'xyverra_skill_score',
