@@ -19,6 +19,16 @@ mongoose.connect(process.env.MONGO_URI)
     .catch(err => console.error('MongoDB connection error:', err));
 
 // Routes
+
+app.get('/', async(req, res) => {
+    try{
+        res.status(200).json({message: "Works"});
+    }
+    catch (error) {
+        console.log("Error in server while creating user");
+        res.status(500).json({ message: 'Server error', error: error.message });
+}});
+
 app.post('/api/auth/register', async (req, res) => {
     try {
         const { email, password, name } = req.body;
@@ -59,7 +69,26 @@ app.post('/api/auth/register', async (req, res) => {
             }
         });
     } catch (error) {
+        console.log("Error in server while creating user");
         res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+// Get all users
+app.get('/api/users', async (req, res) => {
+    try {
+        const users = await User.find().select('-password');
+
+        res.status(200).json({
+            count: users.length,
+            users
+        });
+    } catch (error) {
+        console.log("Error fetching users");
+        res.status(500).json({
+            message: 'Server error',
+            error: error.message
+        });
     }
 });
 
@@ -116,6 +145,35 @@ app.put('/api/user/path', async (req, res) => {
         }
 
         res.json({ message: 'Path updated successfully', selectedPath: user.selectedPath });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+// Save Selected Path (New POST route as requested)
+app.post('/api/user/save-path', async (req, res) => {
+    try {
+        const { email, selectedPath } = req.body;
+
+        if (!email || !selectedPath) {
+            return res.status(400).json({ message: 'Email and selectedPath are required' });
+        }
+        
+        const user = await User.findOneAndUpdate(
+            { email },
+            { selectedPath },
+            { new: true }
+        );
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Path saved successfully', 
+            selectedPath: user.selectedPath 
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
