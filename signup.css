@@ -1,0 +1,99 @@
+/* =====================================================
+   SIGN UP PAGE — Xyverra
+   ===================================================== */
+@import url('global.css');
+
+/* Auth card max-width constraint */
+.auth-card { max-width: 460px; width: 100%; animation-delay: 0.1s; }
+
+/* Form groups */
+.form-group { margin-bottom: 1.25rem; }
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.45rem;
+    letter-spacing: 0.01em;
+}
+
+/* Input wrapper with icon */
+.input-wrapper { position: relative; display: flex; align-items: center; }
+
+.input-wrapper>i:first-child {
+    position: absolute;
+    left: 1rem;
+    color: var(--text-muted);
+    font-size: 1rem;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding: 13px 2.5rem 13px 2.85rem;
+    background: var(--bg-light);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-size: 0.9375rem;
+    color: var(--text-dark);
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.input-wrapper input::placeholder { color: var(--text-light); }
+
+.input-wrapper input:focus {
+    outline: none;
+    background: var(--white);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+/* Eye icon for password */
+.eye-icon {
+    position: absolute !important;
+    left: auto !important;
+    right: 1rem !important;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 1rem;
+    z-index: 2;
+    transition: color 0.2s;
+}
+
+.eye-icon:hover { color: var(--primary); }
+
+/* Small hint text (e.g. "At least 6 characters") */
+.hint-text {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 0.35rem;
+    margin-left: 0.25rem;
+}
+
+/* Terms note at bottom */
+.terms-note {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    margin-top: 1.25rem;
+    line-height: 1.5;
+}
+
+.terms-note a { color: var(--primary); font-weight: 600; }
+
+.terms-note a:hover { text-decoration: underline; }
+
+/* Footer link below the card */
+.auth-footer {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.auth-footer a { color: var(--primary); font-weight: 600; }
+
+.auth-footer a:hover { text-decoration: underline; }
