@@ -78,12 +78,33 @@
             <div class="quiz-container">
 
                 <!-- Quiz Header -->
-                <div class="quiz-header">
-                    <a href="roadmap.html" class="quiz-back-link">
-                        <i class="fas fa-arrow-left"></i> Back to Roadmap
-                    </a>
+                <div class="quiz-header" style="position: relative;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 0.5rem;">
+                        <a href="roadmap.html" class="quiz-back-link" style="margin-bottom: 0;">
+                            <i class="fas fa-arrow-left"></i> Back to Roadmap
+                        </a>
+                        <button id="btn-ai-config" class="btn btn-outline" style="font-size: 0.8rem; padding: 6px 12px; min-width: auto; width: auto; gap: 6px; display: inline-flex; align-items: center; border-radius: 20px; box-shadow: none; height: 32px; background: rgba(255,255,255,0.85);">
+                            <i class="fas fa-robot text-primary"></i> <span id="ai-status-label">AI: Off</span>
+                        </button>
+                    </div>
                     <h1 id="quiz-module-title">Module Assessment</h1>
                     <p>Answer correctly (70%+) to mark this module as completed on your roadmap.</p>
+                </div>
+
+                <!-- AI Loading Screen -->
+                <div id="ai-loading-screen" style="display: none; flex-direction: column; align-items: center; justify-content: center; padding: 3.5rem 2rem; background: var(--glass-bg); border-radius: 20px; box-shadow: var(--shadow-md); border: 1px solid var(--glass-border); text-align: center; margin-bottom: 1.5rem;">
+                    <div class="ai-avatar-icon" style="width: 56px; height: 56px; font-size: 24px; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-robot text-primary" style="animation: pulseGlow 2s infinite;"></i>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-dark); margin-bottom: 0.5rem;">Gemini AI is generating your Quiz...</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; max-width: 380px; line-height: 1.5;">
+                        Custom-tailoring 5 unique multiple-choice questions for your module topic and experience level.
+                    </p>
+                    <div class="ai-typing-dots" style="margin-bottom: 0;">
+                        <div class="ai-dot" style="background: var(--primary);"></div>
+                        <div class="ai-dot" style="background: var(--primary); animation-delay: 0.2s;"></div>
+                        <div class="ai-dot" style="background: var(--primary); animation-delay: 0.4s;"></div>
+                    </div>
                 </div>
 
                 <!-- Quiz Card -->
@@ -136,8 +157,34 @@
         </main>
     </div>
 
+    <!-- AI Quiz Config Overlay -->
+    <div class="ai-exit-overlay" id="aiConfigOverlay" style="display: none; align-items: center; justify-content: center; z-index: 99999;">
+        <div class="ai-exit-modal" style="max-width: 440px; width: 90%; background: #FFFFFF; border-radius: 24px; padding: 2.2rem; box-shadow: var(--shadow-lg); border: 1px solid var(--border);">
+            <div class="ai-modal-header" style="display: flex; gap: 15px; align-items: flex-start;">
+                <div class="ai-avatar-icon" style="background: linear-gradient(135deg, var(--primary), var(--accent)); width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div>
+                    <h3 class="ai-modal-title" style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text-dark);">AI Quiz Generation</h3>
+                    <p class="ai-modal-subtitle" style="margin: 3px 0 0 0; font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">Integrate Gemini LLM to generate completely dynamic and fresh questions every single time!</p>
+                </div>
+            </div>
+            <div style="margin: 1.5rem 0;">
+                <label for="gemini-api-key" style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.03em;">Google Gemini API Key</label>
+                <input type="password" id="gemini-api-key" placeholder="Paste your API key here..." style="width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border); font-size: 0.9rem; background: #F8FAFC; color: var(--text-dark); outline: none; transition: border-color 0.2s;">
+                <p style="font-size: 0.76rem; color: var(--text-muted); margin-top: 0.65rem; line-height: 1.45;">
+                    <i class="fas fa-info-circle" style="color: var(--primary); margin-right: 3px;"></i> Don't have a key? Get a free API key from <a href="https://aistudio.google.com/" target="_blank" style="color: var(--primary); font-weight: 600; text-decoration: underline;">Google AI Studio</a>. Leave empty to use pre-defined randomized fallback questions.
+                </p>
+            </div>
+            <div class="ai-modal-actions" style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--border); padding-top: 1.25rem; margin-top: 0.5rem;">
+                <button class="btn btn-outline" id="btn-cancel-ai" style="padding: 10px 16px; font-size: 0.85rem; width: auto; min-width: auto; height: 38px;">Cancel</button>
+                <button class="btn btn-primary" id="btn-save-ai" style="padding: 10px 16px; font-size: 0.85rem; width: auto; min-width: auto; height: 38px; background: var(--primary); color: white;">Save Config</button>
+            </div>
+        </div>
+    </div>
+
     <script src="global-sidebar.js"></script>
-    <script src="quiz.js"></script>
+    <script src="quiz.js?v=4"></script>
     <script src="ai-recommendation.js"></script>
 </body>
 </html>

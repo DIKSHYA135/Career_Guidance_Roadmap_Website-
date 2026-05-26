@@ -48,7 +48,7 @@
     outline: none;
     background: var(--white);
     border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    box-shadow: 0 0 0 4px rgba(42, 101, 245, 0.1);
 }
 
 /* Eye icon (password toggle) */
@@ -105,9 +105,9 @@
     font-size: 0.78rem;
     margin-top: 1rem;
     padding: 0.6rem 1rem;
-    background: rgba(99, 102, 241, 0.04);
+    background: rgba(42, 101, 245, 0.04);
     border-radius: 8px;
-    border: 1px dashed rgba(99, 102, 241, 0.2);
+    border: 1px dashed rgba(42, 101, 245, 0.2);
 }
 
 /* Footer link below the card */

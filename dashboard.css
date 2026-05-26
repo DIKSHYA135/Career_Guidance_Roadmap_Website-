@@ -60,7 +60,7 @@
 
 .metric-icon {
     color: var(--primary);
-    background: rgba(99, 102, 241, 0.1);
+    background: rgba(42, 101, 245, 0.1);
     padding: 8px;
     border-radius: 12px;
 }
@@ -101,7 +101,7 @@
 
 .progress-bar-container {
     height: 8px;
-    background-color: rgba(99, 102, 241, 0.1);
+    background-color: rgba(42, 101, 245, 0.1);
     border-radius: 999px;
     overflow: hidden;
     margin-top: auto;
@@ -113,7 +113,7 @@
     height: 100%;
     background: linear-gradient(90deg, var(--primary), var(--accent));
     border-radius: 999px;
-    box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+    box-shadow: 0 0 10px rgba(42, 101, 245, 0.5);
 }
 
 .content-grid {
@@ -155,7 +155,7 @@
     top: 0;
     bottom: 0;
     width: 2px;
-    background: rgba(99, 102, 241, 0.2);
+    background: rgba(42, 101, 245, 0.2);
 }
 
 .milestone-content h3 { font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-dark); }
@@ -163,10 +163,10 @@
 .milestone-content p { color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.95rem; }
 
 .knowledge-check {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+    background: linear-gradient(135deg, rgba(42, 101, 245, 0.05), rgba(59, 130, 246, 0.05));
     border-radius: 16px;
     padding: 1.5rem;
-    border: 1px solid rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(42, 101, 245, 0.1);
     margin-top: 1.5rem;
 }
 
@@ -305,9 +305,9 @@
     border-radius: 999px;
     font-size: 0.72rem;
     font-weight: 700;
-    background: rgba(99, 102, 241, 0.08);
+    background: rgba(42, 101, 245, 0.08);
     color: var(--primary);
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    border: 1px solid rgba(42, 101, 245, 0.2);
     margin-bottom: 0.5rem;
 }
 
@@ -386,7 +386,7 @@
 .progress-bar-container.large { height: 10px; }
 
 /* Highlight card variant */
-.highlight-card { background: linear-gradient(135deg, rgba(99, 102, 241, 0.04), rgba(139, 92, 246, 0.04)); border-color: rgba(99, 102, 241, 0.15) !important; }
+.highlight-card { background: linear-gradient(135deg, rgba(42, 101, 245, 0.04), rgba(59, 130, 246, 0.04)); border-color: rgba(42, 101, 245, 0.15) !important; }
 
 
 
@@ -451,9 +451,9 @@
     transition: var(--transition);
 }
 
-.nav-item:hover { background: rgba(99, 102, 241, 0.05); color: var(--primary); }
+.nav-item:hover { background: rgba(42, 101, 245, 0.05); color: var(--primary); }
 
-.nav-item.active { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
+.nav-item.active { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; box-shadow: 0 4px 15px rgba(42, 101, 245, 0.4); }
 
 .user-profile {
     padding: 1.25rem 1.5rem;
@@ -476,7 +476,7 @@
     transition: background 0.2s;
 }
 
-.profile-click-area:hover { background: rgba(99, 102, 241, 0.06); }
+.profile-click-area:hover { background: rgba(42, 101, 245, 0.06); }
 
 .profile-info { display: flex; align-items: center; gap: 0.75rem; }
 
@@ -486,7 +486,7 @@
     width: 40px !important;
     height: 40px !important;
     border-radius: 50%;
-    background: rgba(99, 102, 241, 0.1) !important;
+    background: rgba(42, 101, 245, 0.1) !important;
     color: var(--primary) !important;
     display: flex;
     align-items: center;
@@ -598,7 +598,7 @@
     height: 44px;
     border-radius: 50%;
     background-color: #EEF2FF;
-    color: #6366F1;
+    color: #2A65F5;
     display: flex;
     align-items: center;
     justify-content: center;
