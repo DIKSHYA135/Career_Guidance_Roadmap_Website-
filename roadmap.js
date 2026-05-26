@@ -417,4 +417,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!currentModuleFound && topQuizBtn) {
         topQuizBtn.style.display = "none";
     }
+
+    // Apply lock overlay if there is a mandatory quiz pending
+    if (typeof LocalStorageState !== 'undefined' && LocalStorageState.isMandatoryQuizPending()) {
+        if (typeof QuizLockManager !== 'undefined') {
+            QuizLockManager.applyRoadmapOverlay();
+            QuizLockManager.disableNavigation();
+        }
+    }
 });

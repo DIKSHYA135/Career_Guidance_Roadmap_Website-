@@ -4,7 +4,62 @@
    TODO: Replace localStorage reads with GET /api/user/me
    ========================================================== */
 
+// Early-execution hook: if mandatory quiz is active, restrict navigation and redirect
+(function() {
+    const currentFile = window.location.pathname.split('/').pop() || 'dashboard.html';
+    if (currentFile !== 'quiz.html' && currentFile !== 'roadmap.html') {
+        const rawState = localStorage.getItem('xyverra_mandatory_quiz_state');
+        if (rawState) {
+            try {
+                const state = JSON.parse(rawState);
+                if (state && state.isActive && state.assignedQuizzes && state.assignedQuizzes.some(q => q.status !== 'passed')) {
+                    console.log("Mandatory quiz sequence pending. Redirecting to quiz.html");
+                    window.location.href = 'quiz.html?mandatory=true';
+                }
+            } catch (e) {
+                console.error("Error reading mandatory quiz state:", e);
+            }
+        }
+    }
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
+    // Lock sidebar navigation if mandatory quiz is active
+    const rawState = localStorage.getItem('xyverra_mandatory_quiz_state');
+    if (rawState) {
+        try {
+            const state = JSON.parse(rawState);
+            if (state && state.isActive && state.assignedQuizzes && state.assignedQuizzes.some(q => q.status !== 'passed')) {
+                document.querySelectorAll('.nav-item, .sidebar-brand, a').forEach(link => {
+                    const href = link.getAttribute('href') || '';
+                    const isSignOut = href.includes('login.html') || 
+                                      link.classList.contains('signout-btn') || 
+                                      link.id === 'signout-btn' || 
+                                      link.id === 'modal-signout-btn';
+                    const isQuizLink = href.includes('quiz.html');
+
+                    if (!isSignOut && !isQuizLink) {
+                        link.style.pointerEvents = 'none';
+                        link.style.opacity = '0.4';
+                        link.style.cursor = 'not-allowed';
+                    }
+                });
+
+                document.querySelectorAll('.profile-click-area, .user-profile').forEach(area => {
+                    const signoutBtn = area.querySelector('.signout-btn, #signout-btn');
+                    if (signoutBtn) {
+                        signoutBtn.style.pointerEvents = 'auto';
+                        signoutBtn.style.opacity = '1';
+                    }
+                    area.style.pointerEvents = 'none';
+                    area.style.opacity = '0.7';
+                });
+            }
+        } catch (e) {
+            console.error("Error locking navigation:", e);
+        }
+    }
+
 
     // ── 1. Mobile Sidebar Toggle ────────────────────────────
     const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
@@ -68,7 +123,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 skills: localStorage.getItem('userSkills'),
                 modules: localStorage.getItem('completedModules'),
                 score: localStorage.getItem('xyverra_skill_score'),
-                streak: localStorage.getItem('xyverra_user_streak')
+                streak: localStorage.getItem('xyverra_user_streak'),
+                mandatoryQuizState: JSON.parse(localStorage.getItem('xyverra_mandatory_quiz_state') || 'null'),
+                activeQuizState: localStorage.getItem('xyverra_active_quiz') ? JSON.parse(localStorage.getItem('xyverra_active_quiz')) : null
             };
             localStorage.setItem('xyverra_users', JSON.stringify(usersData));
         }
@@ -76,7 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const keysToRemove = [
             'xyverra_user_name', 'xyverra_user_role', 'xyverra_selected_path',
             'userLevel', 'userSkills', 'completedModules', 'xyverra_skill_score',
-            'xyverra_user', 'xyverra_user_streak', 'xyverra_user_email'
+            'xyverra_user', 'xyverra_user_streak', 'xyverra_user_email', 'xyverra_mandatory_quiz_state',
+            'xyverra_active_quiz'
         ];
         keysToRemove.forEach(k => localStorage.removeItem(k));
         document.body.style.opacity = '0';

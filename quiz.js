@@ -376,27 +376,57 @@ const OPTION_LABELS = ['A', 'B', 'C', 'D'];
 
 // ── State ──
 let quizTimerInterval = null;
-let timeLeft = 20;
+let timeLeft = 10;
 let quizPhase = 'read';      // 'read' | 'answer'
 let currentQuestionIndex = 0;
 let selectedOptionIndex = null;
 let score = 0;
 let moduleId = 'html';
 let questions = [];
+let isVerify = false;
+let isMandatory = false;
 
 document.addEventListener("DOMContentLoaded", () => {
-    // ── Read module from URL ──
+    // Enforce Fullscreen Quiz layout style
+    document.body.classList.add('fullscreen-quiz');
+    
+    // Disable any sidebar/header links visually and functionally
+    if (typeof QuizLockManager !== 'undefined') {
+        QuizLockManager.disableNavigation();
+    }
+
+    // ── Read module & mode from URL ──
     const urlParams = new URLSearchParams(window.location.search);
     moduleId = urlParams.get('module') || 'html';
-    const isVerify = urlParams.get('verify') === 'true';
+    isVerify = urlParams.get('verify') === 'true';
+    
+    // Check if mandatory sequence is active in local storage
+    const hasMandatoryPending = typeof LocalStorageState !== 'undefined' && LocalStorageState.isMandatoryQuizPending();
+    isMandatory = (urlParams.get('mandatory') === 'true') || hasMandatoryPending;
+
+    let progress = null;
+    let quizDetail = null;
+
+    if (isMandatory && typeof LocalStorageState !== 'undefined') {
+        progress = LocalStorageState.getCurrentQuizProgress();
+        if (progress && progress.quizDetail) {
+            quizDetail = progress.quizDetail;
+            moduleId = quizDetail.moduleId;
+        }
+    }
 
     // TODO: Replace with GET /api/quiz/:moduleId
     const quizData = QUIZ_DATA[moduleId] || QUIZ_DATA['html'];
-    questions = quizData.questions;
+    questions = [...quizData.questions]; // copy array
 
     // ── Set page title ──
     const moduleTitle = document.getElementById('quiz-module-title');
-    if (moduleTitle) moduleTitle.textContent = quizData.title + ' Assessment';
+    if (moduleTitle) {
+        let titleSuffix = ' Assessment';
+        if (isMandatory) titleSuffix = ' Required Assessment';
+        else if (isVerify) titleSuffix = ' Verification';
+        moduleTitle.textContent = quizData.title + titleSuffix;
+    }
 
     // ── DOM refs ──
     const quizQuestionTxt   = document.getElementById('quiz-question');
@@ -410,29 +440,193 @@ document.addEventListener("DOMContentLoaded", () => {
     const quizBody          = document.getElementById('quiz-body');
     const questionMeta      = document.getElementById('question-meta-text');
 
-    // ── Exit button — always goes back to roadmap or verification ──
-    btnExitQuiz.addEventListener('click', (e) => {
-        // Prevent default only if we are dynamically changing href later, but for standard click, just redirect
-        e.preventDefault();
-        clearInterval(quizTimerInterval);
-        window.location.href = isVerify ? 'skill-verification.html' : 'roadmap.html';
-    });
+    // Custom exit confirmation modal elements
+    const exitModal         = document.getElementById('quiz-exit-modal');
+    const cancelExitBtn     = document.getElementById('btn-cancel-exit');
+    const confirmExitBtn     = document.getElementById('btn-confirm-exit');
 
-    // ── Next question ──
+    // ── Restore saved state if exists ──
+    let savedState = null;
+    try {
+        const raw = localStorage.getItem('xyverra_active_quiz');
+        if (raw) {
+            savedState = JSON.parse(raw);
+        }
+    } catch (e) {
+        console.error("Error reading saved active quiz state:", e);
+    }
+
+    let restored = false;
+    if (savedState && savedState.moduleId === moduleId && savedState.isVerify === isVerify && savedState.isMandatory === isMandatory) {
+        currentQuestionIndex = savedState.currentQuestionIndex;
+        score = savedState.score;
+        quizPhase = savedState.quizPhase;
+        timeLeft = savedState.timeLeft;
+        selectedOptionIndex = savedState.selectedOptionIndex;
+        questions = savedState.shuffledQuestions || questions;
+        restored = true;
+        console.log("Restored active quiz state from localStorage:", savedState);
+    }
+
+    // If it's mandatory, let's also check if we can restore from mandatory state
+    if (!restored && isMandatory && quizDetail) {
+        if (quizDetail.shuffledQuestions) {
+            currentQuestionIndex = quizDetail.currentQuestionIndex;
+            score = quizDetail.score;
+            quizPhase = quizDetail.currentQuestionPhase || 'read';
+            timeLeft = quizDetail.currentQuestionTimeLeft !== undefined ? quizDetail.currentQuestionTimeLeft : 10;
+            selectedOptionIndex = quizDetail.selectedOptionIndex !== undefined ? quizDetail.selectedOptionIndex : null;
+            questions = quizDetail.shuffledQuestions;
+            restored = true;
+            console.log("Restored active quiz from mandatoryQuizState sequence:", quizDetail);
+        }
+    }
+
+    // If not restored, shuffle and start fresh!
+    if (!restored) {
+        currentQuestionIndex = 0;
+        score = 0;
+        quizPhase = 'read';
+        timeLeft = 10;
+        selectedOptionIndex = null;
+        shuffleArray(questions);
+        console.log("Started brand new quiz, shuffled questions.");
+    }
+
+    // ── Setup UI elements depending on mode ──
+    if (isMandatory) {
+        // Hide exit buttons & back links to enforce compliance
+        const backLink = document.querySelector('.quiz-back-link');
+        if (backLink) backLink.style.display = 'none';
+        if (btnExitQuiz) btnExitQuiz.style.display = 'none';
+    } else {
+        // Standard leaving warning popup configuration
+        if (btnExitQuiz) {
+            btnExitQuiz.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (exitModal) {
+                    exitModal.style.display = 'flex';
+                    requestAnimationFrame(() => {
+                        exitModal.classList.add('active');
+                    });
+                }
+            });
+        }
+
+        if (cancelExitBtn) {
+            cancelExitBtn.addEventListener('click', () => {
+                if (exitModal) {
+                    exitModal.classList.remove('active');
+                    setTimeout(() => {
+                        exitModal.style.display = 'none';
+                    }, 300);
+                }
+            });
+        }
+
+        if (confirmExitBtn) {
+            confirmExitBtn.addEventListener('click', () => {
+                clearInterval(quizTimerInterval);
+                window.removeEventListener('beforeunload', handleBeforeUnload);
+                clearState();
+                window.location.href = isVerify ? 'skill-verification.html' : 'roadmap.html';
+            });
+        }
+    }
+
+    // Add beforeunload page event listener
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // ── Next question handler ──
     btnNextQuestion.addEventListener('click', () => {
         currentQuestionIndex++;
+        selectedOptionIndex = null;
+        quizPhase = 'read';
+        timeLeft = 10;
         loadQuestion();
     });
 
-    // ── Start first question ──
+    // ── Start/Load the active question ──
     loadQuestion();
+
+    // ────────────────────────────────────────────────────
+    function handleBeforeUnload(e) {
+        if (currentQuestionIndex < questions.length) {
+            e.preventDefault();
+            e.returnValue = 'Are you sure you want to leave? Your progress is saved, but you must complete this quiz to progress.';
+            return e.returnValue;
+        }
+    }
+
+    // ────────────────────────────────────────────────────
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    // ────────────────────────────────────────────────────
+    function saveState() {
+        const stateObj = {
+            moduleId: moduleId,
+            isVerify: isVerify,
+            isMandatory: isMandatory,
+            currentQuestionIndex: currentQuestionIndex,
+            score: score,
+            quizPhase: quizPhase,
+            timeLeft: timeLeft,
+            selectedOptionIndex: selectedOptionIndex,
+            shuffledQuestions: questions
+        };
+        localStorage.setItem('xyverra_active_quiz', JSON.stringify(stateObj));
+        
+        // Also update the mandatory sequence state if applicable
+        if (isMandatory && typeof LocalStorageState !== 'undefined') {
+            LocalStorageState.saveCurrentQuizProgress(
+                currentQuestionIndex,
+                score,
+                questions,
+                quizPhase,
+                timeLeft,
+                selectedOptionIndex
+            );
+        }
+    }
+
+    // ────────────────────────────────────────────────────
+    function clearState() {
+        localStorage.removeItem('xyverra_active_quiz');
+    }
+
+    // ────────────────────────────────────────────────────
+    function drawProgressDots() {
+        const dotsContainer = document.getElementById('quiz-progress-dots');
+        if (!dotsContainer) return;
+        dotsContainer.innerHTML = '';
+        for (let i = 0; i < questions.length; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'progress-dot';
+            if (i < currentQuestionIndex) {
+                dot.classList.add('completed');
+            } else if (i === currentQuestionIndex) {
+                dot.classList.add('current');
+            } else {
+                dot.classList.add('pending');
+            }
+            dotsContainer.appendChild(dot);
+        }
+    }
 
     // ────────────────────────────────────────────────────
     function loadQuestion() {
         clearInterval(quizTimerInterval);
-        selectedOptionIndex = null;
-        btnNextQuestion.style.display = 'none';
-        quizPhase = 'read';
+        
+        // Draw segmented progress dots
+        drawProgressDots();
+
+        // Enforce saveState
+        saveState();
 
         if (currentQuestionIndex >= questions.length) {
             showResults();
@@ -449,11 +643,10 @@ document.addEventListener("DOMContentLoaded", () => {
         // Set question text
         quizQuestionTxt.textContent = q.q;
 
-        // Clear and disable options during reading time
+        // Clear options
         quizOptionsCont.innerHTML = '';
-        quizOptionsCont.classList.add('disabled');
-
-        // Render option buttons (hidden during reading)
+        
+        // Render option buttons
         const optionsToRender = q.opts || [];
         optionsToRender.forEach((opt, i) => {
             const btn = document.createElement('button');
@@ -467,14 +660,59 @@ document.addEventListener("DOMContentLoaded", () => {
             quizOptionsCont.appendChild(btn);
         });
 
-        // Status: reading phase
-        quizStatus.textContent = 'Read the question carefully. Options will unlock in 10 seconds.';
-        quizStatus.className = 'quiz-status warning';
+        // Restore visual state if option already selected (e.g. after refresh)
+        if (selectedOptionIndex !== null) {
+            quizOptionsCont.classList.add('disabled');
+            const selectedBtn = document.getElementById(`option-${selectedOptionIndex}`);
+            const isCorrect = selectedOptionIndex >= 0 && q.opts[selectedOptionIndex] && q.opts[selectedOptionIndex].correct;
+            
+            if (selectedOptionIndex === -1) {
+                // Was timed out
+                q.opts.forEach((opt, idx) => {
+                    if (opt.correct) {
+                        const btn = document.getElementById(`option-${idx}`);
+                        if (btn) btn.classList.add('correct');
+                    }
+                });
+                quizStatus.textContent = "⏰ Time's up! The correct answer is highlighted.";
+                quizStatus.className = 'quiz-status error';
+                timerText.textContent = 'Time Up!';
+            } else if (isCorrect) {
+                if (selectedBtn) selectedBtn.classList.add('correct');
+                quizStatus.textContent = '✅ Correct! Well done!';
+                quizStatus.className = 'quiz-status success';
+            } else {
+                if (selectedBtn) selectedBtn.classList.add('wrong');
+                quizStatus.textContent = '❌ Incorrect. The correct answer is highlighted.';
+                quizStatus.className = 'quiz-status error';
+                q.opts.forEach((opt, idx) => {
+                    if (opt.correct) {
+                        const btn = document.getElementById(`option-${idx}`);
+                        if (btn) btn.classList.add('correct');
+                    }
+                });
+            }
 
-        // Timer: 10s reading, then 5s answering
-        timeLeft = 10;
-        updateTimerBar(timeLeft, 10, timerBar);
-        timerText.textContent = `${timeLeft}s Reading Time`;
+            timerText.textContent = 'Answered';
+            btnNextQuestion.style.display = 'inline-flex';
+            btnNextQuestion.textContent = currentQuestionIndex + 1 < questions.length ? 'Next Question →' : 'See Results →';
+            return;
+        }
+
+        // Standard timer logic
+        if (quizPhase === 'read') {
+            quizOptionsCont.classList.add('disabled');
+            quizStatus.textContent = 'Read the question carefully. Options will unlock in 10 seconds.';
+            quizStatus.className = 'quiz-status warning';
+            updateTimerBar(timeLeft, 10, timerBar);
+            timerText.textContent = `${timeLeft}s Reading Time`;
+        } else {
+            quizOptionsCont.classList.remove('disabled');
+            quizStatus.textContent = 'Select your answer!';
+            quizStatus.className = 'quiz-status info';
+            updateTimerBar(timeLeft, 5, timerBar);
+            timerText.textContent = `${timeLeft}s to Answer`;
+        }
 
         quizTimerInterval = setInterval(() => {
             timeLeft--;
@@ -483,7 +721,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (quizPhase === 'read') {
                 timerText.textContent = `${timeLeft}s Reading Time`;
                 if (timeLeft <= 0) {
-                    // Switch to answer phase
                     quizPhase = 'answer';
                     timeLeft = 5;
                     quizOptionsCont.classList.remove('disabled');
@@ -495,18 +732,17 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 timerText.textContent = `${timeLeft}s to Answer`;
                 if (timeLeft <= 0) {
-                    // Time's up — auto-mark wrong
                     clearInterval(quizTimerInterval);
+                    selectedOptionIndex = -1; // timed out
                     quizOptionsCont.classList.add('disabled');
-                    // Highlight correct answer
-                    if (q.opts) {
-                        q.opts.forEach((opt, i) => {
-                            if (opt.correct) {
-                                const btn = document.getElementById(`option-${i}`);
-                                if (btn) btn.classList.add('correct');
-                            }
-                        });
-                    }
+                    
+                    q.opts.forEach((opt, idx) => {
+                        if (opt.correct) {
+                            const btn = document.getElementById(`option-${idx}`);
+                            if (btn) btn.classList.add('correct');
+                        }
+                    });
+                    
                     quizStatus.textContent = "⏰ Time's up! The correct answer is highlighted.";
                     quizStatus.className = 'quiz-status error';
                     timerText.textContent = 'Time Up!';
@@ -514,6 +750,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     btnNextQuestion.textContent = currentQuestionIndex + 1 < questions.length ? 'Next Question →' : 'See Results →';
                 }
             }
+            saveState(); // Save state on every timer tick!
         }, 1000);
     }
 
@@ -528,15 +765,15 @@ document.addEventListener("DOMContentLoaded", () => {
         const selectedBtn = document.getElementById(`option-${index}`);
 
         if (isCorrect) {
-            selectedBtn.classList.add('correct');
+            if (selectedBtn) selectedBtn.classList.add('correct');
             quizStatus.textContent = '✅ Correct! Well done!';
             quizStatus.className = 'quiz-status success';
             score++;
         } else {
-            selectedBtn.classList.add('wrong');
+            if (selectedBtn) selectedBtn.classList.add('wrong');
             quizStatus.textContent = '❌ Incorrect. The correct answer is highlighted.';
             quizStatus.className = 'quiz-status error';
-            // Highlight correct
+            
             if (opts) {
                 opts.forEach((opt, i) => {
                     if (opt.correct) {
@@ -550,6 +787,8 @@ document.addEventListener("DOMContentLoaded", () => {
         timerText.textContent = 'Answered';
         btnNextQuestion.style.display = 'inline-flex';
         btnNextQuestion.textContent = currentQuestionIndex + 1 < questions.length ? 'Next Question →' : 'See Results →';
+        
+        saveState(); // Save state when option selected!
     }
 
     // ────────────────────────────────────────────────────
@@ -565,6 +804,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // ────────────────────────────────────────────────────
     function showResults() {
         clearInterval(quizTimerInterval);
+        
+        // Remove the page exit warning popup
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+        
+        // Clear active quiz state since it's completed!
+        clearState();
 
         const pct = Math.round((score / questions.length) * 100);
         const passed = pct >= 70;
@@ -588,7 +833,6 @@ document.addEventListener("DOMContentLoaded", () => {
             : `You scored ${score}/${questions.length} — Try again to pass (70% needed).`;
 
         // Timer bar full green on completion
-        const timerBar = document.getElementById('quiz-timer');
         if (timerBar) {
             timerBar.style.width = '100%';
             timerBar.style.background = passed
@@ -596,39 +840,77 @@ document.addEventListener("DOMContentLoaded", () => {
                 : 'linear-gradient(90deg, var(--error), #F87171)';
         }
 
-        timerText.textContent = passed ? '🎉 Passed!' : '💪 Keep Learning';
+        timerText.textContent = passed ? 'Passed!' : '💪 Keep Learning';
         quizStatus.textContent = '';
 
-        // Exit button → always roadmap or verification
-        btnExitQuiz.textContent = isVerify ? '← Back to Verification' : '← Back to Roadmap';
-        
-        // Remove old listeners and add a specific one for results page
-        const newBtnExit = btnExitQuiz.cloneNode(true);
-        btnExitQuiz.parentNode.replaceChild(newBtnExit, btnExitQuiz);
-        newBtnExit.addEventListener('click', () => {
-             if (isVerify && !passed) {
-                 window.location.href = `skill-verification.html?failed=${moduleId}`;
-             } else if (isVerify && passed) {
-                 window.location.href = `skill-verification.html`;
-             } else {
-                 window.location.href = `roadmap.html`;
-             }
-        });
-        
-        btnNextQuestion.style.display = 'none';
+        // ── Actions Setup for Results Screen ──
+        const footerActions = document.querySelector('.quiz-footer-actions');
+        if (footerActions) {
+            footerActions.innerHTML = ''; // Clear standard action buttons
+        }
 
-        // Save if passed
-        if (passed) {
-            // TODO: POST /api/quiz/submit { moduleId, score, total: questions.length }
-            let completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
-            if (!completedModules.includes(moduleId)) {
-                completedModules.push(moduleId);
-                localStorage.setItem('completedModules', JSON.stringify(completedModules));
+        if (isMandatory && typeof RoadmapUnlockLogic !== 'undefined') {
+            if (passed) {
+                // Handle passing logic via RoadmapUnlockLogic
+                RoadmapUnlockLogic.handlePass(moduleId);
+
+                const hasNext = progress && (progress.currentQuizIndex + 1 < progress.totalQuizzes);
+                
+                if (hasNext) {
+                    const nextQuizBtn = document.createElement('button');
+                    nextQuizBtn.className = 'btn btn-primary';
+                    nextQuizBtn.style.background = 'linear-gradient(135deg, #10B981, #059669)';
+                    nextQuizBtn.innerHTML = 'Start Next Required Quiz <i class="fas fa-arrow-right"></i>';
+                    nextQuizBtn.addEventListener('click', () => {
+                        RoadmapUnlockLogic.advanceToNextQuiz();
+                        window.location.reload();
+                    });
+                    if (footerActions) footerActions.appendChild(nextQuizBtn);
+                } else {
+                    const unlockBtn = document.createElement('button');
+                    unlockBtn.className = 'btn btn-primary';
+                    unlockBtn.style.background = 'linear-gradient(135deg, #6366F1, #4F46E5)';
+                    unlockBtn.innerHTML = 'Complete & Unlock Roadmap <i class="fas fa-unlock"></i>';
+                    unlockBtn.addEventListener('click', () => {
+                        RoadmapUnlockLogic.completeVerification();
+                        window.location.href = 'roadmap.html';
+                    });
+                    if (footerActions) footerActions.appendChild(unlockBtn);
+                }
+            } else {
+                const retakeBtn = document.createElement('button');
+                retakeBtn.className = 'btn btn-primary';
+                retakeBtn.style.background = 'linear-gradient(135deg, #EF4444, #F59E0B)';
+                retakeBtn.innerHTML = '<i class="fas fa-redo"></i> Retake Required Quiz';
+                retakeBtn.addEventListener('click', () => {
+                    RoadmapUnlockLogic.handleFail(moduleId);
+                    window.location.reload();
+                });
+                if (footerActions) footerActions.appendChild(retakeBtn);
+            }
+        } else {
+            // Non-mandatory standard quiz handling
+            if (passed) {
+                let completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
+                if (!completedModules.includes(moduleId)) {
+                    completedModules.push(moduleId);
+                    localStorage.setItem('completedModules', JSON.stringify(completedModules));
+                }
+
+                let currentScore = parseInt(localStorage.getItem('xyverra_skill_score') || '0');
+                localStorage.setItem('xyverra_skill_score', currentScore + 10);
             }
 
-            // TODO: Update user skill score via PATCH /api/user/score
-            let currentScore = parseInt(localStorage.getItem('xyverra_skill_score') || '0');
-            localStorage.setItem('xyverra_skill_score', currentScore + 10);
+            const doneBtn = document.createElement('button');
+            doneBtn.className = 'btn btn-primary';
+            doneBtn.innerHTML = isVerify ? '← Back to Verification' : '← Back to Roadmap';
+            doneBtn.addEventListener('click', () => {
+                window.location.href = isVerify 
+                    ? (passed ? 'skill-verification.html' : `skill-verification.html?failed=${moduleId}`)
+                    : 'roadmap.html';
+            });
+            if (footerActions) footerActions.appendChild(doneBtn);
         }
     }
+});
 });

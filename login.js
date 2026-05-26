@@ -40,7 +40,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         skills: localStorage.getItem('userSkills'),
                         modules: localStorage.getItem('completedModules'),
                         score: localStorage.getItem('xyverra_skill_score'),
-                        streak: localStorage.getItem('xyverra_user_streak')
+                        streak: localStorage.getItem('xyverra_user_streak'),
+                        mandatoryQuizState: localStorage.getItem('xyverra_mandatory_quiz_state') ? JSON.parse(localStorage.getItem('xyverra_mandatory_quiz_state')) : null,
+                        activeQuizState: localStorage.getItem('xyverra_active_quiz') ? JSON.parse(localStorage.getItem('xyverra_active_quiz')) : null
                     };
                     localStorage.setItem('xyverra_users', JSON.stringify(usersDataObj));
                 }
@@ -49,7 +51,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 const keysToRemove = [
                     'xyverra_user_name', 'xyverra_user_role', 'xyverra_selected_path',
                     'userLevel', 'userSkills', 'completedModules', 'xyverra_skill_score',
-                    'xyverra_user', 'xyverra_user_streak', 'xyverra_user_email'
+                    'xyverra_user', 'xyverra_user_streak', 'xyverra_user_email', 'xyverra_mandatory_quiz_state',
+                    'xyverra_active_quiz'
                 ];
                 keysToRemove.forEach(k => localStorage.removeItem(k));
 
@@ -68,6 +71,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (userData.modules) localStorage.setItem('completedModules', userData.modules);
                     if (userData.score) localStorage.setItem('xyverra_skill_score', userData.score);
                     if (userData.streak) localStorage.setItem('xyverra_user_streak', userData.streak);
+                    if (userData.mandatoryQuizState) {
+                        localStorage.setItem('xyverra_mandatory_quiz_state', JSON.stringify(userData.mandatoryQuizState));
+                    }
+                    if (userData.activeQuizState) {
+                        localStorage.setItem('xyverra_active_quiz', JSON.stringify(userData.activeQuizState));
+                    }
 
                     // Redirect based on whether they have a path
                     window.location.href = userData.path ? 'dashboard.html' : 'path-selection.html';

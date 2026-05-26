@@ -110,10 +110,35 @@
                         <span id="error-text">Please enter at least one skill to generate your roadmap.</span>
                     </div>
 
-                    <div class="form-actions">
+                    <div class="form-actions" id="form-actions-container">
                         <button type="button" id="generate-btn" class="btn btn-primary generate-btn disabled" disabled>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                             Generate Roadmap
+                        </button>
+                    </div>
+                </div>
+
+                <!-- AI Skill Gap Recommendations -->
+                <div class="recommendations-section" id="recommendations-section" style="display: none;">
+                    <div class="section-header">
+                        <h2 id="recommendation-title">Skills You May Need</h2>
+                        <p>Select the skills you want to learn, and mark the ones you already know. We'll generate a personalized roadmap to fill your gaps.</p>
+                    </div>
+                    
+                    <div class="skills-gap-container">
+                        <div class="gap-legend">
+                            <span class="legend-item"><span class="dot dot-learn"></span> Want to Learn</span>
+                            <span class="legend-item"><span class="dot dot-known"></span> Already Know</span>
+                        </div>
+                        <div class="skill-tags-grid" id="skill-gap-grid">
+                            <!-- Skill gap tags will be injected here -->
+                        </div>
+                    </div>
+
+                    <div class="recommendations-actions">
+                        <button type="button" id="generate-roadmap-btn" class="btn btn-primary generate-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                            Generate Personalized Roadmap
                         </button>
                     </div>
                 </div>
