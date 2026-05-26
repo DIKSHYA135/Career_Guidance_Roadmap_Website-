@@ -304,7 +304,7 @@ const ROADMAP_DATA = {
             courses: [
                 { name: "Tableau Public Free Training", url: "https://www.tableau.com/learn/training/20221" },
                 { name: "Power BI Tutorial (YouTube)", url: "https://www.youtube.com/watch?v=TmhQCQr_DCA" },
-                { name: "edX Data Analysis", url: "https://www.edx.org/learn/data-analysis" }
+{ name: "edX Data Analysis", url: "https://www.edx.org/learn/data-analysis" }
             ]
         },
         { id: "capstone", title: "Analytics Capstone", desc: "Analyze a dataset and present a BI dashboard.", keywords: [], courses: [] }
@@ -323,7 +323,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Fallback logic for path selection text mismatch (if any)
     let matchedPathKey = selectedPath;
     if (!ROADMAP_DATA[matchedPathKey]) {
-        // Find closest match or default to Frontend
         matchedPathKey = Object.keys(ROADMAP_DATA).find(key => selectedPath.includes(key)) || "Web Development";
     }
     
@@ -342,54 +341,70 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const pathData = ROADMAP_DATA[matchedPathKey];
-    if (timelineContainer) timelineContainer.innerHTML = ""; // Clear existing nodes
-    
-    let currentModuleFound = false;
+    if (timelineContainer) timelineContainer.innerHTML = "";
+
     let completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
 
-    pathData.forEach((module, index) => {
+    // ── Respect the "Start from Module" selection ──
+    // If the user chose a specific starting module on the Create Roadmap page,
+    // treat every non-capstone module that appears BEFORE it as pre-completed
+    // (skipped), so the roadmap begins at the chosen entry point.
+    const selectedStartModule = localStorage.getItem('selectedStartModule') || '';
+    if (selectedStartModule) {
+        const startIdx = pathData.findIndex(m => m.id === selectedStartModule);
+        if (startIdx > 0) {
+            for (let i = 0; i < startIdx; i++) {
+                const m = pathData[i];
+                if (m.id !== 'capstone' && !completedModules.includes(m.id)) {
+                    completedModules.push(m.id);
+                }
+            }
+            // Persist so progress page also reflects the skipped modules
+            localStorage.setItem('completedModules', JSON.stringify(completedModules));
+        }
+    }
+
+    let currentModuleFound = false;
+
+    pathData.forEach((module) => {
         const isCapstone = module.id === 'capstone';
-        let isCompleted = completedModules.includes(module.id);
+        let isCompleted  = completedModules.includes(module.id);
 
         let statusClass = "locked";
-        let statusText = "Locked";
-        
+        let statusText  = "Locked";
+
         if (isCompleted) {
             statusClass = "completed";
-            statusText = "Completed";
+            statusText  = "Completed";
         } else if (!currentModuleFound && !isCapstone) {
             statusClass = "active";
-            statusText = "Current Module";
+            statusText  = "Current Module";
             currentModuleFound = true;
-            
-            // Set top quiz button URL to this module
             if (topQuizBtn) {
-                topQuizBtn.href = `quiz.html?module=${module.id}`;
-                topQuizBtn.style.display = "inline-flex"; // Show it
+                topQuizBtn.href         = `quiz.html?module=${module.id}`;
+                topQuizBtn.style.display = "inline-flex";
             }
         } else if (isCapstone && !currentModuleFound) {
-            // If all previous were skipped/completed, capstone is current
             statusClass = "active";
-            statusText = "Current Module";
+            statusText  = "Current Module";
             currentModuleFound = true;
         } else if (isCapstone) {
             statusClass = "locked capstone";
-            statusText = "Requires previous completion";
+            statusText  = "Requires previous completion";
         }
 
-        // Render HTML for node
         const itemDiv = document.createElement("div");
         itemDiv.className = `timeline-item ${statusClass}`;
-        
+
         let coursesHTML = "";
         if (module.courses && module.courses.length > 0) {
-            coursesHTML = `<div class="course-suggestions" style="margin-top: 10px; font-size: 0.9em;">
+            coursesHTML = `<div class="course-suggestions" style="margin-top:10px;font-size:0.9em;">
                 <strong>Recommended Free Resources:</strong>
-                <ul style="list-style-type: none; padding-left: 0; margin-top: 5px;">
-                    ${module.courses.map(course => 
-                        `<li style="margin-bottom: 3px;">
-                            <i class="fas fa-external-link-alt" style="color: #4F46E5; font-size: 0.8em; margin-right: 5px;"></i>
-                            <a href="${course.url}" target="_blank" style="color: #4F46E5; text-decoration: none;">${course.name}</a>
+                <ul style="list-style-type:none;padding-left:0;margin-top:5px;">
+                    ${module.courses.map(c =>
+                        `<li style="margin-bottom:3px;">
+                            <i class="fas fa-external-link-alt" style="color:#4F46E5;font-size:0.8em;margin-right:5px;"></i>
+                            <a href="${c.url}" target="_blank" style="color:#4F46E5;text-decoration:none;">${c.name}</a>
                         </li>`
                     ).join('')}
                 </ul>
@@ -398,19 +413,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let actionBtnHTML = "";
         if (statusClass === "active" && !isCapstone) {
-            actionBtnHTML = `<a href="quiz.html?module=${module.id}" class="btn btn-outline" style="margin-top: 15px; font-size: 0.85em; padding: 6px 12px; display: inline-block;">Take Module Quiz</a>`;
+            actionBtnHTML = `<a href="quiz.html?module=${module.id}" class="btn btn-outline"
+                style="margin-top:15px;font-size:0.85em;padding:6px 12px;display:inline-block;">
+                Take Module Quiz</a>`;
         }
+
+        // "Your Start Point" badge for the chosen entry module
+        const isStartPoint   = selectedStartModule && module.id === selectedStartModule;
+        const startBadgeHTML = isStartPoint
+            ? `<span style="display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;font-weight:700;
+                background:rgba(245,158,11,0.1);color:#D97706;border:1px solid rgba(245,158,11,0.3);
+                padding:3px 10px;border-radius:999px;margin-left:8px;">⚡ Your Start Point</span>`
+            : '';
 
         itemDiv.innerHTML = `
             <div class="timeline-content">
-                <h4>${module.title}</h4>
+                <h4>${module.title}${startBadgeHTML}</h4>
                 <p>${module.desc}</p>
                 ${statusClass !== "completed" && statusClass !== "locked" && statusClass !== "locked capstone" ? coursesHTML : ""}
                 ${actionBtnHTML}
                 <span class="timeline-pill ${statusClass === 'active' ? 'current' : ''}">${statusText}</span>
             </div>
         `;
-        
+
         if (timelineContainer) timelineContainer.appendChild(itemDiv);
     });
 

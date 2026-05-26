@@ -15,7 +15,6 @@
 <body>
     <div class="centered-layout">
 
-
         <div class="brand-header">
             <div class="brand-icon">
                 <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" />
@@ -39,7 +38,7 @@
 
             <!-- Context: selected path -->
             <div class="selection-context">
-                <i class="fas fa-globe" style="color: #60A5FA; font-size: 22px;"></i>
+                <i class="fas fa-globe" style="color: #60A5FA; font-size: 22px; flex-shrink: 0;"></i>
                 <div class="context-text">
                     <span id="selected-path-label">Web Development</span>
                     <span class="context-sub">How much do you already know?</span>
@@ -50,9 +49,10 @@
             <div class="level-options">
                 <!-- Option 1 -->
                 <div class="level-card active" data-level="Beginner">
+                    <span class="level-check"><i class="fas fa-check"></i></span>
                     <div class="level-card-left">
                         <span class="level-emoji">🌱</span>
-                        <div>
+                        <div class="level-card-text">
                             <h4>I am a Beginner</h4>
                             <p>Starting fresh — I have little or no experience in this field</p>
                         </div>
@@ -62,9 +62,10 @@
 
                 <!-- Option 2 -->
                 <div class="level-card" data-level="Advanced">
+                    <span class="level-check"><i class="fas fa-check"></i></span>
                     <div class="level-card-left">
                         <span class="level-emoji">🚀</span>
-                        <div>
+                        <div class="level-card-text">
                             <h4>I Already Know Some</h4>
                             <p>I have existing knowledge — let me show what I know via a skill quiz</p>
                         </div>

@@ -52,13 +52,61 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Continue button validation
+    // Continue button validation and saving to backend
     if (continueBtn) {
-        continueBtn.addEventListener('click', (e) => {
+        continueBtn.addEventListener('click', async (e) => {
+            e.preventDefault(); // Prevent immediate navigation
 
-            if (!localStorage.getItem('xyverra_selected_path')) {
-                e.preventDefault();
+            const selectedPath = localStorage.getItem('xyverra_selected_path');
+            const email = localStorage.getItem('xyverra_user_email');
+
+            if (!selectedPath) {
                 alert("Please select a learning path to continue.");
+                return;
+            }
+
+            if (!email) {
+                alert("User session not found. Please login again.");
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                // Show loading state if desired (optional)
+                continueBtn.innerHTML = 'Saving... <i class="fas fa-spinner fa-spin"></i>';
+                continueBtn.style.pointerEvents = 'none';
+
+                // Send POST request to backend
+                const response = await fetch('http://localhost:5000/api/user/save-path', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        selectedPath: selectedPath
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    console.log("Path saved to MongoDB:", data.selectedPath);
+                    // Navigate to next page after successful save
+                    window.location.href = 'level-selection.html';
+                } else {
+                    alert(data.message || "Failed to save path.");
+                    // Re-enable button
+                    continueBtn.innerHTML = 'Continue <i class="fas fa-arrow-right"></i>';
+                    continueBtn.style.pointerEvents = 'auto';
+                }
+
+            } catch (error) {
+                console.error("Error saving path:", error);
+                alert("Server connection error. Please try again later.");
+                // Re-enable button
+                continueBtn.innerHTML = 'Continue <i class="fas fa-arrow-right"></i>';
+                continueBtn.style.pointerEvents = 'auto';
             }
         });
     }

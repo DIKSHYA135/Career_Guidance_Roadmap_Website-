@@ -372,7 +372,7 @@ const QUIZ_DATA = {
 };
 
 // ── Option labels ──
-const OPTION_LABELS = ['A', 'B', 'C', 'D'];
+const OPTION_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
 // ── State ──
 let quizTimerInterval = null;
@@ -415,8 +415,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // TODO: Replace with GET /api/quiz/:moduleId
     const quizData = QUIZ_DATA[moduleId] || QUIZ_DATA['html'];
+<<<<<<< HEAD
     questions = [...quizData.questions]; // copy array
 
     // ── Set page title ──
@@ -426,9 +426,21 @@ document.addEventListener("DOMContentLoaded", () => {
         if (isMandatory) titleSuffix = ' Required Assessment';
         else if (isVerify) titleSuffix = ' Verification';
         moduleTitle.textContent = quizData.title + titleSuffix;
+=======
+
+    // ── Shuffle helper (Fisher-Yates) ──
+    function shuffleArray(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+>>>>>>> 8bf0ba3952f61e1122f26d8b54b97912b4634d36
     }
 
     // ── DOM refs ──
+    const moduleTitle       = document.getElementById('quiz-module-title');
     const quizQuestionTxt   = document.getElementById('quiz-question');
     const quizOptionsCont   = document.getElementById('quiz-options-container');
     const timerBar          = document.getElementById('quiz-timer');
@@ -440,10 +452,87 @@ document.addEventListener("DOMContentLoaded", () => {
     const quizBody          = document.getElementById('quiz-body');
     const questionMeta      = document.getElementById('question-meta-text');
 
+<<<<<<< HEAD
     // Custom exit confirmation modal elements
     const exitModal         = document.getElementById('quiz-exit-modal');
     const cancelExitBtn     = document.getElementById('btn-cancel-exit');
     const confirmExitBtn     = document.getElementById('btn-confirm-exit');
+=======
+    // AI Refs
+    const btnAiConfig      = document.getElementById('btn-ai-config');
+    const aiConfigOverlay  = document.getElementById('aiConfigOverlay');
+    const inputGeminiKey   = document.getElementById('gemini-api-key');
+    const btnCancelAi      = document.getElementById('btn-cancel-ai');
+    const btnSaveAi        = document.getElementById('btn-save-ai');
+    const aiStatusLabel    = document.getElementById('ai-status-label');
+    const aiLoadingScreen  = document.getElementById('ai-loading-screen');
+    const quizCard         = document.getElementById('quiz-card');
+
+    // ── AI Config Modal Logic ──
+    function updateAiStatus() {
+        const key = localStorage.getItem('gemini_api_key');
+        if (key && key.trim()) {
+            if (aiStatusLabel) {
+                aiStatusLabel.textContent = "AI: On";
+                aiStatusLabel.style.color = "var(--success)";
+            }
+            if (btnAiConfig) {
+                btnAiConfig.style.borderColor = "var(--success)";
+                btnAiConfig.style.background = "rgba(16, 185, 129, 0.05)";
+            }
+        } else {
+            if (aiStatusLabel) {
+                aiStatusLabel.textContent = "AI: Off";
+                aiStatusLabel.style.color = "var(--text-muted)";
+            }
+            if (btnAiConfig) {
+                btnAiConfig.style.borderColor = "var(--border)";
+                btnAiConfig.style.background = "rgba(255,255,255,0.85)";
+            }
+        }
+    }
+
+    if (btnAiConfig && aiConfigOverlay) {
+        btnAiConfig.addEventListener('click', () => {
+            inputGeminiKey.value = localStorage.getItem('gemini_api_key') || '';
+            aiConfigOverlay.style.display = 'flex';
+            setTimeout(() => aiConfigOverlay.classList.add('active'), 50);
+        });
+    }
+
+    if (btnCancelAi && aiConfigOverlay) {
+        btnCancelAi.addEventListener('click', () => {
+            aiConfigOverlay.classList.remove('active');
+            setTimeout(() => aiConfigOverlay.style.display = 'none', 300);
+        });
+    }
+
+    if (btnSaveAi && aiConfigOverlay) {
+        btnSaveAi.addEventListener('click', () => {
+            const key = inputGeminiKey.value.trim();
+            if (key) {
+                localStorage.setItem('gemini_api_key', key);
+            } else {
+                localStorage.removeItem('gemini_api_key');
+            }
+            updateAiStatus();
+            aiConfigOverlay.classList.remove('active');
+            setTimeout(() => {
+                aiConfigOverlay.style.display = 'none';
+                window.location.reload();
+            }, 300);
+        });
+    }
+
+    updateAiStatus();
+
+    // ── Exit button — always goes back to roadmap or verification ──
+    btnExitQuiz.addEventListener('click', (e) => {
+        e.preventDefault();
+        clearInterval(quizTimerInterval);
+        window.location.href = isVerify ? 'skill-verification.html' : 'roadmap.html';
+    });
+>>>>>>> 8bf0ba3952f61e1122f26d8b54b97912b4634d36
 
     // ── Restore saved state if exists ──
     let savedState = null;
@@ -546,6 +635,7 @@ document.addEventListener("DOMContentLoaded", () => {
         loadQuestion();
     });
 
+<<<<<<< HEAD
     // ── Start/Load the active question ──
     loadQuestion();
 
@@ -627,6 +717,194 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Enforce saveState
         saveState();
+=======
+    // ── Load / Generate Quiz ──
+    const userLevel = localStorage.getItem("userLevel") || "Beginner";
+    let geminiKey = localStorage.getItem('gemini_api_key');
+
+    if (!geminiKey || !geminiKey.trim()) {
+        const wantsAi = confirm("Do you want to use Real-time AI for dynamic questions? (Requires a free Google Gemini API Key)");
+        if (wantsAi) {
+            geminiKey = prompt("Please paste your free Google Gemini API Key:\\n(Get it at https://aistudio.google.com/app/apikey)");
+            if (geminiKey && geminiKey.trim()) {
+                localStorage.setItem('gemini_api_key', geminiKey.trim());
+            }
+        }
+    }
+
+    if (geminiKey && geminiKey.trim()) {
+        generateAiQuiz(geminiKey.trim(), quizData.title, userLevel);
+    } else {
+        loadFallbackQuiz();
+    }
+
+    function loadFallbackQuiz() {
+        questions = shuffleArray(quizData.questions).map(q => ({
+            ...q,
+            opts: shuffleArray(q.opts)
+        }));
+        questions = questions.slice(0, 5); // 5 questions standard
+        
+        if (moduleTitle) moduleTitle.textContent = quizData.title + ' Assessment';
+        loadQuestion();
+    }
+
+    async function generateAiQuiz(apiKey, topic, level) {
+        if (aiLoadingScreen && quizCard) {
+            quizCard.style.display = 'none';
+            aiLoadingScreen.style.display = 'flex';
+        }
+
+        const promptText = `Generate a JSON quiz with exactly 5 multiple-choice questions for the topic: "${topic}".
+The difficulty level should be suitable for a "${level}" level student in this domain.
+
+You MUST respond with a JSON object in this exact format:
+{
+  "title": "${topic}",
+  "questions": [
+    {
+      "q": "Unique, clear question text?",
+      "opts": [
+        { "text": "Option A text", "correct": false },
+        { "text": "Option B text", "correct": true },
+        { "text": "Option C text", "correct": false },
+        { "text": "Option D text", "correct": false }
+      ]
+    }
+  ]
+}
+
+CRITICAL RULES:
+1. Ensure exactly one option has correct = true.
+2. Return ONLY the raw JSON string. Do not wrap it in \`\`\`json markdown blocks or add any other text outside the JSON.
+3. Make the questions diverse, high-quality, and highly relevant. Give different sets of questions every time.`;
+
+        try {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: promptText
+                        }]
+                    }],
+                    generationConfig: {
+                        responseMimeType: "application/json"
+                    }
+                })
+            });
+
+            if (!response.ok) throw new Error("API request failed");
+
+            const data = await response.json();
+            const textResponse = data.candidates[0].content.parts[0].text;
+            
+            let cleanJson = textResponse.trim();
+            
+            // Defensively extract JSON object out of any conversational text or markdown blocks
+            const jsonStart = cleanJson.indexOf('{');
+            const jsonEnd = cleanJson.lastIndexOf('}');
+            if (jsonStart !== -1 && jsonEnd !== -1) {
+                cleanJson = cleanJson.substring(jsonStart, jsonEnd + 1);
+            }
+
+            const parsedQuiz = JSON.parse(cleanJson);
+            
+            if (parsedQuiz && parsedQuiz.questions && parsedQuiz.questions.length > 0) {
+                // Highly robust, defensive parser for AI-generated structure variations
+                questions = parsedQuiz.questions.map(q => {
+                    let rawOpts = q.opts || q.options || q.choices || q.answers || q.options_list || 
+                                  (Object.values(q).find(v => Array.isArray(v) && v.length > 0));
+                    
+                    if (!Array.isArray(rawOpts) && typeof rawOpts === 'object' && rawOpts !== null) {
+                        // Extract array from dictionary if AI sends an object like {"A": "Option 1"}
+                        rawOpts = Object.keys(rawOpts).map(key => {
+                            const val = rawOpts[key];
+                            if (typeof val === 'string') return { text: val, correct: false };
+                            return val;
+                        });
+                    }
+
+                    if (!Array.isArray(rawOpts)) rawOpts = [];
+
+                    const opts = rawOpts.map(o => {
+                        if (!o) return { text: '', correct: false };
+                        if (typeof o === 'string') {
+                            const isCorrect = (q.correct_answer && String(q.correct_answer).toLowerCase() === o.toLowerCase()) || 
+                                              (q.correct && String(q.correct).toLowerCase() === o.toLowerCase()) || false;
+                            return { text: o, correct: isCorrect };
+                        }
+                        
+                        let optText = o.text || o.option || o.answer || o.choice || o.value || o.label || o.name || '';
+                        if (!optText && typeof o === 'object') {
+                            const strVal = Object.values(o).find(v => typeof v === 'string' && !['true', 'false'].includes(v.toLowerCase()));
+                            if (strVal) optText = strVal;
+                        }
+                        
+                        let isCorrect = o.correct === true || o.correct === 'true' || o.isCorrect === true || o.isCorrect === 'true' || o.correct_answer === true;
+                        if (!isCorrect && typeof o === 'object') {
+                            isCorrect = Object.values(o).some(v => v === true || v === 'true');
+                        }
+
+                        return {
+                            text: optText || 'Option',
+                            correct: isCorrect
+                        };
+                    });
+
+                    // Ensure at least one option is marked correct to prevent lockouts
+                    if (!opts.some(o => o.correct)) {
+                        if (opts.length > 0) opts[0].correct = true;
+                    }
+
+                    return {
+                        q: q.q || q.question || 'No question text provided',
+                        opts: shuffleArray(opts)
+                    };
+                });
+
+                // Validation step: Ensure ALL questions have options, otherwise fallback!
+                const invalidQuestions = questions.filter(q => !q.opts || q.opts.length < 2);
+                if (!questions || questions.length === 0 || invalidQuestions.length > 0) {
+                    throw new Error("AI generated questions without valid options structure.");
+                }
+
+                if (moduleTitle) moduleTitle.textContent = `${parsedQuiz.title || topic} (AI Gen)`;
+            } else {
+                throw new Error("Invalid structure returned by AI");
+            }
+
+        } catch (error) {
+            console.error("AI Quiz generation failed, falling back to predefined questions:", error);
+            if (quizStatus) {
+                quizStatus.textContent = "💡 Gemini API error or invalid response. Loaded pre-defined questions.";
+                quizStatus.className = 'quiz-status warning';
+            }
+            loadFallbackQuiz();
+            return;
+        } finally {
+            if (aiLoadingScreen && quizCard) {
+                aiLoadingScreen.style.display = 'none';
+                quizCard.style.display = 'block';
+            }
+        }
+
+        loadQuestion();
+    }
+
+    // ────────────────────────────────────────────────────
+    // Constants: reading time = 10s, answering time = 5s
+    const READ_TIME   = 10;
+    const ANSWER_TIME = 5;
+
+    function loadQuestion() {
+        clearInterval(quizTimerInterval);
+        selectedOptionIndex = null;
+        btnNextQuestion.style.display = 'none';
+>>>>>>> 8bf0ba3952f61e1122f26d8b54b97912b4634d36
 
         if (currentQuestionIndex >= questions.length) {
             showResults();
@@ -643,23 +921,38 @@ document.addEventListener("DOMContentLoaded", () => {
         // Set question text
         quizQuestionTxt.textContent = q.q;
 
+<<<<<<< HEAD
         // Clear options
         quizOptionsCont.innerHTML = '';
         
         // Render option buttons
+=======
+        // Clear and render option buttons — but lock them during reading phase
+        quizOptionsCont.innerHTML = '';
+        quizOptionsCont.classList.add('disabled'); // locked during read phase
+
+>>>>>>> 8bf0ba3952f61e1122f26d8b54b97912b4634d36
         const optionsToRender = q.opts || [];
         optionsToRender.forEach((opt, i) => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
             btn.id = `option-${i}`;
-            btn.innerHTML = `
-                <span class="option-letter">${OPTION_LABELS[i]}</span>
-                <span class="option-text">${opt.text}</span>
-            `;
+
+            const letterSpan = document.createElement('span');
+            letterSpan.className = 'option-letter';
+            letterSpan.textContent = OPTION_LABELS[i];
+
+            const textSpan = document.createElement('span');
+            textSpan.className = 'option-text';
+            textSpan.textContent = opt.text;
+
+            btn.appendChild(letterSpan);
+            btn.appendChild(textSpan);
             btn.addEventListener('click', () => selectOption(i, opt.correct, q.opts));
             quizOptionsCont.appendChild(btn);
         });
 
+<<<<<<< HEAD
         // Restore visual state if option already selected (e.g. after refresh)
         if (selectedOptionIndex !== null) {
             quizOptionsCont.classList.add('disabled');
@@ -713,11 +1006,23 @@ document.addEventListener("DOMContentLoaded", () => {
             updateTimerBar(timeLeft, 5, timerBar);
             timerText.textContent = `${timeLeft}s to Answer`;
         }
+=======
+        // ── PHASE 1: Reading (10s) ──
+        quizPhase = 'read';
+        timeLeft = READ_TIME;
+        updateTimerBar(timeLeft, READ_TIME, timerBar);
+        if (timerBar) timerBar.style.background = 'linear-gradient(90deg, var(--primary), #60A5FA)';
+        timerText.textContent = `📖 ${timeLeft}s to Read`;
+        quizStatus.textContent = '📖 Read the question carefully!';
+        quizStatus.className = 'quiz-status info';
+>>>>>>> 8bf0ba3952f61e1122f26d8b54b97912b4634d36
 
         quizTimerInterval = setInterval(() => {
             timeLeft--;
-            updateTimerBar(timeLeft, quizPhase === 'read' ? 10 : 5, timerBar);
+            updateTimerBar(timeLeft, READ_TIME, timerBar);
+            timerText.textContent = `📖 ${timeLeft}s to Read`;
 
+<<<<<<< HEAD
             if (quizPhase === 'read') {
                 timerText.textContent = `${timeLeft}s Reading Time`;
                 if (timeLeft <= 0) {
@@ -749,6 +1054,45 @@ document.addEventListener("DOMContentLoaded", () => {
                     btnNextQuestion.style.display = 'inline-flex';
                     btnNextQuestion.textContent = currentQuestionIndex + 1 < questions.length ? 'Next Question →' : 'See Results →';
                 }
+=======
+            if (timeLeft <= 0) {
+                // ── PHASE 2: Answering (5s) ──
+                clearInterval(quizTimerInterval);
+                quizPhase = 'answer';
+                quizOptionsCont.classList.remove('disabled'); // unlock options
+                timeLeft = ANSWER_TIME;
+                updateTimerBar(timeLeft, ANSWER_TIME, timerBar);
+                if (timerBar) timerBar.style.background = 'linear-gradient(90deg, #F59E0B, #EF4444)';
+                timerText.textContent = `⚡ ${timeLeft}s to Answer`;
+                quizStatus.textContent = '⚡ Choose your answer now!';
+                quizStatus.className = 'quiz-status warning';
+
+                quizTimerInterval = setInterval(() => {
+                    timeLeft--;
+                    updateTimerBar(timeLeft, ANSWER_TIME, timerBar);
+                    timerText.textContent = `⚡ ${timeLeft}s to Answer`;
+
+                    if (timeLeft <= 0) {
+                        // Time's up — auto-mark wrong
+                        clearInterval(quizTimerInterval);
+                        quizOptionsCont.classList.add('disabled');
+                        // Highlight correct answer
+                        if (q.opts) {
+                            q.opts.forEach((opt, i) => {
+                                if (opt.correct) {
+                                    const btn = document.getElementById(`option-${i}`);
+                                    if (btn) btn.classList.add('correct');
+                                }
+                            });
+                        }
+                        quizStatus.textContent = "⏰ Time's up! The correct answer is highlighted.";
+                        quizStatus.className = 'quiz-status error';
+                        timerText.textContent = 'Time Up!';
+                        btnNextQuestion.style.display = 'inline-flex';
+                        btnNextQuestion.textContent = currentQuestionIndex + 1 < questions.length ? 'Next Question →' : 'See Results →';
+                    }
+                }, 1000);
+>>>>>>> 8bf0ba3952f61e1122f26d8b54b97912b4634d36
             }
             saveState(); // Save state on every timer tick!
         }, 1000);

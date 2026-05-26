@@ -11,11 +11,8 @@ q/*
     width: 100vw;
     height: 100vh;
     z-index: -1;
-    background-color: var(--bg-light);
-    background-image: 
-        radial-gradient(at 10% 20%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-        radial-gradient(at 90% 10%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
-        radial-gradient(at 50% 80%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+    background-color: #FFFFFF;
+    background-image: none;
 }
 
 /* Layout utilities */
@@ -143,7 +140,7 @@ section {
 .badge {
     display: inline-block;
     padding: 0.5rem 1rem;
-    background: rgba(99, 102, 241, 0.1);
+    background: rgba(42, 101, 245, 0.1);
     color: var(--primary);
     border-radius: 20px;
     font-weight: 700;
@@ -172,9 +169,9 @@ section {
 .dot.green { background: #10B981; }
 .mockup-body { display: flex; gap: 1rem; flex: 1; }
 .mockup-sidebar { width: 60px; display: flex; flex-direction: column; gap: 10px; }
-.mockup-item { height: 24px; background: rgba(99,102,241,0.1); border-radius: 6px; }
+.mockup-item { height: 24px; background: rgba(42,101,245,0.1); border-radius: 6px; }
 .mockup-content { flex: 1; display: flex; flex-direction: column; gap: 1rem; }
-.mockup-title { height: 32px; width: 60%; background: rgba(99,102,241,0.2); border-radius: 8px; }
+.mockup-title { height: 32px; width: 60%; background: rgba(42,101,245,0.2); border-radius: 8px; }
 .mockup-text { height: 16px; background: rgba(148,163,184,0.2); border-radius: 4px; }
 .mockup-text.line-1 { width: 100%; }
 .mockup-text.line-2 { width: 80%; }
@@ -236,7 +233,7 @@ section {
 /* Smooth hover animation applied to the icon when hovering the card */
 .feature-card:hover .feature-icon {
     transform: scale(1.12); /* Slight scale up */
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.25); /* Soft purple glow */
+    box-shadow: 0 0 20px rgba(42, 101, 245, 0.25); /* Soft purple glow */
 }
 
 .feature-icon {
@@ -248,7 +245,7 @@ section {
     /* Responsive font-size for the FontAwesome icon */
     font-size: clamp(1.25rem, 2vw, 1.75rem);
     
-    background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.1));
+    background: linear-gradient(135deg, rgba(42,101,245,0.1), rgba(59,130,246,0.1));
     color: var(--primary);
     border-radius: 16px;
     
@@ -343,7 +340,7 @@ section {
     width: 250px;
     height: 250px;
     border-radius: 50%;
-    background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.2));
+    background: linear-gradient(135deg, rgba(42,101,245,0.2), rgba(59,130,246,0.2));
     display: flex;
     justify-content: center;
     align-items: center;
@@ -387,7 +384,7 @@ section {
     text-align: center;
     padding: 5rem 2rem;
     border-radius: 32px;
-    background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.1));
+    background: linear-gradient(135deg, rgba(42,101,245,0.1), rgba(59,130,246,0.1));
     border: 1px solid rgba(255,255,255,0.8);
 }
 .cta-content h2 { font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem; }

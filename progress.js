@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             stepDiv.innerHTML = `
                 <div class="rs-node ${nodeClass}">${iconOrNum}</div>
-                <span class="rs-label">${module.title.replace(" ", "<br>")}</span>
+                <span class="rs-label">${module.title}</span>
             `;
             trackContainer.appendChild(stepDiv);
 
