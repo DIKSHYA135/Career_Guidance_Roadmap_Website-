@@ -58,16 +58,17 @@
                 </a>
             </nav>
 
-            <div style="flex: 1;"></div>
-            <div class="user-profile" style="display: flex; align-items: center; justify-content: space-between;">
-                <div class="profile-click-area" style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; cursor: pointer;" title="View Profile">
+                        <div style="flex: 1;"></div>
+            
+            <div class="user-profile">
+                <div class="profile-click-area" title="View Profile">
                     <div class="avatar" id="user-avatar"></div>
                     <div class="profile-text">
-                        <h4 id="user-display-name"></h4>
-                        <p></p>
+                        <h4 id="user-display-name">Loading...</h4>
+                        <p>User Role</p>
                     </div>
                 </div>
-                <button class="btn signout-btn" style="background: transparent; border: none; padding: 6px 8px; color: var(--text-muted); cursor: pointer; min-width: auto; box-shadow: none; flex-shrink: 0;" title="Sign Out">
+                <button class="signout-btn" title="Sign Out" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>

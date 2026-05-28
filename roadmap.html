@@ -57,27 +57,27 @@
                 </a>
             </nav>
             
-            <div style="flex: 1;"></div>
-                        <div class="user-profile" style="display: flex; align-items: center; justify-content: space-between;">
-                <div class="profile-click-area" style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; cursor: pointer;" title="View Profile">
+                        <div style="flex: 1;"></div>
+            
+            <div class="user-profile">
+                <div class="profile-click-area" title="View Profile">
                     <div class="avatar" id="user-avatar"></div>
                     <div class="profile-text">
-                        <h4 id="user-display-name"></h4>
-                        <p></p>
+                        <h4 id="user-display-name">Loading...</h4>
+                        <p>User Role</p>
                     </div>
                 </div>
-                <button class="btn signout-btn" style="background: transparent; border: none; padding: 6px 8px; color: var(--text-muted); cursor: pointer; min-width: auto; box-shadow: none; flex-shrink: 0;" title="Sign Out">
+                <button class="signout-btn" title="Sign Out" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">
                     <i class="fas fa-sign-out-alt"></i>
-                </button>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <div class="page-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2rem;">
                 <div>
-                    <h2 id="roadmap-header-title">Your Learning Path</h2>
-                    <p>Follow the points below from beginning to end to progress towards job-readiness.</p>
+                    <h2 id="roadmap-header-title" style="font-size:1.875rem; font-weight:800; color:var(--text-dark); letter-spacing:-0.03em; margin-bottom:0.35rem;">Your Learning Path</h2>
+                    <p style="color:var(--text-muted); font-size:0.9375rem; font-weight:500;">Follow the points below from beginning to end to progress towards job-readiness.</p>
                 </div>
                 <div style="display: flex; gap: 10px;">
                     <button class="btn btn-outline ai-exit-trigger" style="width:auto; padding: 10px 20px;">
@@ -89,7 +89,7 @@
                 </div>
             </div>
 
-            <div class="roadmap-wrapper card-box">
+            <div class="roadmap-wrapper">
                 <div class="roadmap-timeline" id="roadmap-timeline">
                     <!-- Nodes will be dynamically populated here by roadmap.js -->
                 </div>

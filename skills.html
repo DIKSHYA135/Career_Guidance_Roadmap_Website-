@@ -58,21 +58,24 @@
                 </a>
             </nav>
             
-            <div style="flex: 1;"></div>
-
+                        <div style="flex: 1;"></div>
+            
+            <div class="user-profile">
+                <div class="profile-click-area" title="View Profile">
+                    <div class="avatar" id="user-avatar"></div>
+                    <div class="profile-text">
+                        <h4 id="user-display-name">Loading...</h4>
+                        <p>User Role</p>
+                    </div>
+                </div>
+                <button class="signout-btn" title="Sign Out" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Compact Top-Right Profile -->
-            <div class="compact-header-profile">
-                <div class="profile-click-area" style="cursor: pointer; display: flex;" title="View Profile">
-                    <div class="compact-avatar" id="user-avatar"></div>
-                </div>
-                <button class="compact-signout signout-btn" title="Sign Out">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
-            </div>
             <div class="dashboard-container">
                 <!-- TOP HEADER SECTION -->
                 <header class="page-header flex-header dashboard-header">
