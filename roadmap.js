@@ -312,43 +312,30 @@ const ROADMAP_DATA = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-    const timelineContainer = document.getElementById("roadmap-timeline");
+    const accordionContainer = document.getElementById("roadmap-accordion");
+    const overallProgressText = document.getElementById("overall-progress-text");
+    const overallProgressBar = document.getElementById("overall-progress-bar");
     const topQuizBtn = document.getElementById("top-quiz-btn");
     const headerTitle = document.getElementById("roadmap-header-title");
     
     // Load state
     const selectedPath = localStorage.getItem("xyverra_selected_path") || "Web Development";
-    const userLevel = localStorage.getItem("userLevel") || "Beginner";
-    
-    // Fallback logic for path selection text mismatch (if any)
     let matchedPathKey = selectedPath;
     if (!ROADMAP_DATA[matchedPathKey]) {
         matchedPathKey = Object.keys(ROADMAP_DATA).find(key => selectedPath.includes(key)) || "Web Development";
     }
     
-    let userSkills = [];
-    try {
-        const storedSkills = localStorage.getItem("userSkills");
-        if (storedSkills) {
-            userSkills = JSON.parse(storedSkills).map(s => s.toLowerCase().trim());
-        }
-    } catch (e) {
-        console.error("Error parsing user skills");
-    }
-
     if (headerTitle) {
         headerTitle.innerText = `${matchedPathKey} Roadmap`;
     }
 
     const pathData = ROADMAP_DATA[matchedPathKey];
-    if (timelineContainer) timelineContainer.innerHTML = "";
+    if (accordionContainer) accordionContainer.innerHTML = "";
 
     let completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
+    let completedCourses = JSON.parse(localStorage.getItem('completedCourses') || '[]');
 
-    // ── Respect the "Start from Module" selection ──
-    // If the user chose a specific starting module on the Create Roadmap page,
-    // treat every non-capstone module that appears BEFORE it as pre-completed
-    // (skipped), so the roadmap begins at the chosen entry point.
+    // Respect "Start from Module"
     const selectedStartModule = localStorage.getItem('selectedStartModule') || '';
     if (selectedStartModule) {
         const startIdx = pathData.findIndex(m => m.id === selectedStartModule);
@@ -359,91 +346,234 @@ document.addEventListener("DOMContentLoaded", () => {
                     completedModules.push(m.id);
                 }
             }
-            // Persist so progress page also reflects the skipped modules
             localStorage.setItem('completedModules', JSON.stringify(completedModules));
         }
     }
 
-    let currentModuleFound = false;
+    let visibleModulesData = [];
 
-    pathData.forEach((module) => {
-        const isCapstone = module.id === 'capstone';
-        let isCompleted  = completedModules.includes(module.id);
+    // Helper: update overall progress
+    const updateOverallProgress = () => {
+        if (!visibleModulesData.length) return;
+        let cCount = 0;
+        visibleModulesData.forEach(m => {
+            if (completedModules.includes(m.id)) cCount++;
+        });
+        const pct = Math.round((cCount / visibleModulesData.length) * 100);
+        if (overallProgressText) overallProgressText.innerText = `${pct}%`;
+        if (overallProgressBar) overallProgressBar.style.width = `${pct}%`;
+    };
 
-        let statusClass = "locked";
-        let statusText  = "Locked";
+    // Helper: Build course ID
+    const getCourseId = (moduleId, courseName) => `${moduleId}_${courseName.replace(/\s+/g, '')}`;
 
-        if (isCompleted) {
-            statusClass = "completed";
-            statusText  = "Completed";
-        } else if (!currentModuleFound && !isCapstone) {
-            statusClass = "active";
-            statusText  = "Current Module";
-            currentModuleFound = true;
-            if (topQuizBtn) {
-                topQuizBtn.href         = `quiz.html?module=${module.id}`;
-                topQuizBtn.style.display = "inline-flex";
+    // Helper: Render a group
+    const renderGroup = (title, modulesToRender) => {
+        if (!modulesToRender || modulesToRender.length === 0) return;
+        
+        const groupDiv = document.createElement("div");
+        groupDiv.className = "accordion-group";
+        
+        const groupTitle = document.createElement("div");
+        groupTitle.className = "accordion-group-title";
+        groupTitle.innerHTML = `<i class="fas fa-layer-group" style="color:var(--primary); font-size:0.9rem;"></i> ${title}`;
+        groupDiv.appendChild(groupTitle);
+
+        modulesToRender.forEach((module) => {
+            // Check course completion status
+            const totalCourses = module.courses && module.courses.length > 0 ? module.courses.length : 1;
+            let completedCount = 0;
+            
+            if (module.courses && module.courses.length > 0) {
+                module.courses.forEach(c => {
+                    if (completedCourses.includes(getCourseId(module.id, c.name))) {
+                        completedCount++;
+                    }
+                });
+            } else {
+                if (completedCourses.includes(getCourseId(module.id, 'dummy_capstone'))) {
+                    completedCount++;
+                }
             }
-        } else if (isCapstone && !currentModuleFound) {
-            statusClass = "active";
-            statusText  = "Current Module";
-            currentModuleFound = true;
-        } else if (isCapstone) {
-            statusClass = "locked capstone";
-            statusText  = "Requires previous completion";
+
+            // Auto mark module complete if courses are 100%
+            if (completedCount === totalCourses && !completedModules.includes(module.id)) {
+                completedModules.push(module.id);
+                localStorage.setItem('completedModules', JSON.stringify(completedModules));
+            }
+            
+            const moduleCompleted = completedCount === totalCourses || completedModules.includes(module.id);
+            const modulePct = moduleCompleted ? 100 : Math.round((completedCount / totalCourses) * 100);
+
+            const accItem = document.createElement("div");
+            accItem.className = `accordion-item ${moduleCompleted ? 'completed' : ''}`;
+            
+            accItem.innerHTML = `
+                <div class="accordion-header">
+                    <div class="accordion-header-left">
+                        <i class="fas fa-chevron-right toggle-icon"></i>
+                        <h4>${module.title}</h4>
+                    </div>
+                    <div class="accordion-header-right">
+                        <div class="module-progress-wrapper">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: ${modulePct}%; ${moduleCompleted ? 'background: #10B981;' : ''}"></div>
+                            </div>
+                            <span class="module-progress-text">${modulePct}%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-content-inner">
+                        <p class="module-desc">${module.desc}</p>
+                        <div class="course-list">
+                            <!-- courses go here -->
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const courseListContainer = accItem.querySelector('.course-list');
+            
+            const addCourseItem = (cName, cUrl, isDummy = false) => {
+                const cId = getCourseId(module.id, cName);
+                const isChecked = completedCourses.includes(cId) || moduleCompleted;
+                
+                const cItem = document.createElement("label");
+                cItem.className = `course-item ${isChecked ? 'completed' : ''}`;
+                cItem.innerHTML = `
+                    <input type="checkbox" class="course-checkbox" value="${cId}" ${isChecked ? 'checked' : ''}>
+                    <div class="checkbox-custom">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="course-details">
+                        <h5>${isDummy ? 'Submit ' + module.title : cName}</h5>
+                        ${cUrl ? `<a href="${cUrl}" target="_blank" class="course-link">View Course <i class="fas fa-external-link-alt"></i></a>` : ''}
+                    </div>
+                `;
+                
+                const checkbox = cItem.querySelector('.course-checkbox');
+                checkbox.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        if (!completedCourses.includes(cId)) completedCourses.push(cId);
+                        cItem.classList.add('completed');
+                    } else {
+                        completedCourses = completedCourses.filter(id => id !== cId);
+                        cItem.classList.remove('completed');
+                    }
+                    localStorage.setItem('completedCourses', JSON.stringify(completedCourses));
+                    
+                    let currentCount = 0;
+                    if (module.courses && module.courses.length > 0) {
+                        module.courses.forEach(cx => {
+                            if (completedCourses.includes(getCourseId(module.id, cx.name))) currentCount++;
+                        });
+                    } else {
+                        if (completedCourses.includes(getCourseId(module.id, 'dummy_capstone'))) currentCount++;
+                    }
+                    
+                    const newPct = Math.round((currentCount / totalCourses) * 100);
+                    accItem.querySelector('.progress-bar').style.width = `${newPct}%`;
+                    accItem.querySelector('.module-progress-text').innerText = `${newPct}%`;
+                    
+                    if (currentCount === totalCourses) {
+                        if (!completedModules.includes(module.id)) {
+                            completedModules.push(module.id);
+                            localStorage.setItem('completedModules', JSON.stringify(completedModules));
+                        }
+                        accItem.classList.add('completed');
+                        accItem.querySelector('.progress-bar').style.background = '#10B981';
+                    } else {
+                        completedModules = completedModules.filter(id => id !== module.id);
+                        localStorage.setItem('completedModules', JSON.stringify(completedModules));
+                        accItem.classList.remove('completed');
+                        accItem.querySelector('.progress-bar').style.background = 'var(--primary)';
+                    }
+                    
+                    updateOverallProgress();
+                });
+                
+                courseListContainer.appendChild(cItem);
+            };
+
+            if (module.courses && module.courses.length > 0) {
+                module.courses.forEach(c => addCourseItem(c.name, c.url));
+            } else {
+                addCourseItem('dummy_capstone', null, true);
+            }
+            
+            const header = accItem.querySelector('.accordion-header');
+            const content = accItem.querySelector('.accordion-content');
+            header.addEventListener('click', () => {
+                const isActiveNow = accItem.classList.contains('active');
+                document.querySelectorAll('.accordion-item').forEach(item => {
+                    item.classList.remove('active');
+                    item.querySelector('.accordion-content').style.maxHeight = null;
+                });
+                
+                if (!isActiveNow) {
+                    accItem.classList.add('active');
+                    content.style.maxHeight = content.scrollHeight + "px";
+                }
+            });
+
+            groupDiv.appendChild(accItem);
+        });
+        
+        if (accordionContainer) accordionContainer.appendChild(groupDiv);
+    };
+
+    const beginnerModules = pathData.slice(0, 2);
+    const intermediateModules = pathData.slice(2, 4);
+    const advancedModules = pathData.slice(4);
+
+    const quizLevel = localStorage.getItem('quizResultLevel');
+    const quizScore = localStorage.getItem('quizResultScore');
+    const userLevelStr = quizLevel || localStorage.getItem("userLevel") || "Beginner";
+
+    if (quizLevel) {
+        const resultBanner = document.getElementById('quiz-result-banner');
+        if (resultBanner) {
+            resultBanner.style.display = 'block';
+            document.getElementById('quiz-score-display').textContent = quizScore;
+            document.getElementById('quiz-level-display').textContent = quizLevel;
         }
-
-        const itemDiv = document.createElement("div");
-        itemDiv.className = `timeline-item ${statusClass}`;
-
-        let coursesHTML = "";
-        if (module.courses && module.courses.length > 0) {
-            coursesHTML = `<div class="course-suggestions" style="margin-top:10px;font-size:0.9em;">
-                <strong>Recommended Free Resources:</strong>
-                <ul style="list-style-type:none;padding-left:0;margin-top:5px;">
-                    ${module.courses.map(c =>
-                        `<li style="margin-bottom:3px;">
-                            <i class="fas fa-external-link-alt" style="color:#4F46E5;font-size:0.8em;margin-right:5px;"></i>
-                            <a href="${c.url}" target="_blank" style="color:#4F46E5;text-decoration:none;">${c.name}</a>
-                        </li>`
-                    ).join('')}
-                </ul>
-            </div>`;
-        }
-
-        let actionBtnHTML = "";
-        if (statusClass === "active" && !isCapstone) {
-            actionBtnHTML = `<a href="quiz.html?module=${module.id}" class="btn btn-outline"
-                style="margin-top:15px;font-size:0.85em;padding:6px 12px;display:inline-block;">
-                Take Module Quiz</a>`;
-        }
-
-        // "Your Start Point" badge for the chosen entry module
-        const isStartPoint   = selectedStartModule && module.id === selectedStartModule;
-        const startBadgeHTML = isStartPoint
-            ? `<span style="display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;font-weight:700;
-                background:rgba(245,158,11,0.1);color:#D97706;border:1px solid rgba(245,158,11,0.3);
-                padding:3px 10px;border-radius:999px;margin-left:8px;">⚡ Your Start Point</span>`
-            : '';
-
-        itemDiv.innerHTML = `
-            <div class="timeline-content">
-                <h4>${module.title}${startBadgeHTML}</h4>
-                <p>${module.desc}</p>
-                ${statusClass !== "completed" && statusClass !== "locked" && statusClass !== "locked capstone" ? coursesHTML : ""}
-                ${actionBtnHTML}
-                <span class="timeline-pill ${statusClass === 'active' ? 'current' : ''}">${statusText}</span>
-            </div>
-        `;
-
-        if (timelineContainer) timelineContainer.appendChild(itemDiv);
-    });
-
-    if (!currentModuleFound && topQuizBtn) {
-        topQuizBtn.style.display = "none";
     }
 
-    // Apply lock overlay if there is a mandatory quiz pending
+    if (userLevelStr === "Beginner") {
+        renderGroup("Beginner", beginnerModules);
+        visibleModulesData.push(...beginnerModules);
+    }
+    
+    if (userLevelStr === "Beginner" || userLevelStr === "Intermediate") {
+        renderGroup("Intermediate", intermediateModules);
+        visibleModulesData.push(...intermediateModules);
+    }
+
+    renderGroup("Advanced", advancedModules);
+    visibleModulesData.push(...advancedModules);
+
+    updateOverallProgress();
+
+    setTimeout(() => {
+        const allItems = document.querySelectorAll('.accordion-item');
+        let expanded = false;
+        allItems.forEach(item => {
+            if (!item.classList.contains('completed') && !expanded) {
+                item.classList.add('active');
+                const content = item.querySelector('.accordion-content');
+                content.style.maxHeight = content.scrollHeight + "px";
+                expanded = true;
+            }
+        });
+        if (!expanded && allItems.length > 0) {
+            const lastItem = allItems[allItems.length - 1];
+            lastItem.classList.add('active');
+            const content = lastItem.querySelector('.accordion-content');
+            content.style.maxHeight = content.scrollHeight + "px";
+        }
+    }, 100);
+
     if (typeof LocalStorageState !== 'undefined' && LocalStorageState.isMandatoryQuizPending()) {
         if (typeof QuizLockManager !== 'undefined') {
             QuizLockManager.applyRoadmapOverlay();

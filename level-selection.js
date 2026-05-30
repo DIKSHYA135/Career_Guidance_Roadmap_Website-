@@ -35,5 +35,13 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem('userLevel', 'Beginner');
         localStorage.setItem('xyverra_selected_level', 'I am a Beginner');
     }
+
+    const continueBtn = document.getElementById('level-continue-btn');
+    if (continueBtn) {
+        continueBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'skill-input.html';
+        });
+    }
 });
 

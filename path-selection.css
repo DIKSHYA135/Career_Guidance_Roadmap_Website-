@@ -1,83 +1,82 @@
-/* =====================================================
-   PATH SELECTION PAGE — Xyverra
-   ===================================================== */
+/* =========================================================
+   PATH-SELECTION.CSS — Xyverra Career Path Selection
+   ========================================================= */
+@import url('global.css');
 
 /* ── Page wrapper ── */
-.centered-layout { justify-content: flex-start; padding-top: 5rem; padding-bottom: 3rem; }
+.centered-layout {
+    justify-content: flex-start;
+    padding-top: 4.5rem;
+    padding-bottom: 3rem;
+    background: #F8FAFC;
+}
 
 /* ── Page Header ── */
-.path-header { text-align: center; margin-bottom: 2.5rem; animation: fadeInDown 0.5s ease-out; }
+.path-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    animation: fadeInDown 0.5s var(--ease) both;
+}
 
 .path-header h2 {
     font-size: 2rem;
     font-weight: 800;
     color: var(--text-dark);
     margin-bottom: 0.5rem;
-    background: linear-gradient(135deg, var(--text-dark) 0%, var(--primary) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.035em;
+    line-height: 1.2;
 }
 
-.path-header p { font-size: 1rem; color: var(--text-muted); font-weight: 500; }
+.path-header p {
+    font-size: 1rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    max-width: 480px;
+    margin: 0 auto;
+}
 
-/* ── Grid: exactly 3 columns ── */
+/* ── Grid: 3 columns ── */
 .grid-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1.1rem;
+    gap: 1rem;
     width: 100%;
-    max-width: 860px;
+    max-width: 840px;
     margin: 0 auto 2.5rem;
-    animation: fadeInUp 0.55s ease-out forwards;
+    animation: fadeInUp 0.55s var(--ease) both;
 }
 
 /* ── Path Card ── */
 .grid-card {
     display: flex;
     align-items: center;
-    gap: 0.9rem;
-    padding: 1.1rem 1.25rem;
-    border-radius: 16px;
-    border: 1.5px solid rgba(226, 232, 240, 0.8);
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    gap: 0.875rem;
+    padding: 1.125rem 1.25rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background: #FFFFFF;
     cursor: pointer;
-    transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: var(--transition-sm);
     position: relative;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--shadow-premium);
 }
 
-/* Subtle shimmer overlay */
-.grid-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, transparent 60%);
-    pointer-events: none;
-    z-index: 0;
-    border-radius: inherit;
-}
-
-.grid-card>* { position: relative; z-index: 1; }
+.grid-card > * { position: relative; z-index: 1; }
 
 /* ── Hover State ── */
 .grid-card:hover {
-    border-color: rgba(42, 101, 245, 0.3);
-    background: rgba(255, 255, 255, 0.97);
-    transform: translateY(-3px);
-    box-shadow: 0 10px 28px rgba(42, 101, 245, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-color: var(--border-strong);
+    background: #FFFFFF;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.08);
 }
 
-/* ── Active/Selected State ── */
+/* ── Active / Selected State ── */
 .grid-card.active {
     border-color: var(--primary);
-    background: rgba(255, 255, 255, 0.98);
-    box-shadow:
-        0 0 0 3px rgba(42, 101, 245, 0.14),
-        0 10px 25px rgba(42, 101, 245, 0.12);
+    background: #FFFFFF;
+    box-shadow: 0 0 0 4px #DBEAFE;
 }
 
 /* Check mark on active */
@@ -88,38 +87,45 @@
     position: absolute;
     top: 9px;
     right: 11px;
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     color: var(--primary);
     z-index: 2;
 }
 
-/* Active left accent bar */
-.grid-card.active::before { background: linear-gradient(180deg, rgba(42, 101, 245, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%); }
-
 /* ── Icon Box ── */
 .grid-card .icon {
-    font-size: 1.2rem;
-    width: 40px;
-    height: 40px;
+    font-size: 1.25rem;
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
     border-radius: 11px;
-    background: rgba(255, 255, 255, 0.9);
+    background: #F1F5F9;
+    border: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: var(--transition-sm);
+    color: #475569;
     flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), inset 0 0 0 1px rgba(255, 255, 255, 0.8);
-    transition: transform 0.22s ease;
 }
 
-.grid-card:hover .icon { transform: scale(1.12) rotate(-4deg); }
+.grid-card:hover .icon {
+    background: #DBEAFE;
+    border-color: rgba(37, 99, 235, 0.15);
+    color: var(--primary);
+}
 
-.grid-card.active .icon { box-shadow: 0 2px 10px rgba(42, 101, 245, 0.18), inset 0 0 0 1px rgba(255, 255, 255, 0.9); }
+.grid-card.active .icon {
+    background: #DBEAFE;
+    border-color: rgba(37, 99, 235, 0.15);
+    color: var(--primary);
+}
 
 /* ── Card Text ── */
 .grid-card-content { flex: 1; min-width: 0; }
 
 .grid-card-content h4 {
-    font-size: 0.85rem;
+    font-size: 0.875rem;
     font-weight: 700;
     color: var(--text-dark);
     margin-bottom: 2px;
@@ -127,15 +133,17 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    letter-spacing: -0.01em;
 }
 
 .grid-card-content p {
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     color: var(--text-muted);
-    line-height: 1.35;
+    line-height: 1.4;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-weight: 500;
 }
 
 /* ── Continue Button ── */
@@ -143,16 +151,15 @@
     max-width: 260px;
     margin: 0 auto;
     display: flex;
-    transition: all 0.25s;
+    transition: var(--transition-sm);
 }
 
 /* ── Responsive ── */
 @media (max-width: 700px) {
-    .grid-container { grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
+    .grid-container { grid-template-columns: repeat(2, 1fr); gap: 0.875rem; }
 }
 
 @media (max-width: 440px) {
     .grid-container { grid-template-columns: 1fr; }
-
     #path-continue-btn { max-width: 100%; }
 }

@@ -400,6 +400,11 @@ document.addEventListener("DOMContentLoaded", () => {
     moduleId = urlParams.get('module') || 'html';
     isVerify = urlParams.get('verify') === 'true';
     
+    // Assessment logic
+    const isAssessment = urlParams.get('mode') === 'assessment';
+    const targetLevel = urlParams.get('targetLevel') || 'Intermediate';
+    const assessmentPhase = urlParams.get('phase') || 'beginner';
+    
     // Check if mandatory sequence is active in local storage
     const hasMandatoryPending = typeof LocalStorageState !== 'undefined' && LocalStorageState.isMandatoryQuizPending();
     isMandatory = (urlParams.get('mandatory') === 'true') || hasMandatoryPending;
@@ -416,17 +421,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const quizData = QUIZ_DATA[moduleId] || QUIZ_DATA['html'];
-<<<<<<< HEAD
-    questions = [...quizData.questions]; // copy array
-
-    // ── Set page title ──
-    const moduleTitle = document.getElementById('quiz-module-title');
-    if (moduleTitle) {
-        let titleSuffix = ' Assessment';
-        if (isMandatory) titleSuffix = ' Required Assessment';
-        else if (isVerify) titleSuffix = ' Verification';
-        moduleTitle.textContent = quizData.title + titleSuffix;
-=======
 
     // ── Shuffle helper (Fisher-Yates) ──
     function shuffleArray(arr) {
@@ -436,7 +430,6 @@ document.addEventListener("DOMContentLoaded", () => {
             [a[i], a[j]] = [a[j], a[i]];
         }
         return a;
->>>>>>> 8bf0ba3952f61e1122f26d8b54b97912b4634d36
     }
 
     // ── DOM refs ──
@@ -452,12 +445,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const quizBody          = document.getElementById('quiz-body');
     const questionMeta      = document.getElementById('question-meta-text');
 
-<<<<<<< HEAD
-    // Custom exit confirmation modal elements
-    const exitModal         = document.getElementById('quiz-exit-modal');
-    const cancelExitBtn     = document.getElementById('btn-cancel-exit');
-    const confirmExitBtn     = document.getElementById('btn-confirm-exit');
-=======
     // AI Refs
     const btnAiConfig      = document.getElementById('btn-ai-config');
     const aiConfigOverlay  = document.getElementById('aiConfigOverlay');
@@ -532,7 +519,6 @@ document.addEventListener("DOMContentLoaded", () => {
         clearInterval(quizTimerInterval);
         window.location.href = isVerify ? 'skill-verification.html' : 'roadmap.html';
     });
->>>>>>> 8bf0ba3952f61e1122f26d8b54b97912b4634d36
 
     // ── Restore saved state if exists ──
     let savedState = null;
@@ -635,89 +621,6 @@ document.addEventListener("DOMContentLoaded", () => {
         loadQuestion();
     });
 
-<<<<<<< HEAD
-    // ── Start/Load the active question ──
-    loadQuestion();
-
-    // ────────────────────────────────────────────────────
-    function handleBeforeUnload(e) {
-        if (currentQuestionIndex < questions.length) {
-            e.preventDefault();
-            e.returnValue = 'Are you sure you want to leave? Your progress is saved, but you must complete this quiz to progress.';
-            return e.returnValue;
-        }
-    }
-
-    // ────────────────────────────────────────────────────
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-    }
-
-    // ────────────────────────────────────────────────────
-    function saveState() {
-        const stateObj = {
-            moduleId: moduleId,
-            isVerify: isVerify,
-            isMandatory: isMandatory,
-            currentQuestionIndex: currentQuestionIndex,
-            score: score,
-            quizPhase: quizPhase,
-            timeLeft: timeLeft,
-            selectedOptionIndex: selectedOptionIndex,
-            shuffledQuestions: questions
-        };
-        localStorage.setItem('xyverra_active_quiz', JSON.stringify(stateObj));
-        
-        // Also update the mandatory sequence state if applicable
-        if (isMandatory && typeof LocalStorageState !== 'undefined') {
-            LocalStorageState.saveCurrentQuizProgress(
-                currentQuestionIndex,
-                score,
-                questions,
-                quizPhase,
-                timeLeft,
-                selectedOptionIndex
-            );
-        }
-    }
-
-    // ────────────────────────────────────────────────────
-    function clearState() {
-        localStorage.removeItem('xyverra_active_quiz');
-    }
-
-    // ────────────────────────────────────────────────────
-    function drawProgressDots() {
-        const dotsContainer = document.getElementById('quiz-progress-dots');
-        if (!dotsContainer) return;
-        dotsContainer.innerHTML = '';
-        for (let i = 0; i < questions.length; i++) {
-            const dot = document.createElement('div');
-            dot.className = 'progress-dot';
-            if (i < currentQuestionIndex) {
-                dot.classList.add('completed');
-            } else if (i === currentQuestionIndex) {
-                dot.classList.add('current');
-            } else {
-                dot.classList.add('pending');
-            }
-            dotsContainer.appendChild(dot);
-        }
-    }
-
-    // ────────────────────────────────────────────────────
-    function loadQuestion() {
-        clearInterval(quizTimerInterval);
-        
-        // Draw segmented progress dots
-        drawProgressDots();
-
-        // Enforce saveState
-        saveState();
-=======
     // ── Load / Generate Quiz ──
     const userLevel = localStorage.getItem("userLevel") || "Beginner";
     let geminiKey = localStorage.getItem('gemini_api_key');
@@ -733,8 +636,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (geminiKey && geminiKey.trim()) {
-        generateAiQuiz(geminiKey.trim(), quizData.title, userLevel);
+        let topic = quizData.title;
+        let aiLevel = userLevel;
+        
+        if (isAssessment) {
+            const selectedPath = localStorage.getItem('xyverra_selected_path') || 'Web Development';
+            topic = `${assessmentPhase === 'beginner' ? 'Beginner' : 'Intermediate'} level foundational concepts for ${selectedPath}`;
+            aiLevel = assessmentPhase === 'beginner' ? 'Beginner' : 'Intermediate';
+            if (moduleTitle) moduleTitle.textContent = `Prerequisite Assessment: ${aiLevel}`;
+        }
+        
+        generateAiQuiz(geminiKey.trim(), topic, aiLevel);
     } else {
+        if (isAssessment) {
+            if (moduleTitle) moduleTitle.textContent = `Prerequisite Assessment: ${assessmentPhase === 'beginner' ? 'Beginner' : 'Intermediate'}`;
+        }
         loadFallbackQuiz();
     }
 
@@ -745,7 +661,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }));
         questions = questions.slice(0, 5); // 5 questions standard
         
-        if (moduleTitle) moduleTitle.textContent = quizData.title + ' Assessment';
+        if (moduleTitle && !isAssessment) moduleTitle.textContent = quizData.title + ' Assessment';
         loadQuestion();
     }
 
@@ -904,7 +820,6 @@ CRITICAL RULES:
         clearInterval(quizTimerInterval);
         selectedOptionIndex = null;
         btnNextQuestion.style.display = 'none';
->>>>>>> 8bf0ba3952f61e1122f26d8b54b97912b4634d36
 
         if (currentQuestionIndex >= questions.length) {
             showResults();
@@ -921,17 +836,10 @@ CRITICAL RULES:
         // Set question text
         quizQuestionTxt.textContent = q.q;
 
-<<<<<<< HEAD
-        // Clear options
-        quizOptionsCont.innerHTML = '';
-        
-        // Render option buttons
-=======
         // Clear and render option buttons — but lock them during reading phase
         quizOptionsCont.innerHTML = '';
         quizOptionsCont.classList.add('disabled'); // locked during read phase
 
->>>>>>> 8bf0ba3952f61e1122f26d8b54b97912b4634d36
         const optionsToRender = q.opts || [];
         optionsToRender.forEach((opt, i) => {
             const btn = document.createElement('button');
@@ -952,61 +860,6 @@ CRITICAL RULES:
             quizOptionsCont.appendChild(btn);
         });
 
-<<<<<<< HEAD
-        // Restore visual state if option already selected (e.g. after refresh)
-        if (selectedOptionIndex !== null) {
-            quizOptionsCont.classList.add('disabled');
-            const selectedBtn = document.getElementById(`option-${selectedOptionIndex}`);
-            const isCorrect = selectedOptionIndex >= 0 && q.opts[selectedOptionIndex] && q.opts[selectedOptionIndex].correct;
-            
-            if (selectedOptionIndex === -1) {
-                // Was timed out
-                q.opts.forEach((opt, idx) => {
-                    if (opt.correct) {
-                        const btn = document.getElementById(`option-${idx}`);
-                        if (btn) btn.classList.add('correct');
-                    }
-                });
-                quizStatus.textContent = "⏰ Time's up! The correct answer is highlighted.";
-                quizStatus.className = 'quiz-status error';
-                timerText.textContent = 'Time Up!';
-            } else if (isCorrect) {
-                if (selectedBtn) selectedBtn.classList.add('correct');
-                quizStatus.textContent = '✅ Correct! Well done!';
-                quizStatus.className = 'quiz-status success';
-            } else {
-                if (selectedBtn) selectedBtn.classList.add('wrong');
-                quizStatus.textContent = '❌ Incorrect. The correct answer is highlighted.';
-                quizStatus.className = 'quiz-status error';
-                q.opts.forEach((opt, idx) => {
-                    if (opt.correct) {
-                        const btn = document.getElementById(`option-${idx}`);
-                        if (btn) btn.classList.add('correct');
-                    }
-                });
-            }
-
-            timerText.textContent = 'Answered';
-            btnNextQuestion.style.display = 'inline-flex';
-            btnNextQuestion.textContent = currentQuestionIndex + 1 < questions.length ? 'Next Question →' : 'See Results →';
-            return;
-        }
-
-        // Standard timer logic
-        if (quizPhase === 'read') {
-            quizOptionsCont.classList.add('disabled');
-            quizStatus.textContent = 'Read the question carefully. Options will unlock in 10 seconds.';
-            quizStatus.className = 'quiz-status warning';
-            updateTimerBar(timeLeft, 10, timerBar);
-            timerText.textContent = `${timeLeft}s Reading Time`;
-        } else {
-            quizOptionsCont.classList.remove('disabled');
-            quizStatus.textContent = 'Select your answer!';
-            quizStatus.className = 'quiz-status info';
-            updateTimerBar(timeLeft, 5, timerBar);
-            timerText.textContent = `${timeLeft}s to Answer`;
-        }
-=======
         // ── PHASE 1: Reading (10s) ──
         quizPhase = 'read';
         timeLeft = READ_TIME;
@@ -1015,46 +868,12 @@ CRITICAL RULES:
         timerText.textContent = `📖 ${timeLeft}s to Read`;
         quizStatus.textContent = '📖 Read the question carefully!';
         quizStatus.className = 'quiz-status info';
->>>>>>> 8bf0ba3952f61e1122f26d8b54b97912b4634d36
 
         quizTimerInterval = setInterval(() => {
             timeLeft--;
             updateTimerBar(timeLeft, READ_TIME, timerBar);
             timerText.textContent = `📖 ${timeLeft}s to Read`;
 
-<<<<<<< HEAD
-            if (quizPhase === 'read') {
-                timerText.textContent = `${timeLeft}s Reading Time`;
-                if (timeLeft <= 0) {
-                    quizPhase = 'answer';
-                    timeLeft = 5;
-                    quizOptionsCont.classList.remove('disabled');
-                    quizStatus.textContent = 'Select your answer!';
-                    quizStatus.className = 'quiz-status info';
-                    timerText.textContent = `${timeLeft}s to Answer`;
-                    updateTimerBar(timeLeft, 5, timerBar);
-                }
-            } else {
-                timerText.textContent = `${timeLeft}s to Answer`;
-                if (timeLeft <= 0) {
-                    clearInterval(quizTimerInterval);
-                    selectedOptionIndex = -1; // timed out
-                    quizOptionsCont.classList.add('disabled');
-                    
-                    q.opts.forEach((opt, idx) => {
-                        if (opt.correct) {
-                            const btn = document.getElementById(`option-${idx}`);
-                            if (btn) btn.classList.add('correct');
-                        }
-                    });
-                    
-                    quizStatus.textContent = "⏰ Time's up! The correct answer is highlighted.";
-                    quizStatus.className = 'quiz-status error';
-                    timerText.textContent = 'Time Up!';
-                    btnNextQuestion.style.display = 'inline-flex';
-                    btnNextQuestion.textContent = currentQuestionIndex + 1 < questions.length ? 'Next Question →' : 'See Results →';
-                }
-=======
             if (timeLeft <= 0) {
                 // ── PHASE 2: Answering (5s) ──
                 clearInterval(quizTimerInterval);
@@ -1092,7 +911,6 @@ CRITICAL RULES:
                         btnNextQuestion.textContent = currentQuestionIndex + 1 < questions.length ? 'Next Question →' : 'See Results →';
                     }
                 }, 1000);
->>>>>>> 8bf0ba3952f61e1122f26d8b54b97912b4634d36
             }
             saveState(); // Save state on every timer tick!
         }, 1000);
@@ -1157,6 +975,20 @@ CRITICAL RULES:
 
         const pct = Math.round((score / questions.length) * 100);
         const passed = pct >= 70;
+
+        if (isAssessment) {
+            handleAssessmentResults(pct, passed);
+            return;
+        }
+
+        let detectedLevel = "Beginner";
+        if (pct >= 80) {
+            detectedLevel = "Advanced";
+        } else if (pct >= 50) {
+            detectedLevel = "Intermediate";
+        }
+        localStorage.setItem('quizResultLevel', detectedLevel);
+        localStorage.setItem('quizResultScore', pct);
 
         // Hide quiz body, show result
         if (quizBody) quizBody.style.display = 'none';
@@ -1256,5 +1088,101 @@ CRITICAL RULES:
             if (footerActions) footerActions.appendChild(doneBtn);
         }
     }
+
+    function handleAssessmentResults(pct, passed) {
+        if (quizBody) quizBody.style.display = 'none';
+        resultContainer.style.display = 'block';
+
+        const resultIcon   = document.getElementById('result-icon');
+        const scoreDisplay = document.getElementById('score-display');
+        const scoreText    = document.getElementById('score-text');
+
+        resultIcon.className = `result-icon ${passed ? 'success' : 'fail'}`;
+        resultIcon.innerHTML = passed ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-times-circle"></i>';
+
+        scoreDisplay.textContent = `${pct}%`;
+        scoreText.textContent = passed ? `You scored ${score}/${questions.length} — Phase Complete!` : `You scored ${score}/${questions.length} — Assessment Finished.`;
+
+        if (timerBar) {
+            timerBar.style.width = '100%';
+            timerBar.style.background = passed ? 'linear-gradient(90deg, var(--success), #34D399)' : 'linear-gradient(90deg, var(--error), #F87171)';
+        }
+        timerText.textContent = passed ? 'Passed!' : 'Assessment Done';
+        quizStatus.textContent = '';
+
+        let scores = JSON.parse(localStorage.getItem('xyverra_assessment_scores') || '{}');
+        scores[assessmentPhase] = pct;
+        localStorage.setItem('xyverra_assessment_scores', JSON.stringify(scores));
+
+        let recommendedLevel = "Beginner";
+        let shouldProceedToNextPhase = false;
+
+        if (targetLevel === "Intermediate") {
+            recommendedLevel = passed ? "Intermediate" : "Beginner";
+        } else if (targetLevel === "Advanced") {
+            if (assessmentPhase === 'beginner') {
+                if (passed) {
+                    shouldProceedToNextPhase = true;
+                } else {
+                    recommendedLevel = "Beginner";
+                }
+            } else if (assessmentPhase === 'intermediate') {
+                recommendedLevel = passed ? "Advanced" : "Intermediate";
+            }
+        }
+
+        const footerActions = document.querySelector('.quiz-footer-actions');
+        if (footerActions) footerActions.innerHTML = '';
+
+        if (shouldProceedToNextPhase) {
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'btn btn-primary';
+            nextBtn.innerHTML = 'Proceed to Intermediate Phase <i class="fas fa-arrow-right"></i>';
+            nextBtn.addEventListener('click', () => {
+                window.location.href = `quiz.html?mode=assessment&targetLevel=Advanced&phase=intermediate`;
+            });
+            if (footerActions) footerActions.appendChild(nextBtn);
+        } else {
+            localStorage.setItem('xyverra_recommended_level', recommendedLevel);
+            const viewResultsBtn = document.createElement('button');
+            viewResultsBtn.className = 'btn btn-primary';
+            viewResultsBtn.innerHTML = 'View Assessment Results <i class="fas fa-chart-bar"></i>';
+            viewResultsBtn.addEventListener('click', () => {
+                showAssessmentDecisionModal(recommendedLevel);
+            });
+            if (footerActions) footerActions.appendChild(viewResultsBtn);
+        }
+    }
+
+    function showAssessmentDecisionModal(recommendedLevel) {
+        const overlay = document.getElementById('assessmentDecisionOverlay');
+        if (!overlay) return;
+        
+        const scores = JSON.parse(localStorage.getItem('xyverra_assessment_scores') || '{}');
+        const scoresContainer = document.getElementById('modal-scores-container');
+        if (scoresContainer) {
+            scoresContainer.innerHTML = '';
+            for (const [phase, s] of Object.entries(scores)) {
+                scoresContainer.innerHTML += `<div style="width: 100%; display: flex; justify-content: space-between;"><span style="color: var(--text-muted);">${phase.charAt(0).toUpperCase() + phase.slice(1)} Score:</span> <strong style="color: var(--text-dark);">${s}%</strong></div>`;
+            }
+        }
+
+        document.getElementById('modal-selected-level').textContent = targetLevel;
+        document.getElementById('modal-recommended-level').textContent = recommendedLevel;
+        
+        overlay.style.display = 'flex';
+
+        document.getElementById('btn-use-recommended').onclick = () => {
+            localStorage.setItem('userLevel', recommendedLevel);
+            localStorage.setItem('xyverra_selected_level', `I am a ${recommendedLevel}`);
+            window.location.href = 'skill-input.html';
+        };
+
+        document.getElementById('btn-use-selected').onclick = () => {
+            localStorage.setItem('userLevel', targetLevel);
+            localStorage.setItem('xyverra_selected_level', `I am a ${targetLevel}`);
+            window.location.href = 'skill-input.html';
+        };
+    }
 });
-});
+

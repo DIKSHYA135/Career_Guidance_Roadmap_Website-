@@ -1,161 +1,162 @@
 /* ==========================================================
-   skills.js — Skill Inventory (fully path-driven)
-   TODO: Replace PATH_SKILLS lookup with GET /api/skills/:path
+   skills.js — Redesigned Skill Inventory (Category Based)
    ========================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
-
-    // ── 1. Read selected career path ──────────────────────
-    // TODO: GET /api/user/me → { selectedPath }
-    const selectedPath = localStorage.getItem('xyverra_selected_path') || 'Web Development';
-
-    // Get path skills from the global PATH_SKILLS (loaded from app-data.js)
-    const pathSkills = (typeof PATH_SKILLS !== 'undefined' && PATH_SKILLS[selectedPath])
-        ? PATH_SKILLS[selectedPath]
-        : PATH_SKILLS['Web Development'];
-
-    // Merge with any user-overridden proficiency/verified data from localStorage
-    // TODO: GET /api/user/skills → [{ name, proficiency, verified }]
-    let userOverrides = {};
+    // 1. Initialize Data
+    let localSkillsData = null;
     try {
-        const raw = localStorage.getItem('user_skill_overrides');
-        if (raw) userOverrides = JSON.parse(raw);
-    } catch { /* ignore */ }
-
-    let skillsData = pathSkills.map(skill => ({
-        ...skill,
-        proficiency: userOverrides[skill.name]?.proficiency ?? skill.proficiency,
-        verified:    userOverrides[skill.name]?.verified    ?? skill.verified,
-        level:       userOverrides[skill.name]?.level       ?? skill.level,
-    }));
-
-    // ── 2. UI Elements ────────────────────────────────────
-    const skillsContainer    = document.getElementById('skills-container');
-    const filterChips        = document.getElementById('filter-chips');
-    const searchInput        = document.getElementById('skill-search');
-    const totalSkillsEl      = document.getElementById('total-skills-count');
-    const verifiedSkillsEl   = document.getElementById('verified-skills-count');
-    const avgProficiencyEl   = document.getElementById('avg-proficiency');
-    const pathTitleEl        = document.getElementById('skills-path-title');
-
-    if (!skillsContainer) return;
-
-    // Show selected path name in header
-    if (pathTitleEl) pathTitleEl.textContent = selectedPath;
-
-    // ── 3. Build dynamic filter chips from categories ─────
-    if (filterChips) {
-        const cats = [...new Set(skillsData.map(s => s.category))];
-        filterChips.innerHTML = `<button class="chip active" data-filter="All">All</button>`;
-        cats.forEach(cat => {
-            filterChips.innerHTML += `<button class="chip" data-filter="${cat}">${cat}</button>`;
-        });
-        filterChips.addEventListener('click', e => {
-            const chip = e.target.closest('.chip');
-            if (!chip) return;
-            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-            chip.classList.add('active');
-            currentFilter = chip.dataset.filter;
-            renderSkills();
-        });
+        const storedData = localStorage.getItem('xyverra_skills_data');
+        if (storedData) {
+            localSkillsData = JSON.parse(storedData);
+        }
+    } catch (e) {
+        console.error("Error reading from localStorage", e);
     }
 
-    if (searchInput) {
-        searchInput.addEventListener('input', e => {
-            searchQuery = e.target.value.toLowerCase();
-            renderSkills();
-        });
-    }
-
-    let currentFilter = 'All';
-    let searchQuery   = '';
-
-    // ── 4. Stats ──────────────────────────────────────────
-    function updateStats() {
-        const verified  = skillsData.filter(s => s.verified).length;
-        const avgProf   = skillsData.length
-            ? Math.round(skillsData.reduce((sum, s) => sum + (s.proficiency || 0), 0) / skillsData.length)
-            : 0;
-        if (totalSkillsEl)    totalSkillsEl.textContent    = skillsData.length;
-        if (verifiedSkillsEl) verifiedSkillsEl.textContent = verified;
-        if (avgProficiencyEl) avgProficiencyEl.textContent = `${avgProf}%`;
-    }
-
-    // ── 5. Render ─────────────────────────────────────────
-    function renderSkills() {
-        const filtered = skillsData.filter(skill => {
-            const matchCat    = currentFilter === 'All' || skill.category === currentFilter;
-            const matchSearch = skill.name.toLowerCase().includes(searchQuery)
-                             || skill.category.toLowerCase().includes(searchQuery);
-            return matchCat && matchSearch;
-        });
-
-        if (filtered.length === 0) {
-            skillsContainer.innerHTML = `
-                <div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-muted);">
-                    <i class="fas fa-search" style="font-size:2rem;margin-bottom:1rem;display:block;opacity:0.4;"></i>
-                    No skills match your search.
-                </div>`;
+    if (!localSkillsData) {
+        // Fallback to SKILLS_DATA from app-data.js
+        if (typeof SKILLS_DATA !== 'undefined') {
+            localSkillsData = JSON.parse(JSON.stringify(SKILLS_DATA));
+            saveData();
+        } else {
+            console.error("SKILLS_DATA not found in app-data.js");
             return;
         }
+    }
 
-        skillsContainer.innerHTML = '';
-        filtered.forEach(skill => {
-            const lvl   = skill.level?.toLowerCase() || 'beginner';
-            const prof  = skill.proficiency || 0;
-            const card  = document.createElement('div');
-            card.className = `skill-card ${lvl}`;
+    function saveData() {
+        localStorage.setItem('xyverra_skills_data', JSON.stringify(localSkillsData));
+    }
 
-            const badgeMap = { beginner: 'badge-beginner', intermediate: 'badge-intermediate', advanced: 'badge-advanced' };
+    // 2. Elements
+    const categoryCardsContainer = document.getElementById('category-cards');
+    const skillPanel = document.getElementById('skill-panel');
+    const panelCategoryTitle = document.getElementById('panel-category-title');
+    const btnClosePanel = document.getElementById('btn-close-panel');
 
-            card.innerHTML = `
-                <div class="skill-header">
-                    <div class="title-group">
-                        <h3 class="skill-title">${skill.name}</h3>
-                        <span class="skill-category">${skill.category}</span>
-                    </div>
-                    <div class="badge-container">
-                        <span class="badge ${badgeMap[lvl] || 'badge-beginner'}">${skill.level}</span>
-                        ${skill.verified ? `<span class="badge badge-verified"><i class="fas fa-check" style="font-size:0.6rem;"></i> Verified</span>` : ''}
-                    </div>
-                </div>
+    const lists = {
+        beginner: document.getElementById('list-beginner'),
+        intermediate: document.getElementById('list-intermediate'),
+        advanced: document.getElementById('list-advanced')
+    };
 
-                <p class="skill-description">${skill.description}</p>
+    let selectedCategory = null;
 
-                <div class="progress-wrapper">
-                    <div class="progress-label">
-                        <span>Proficiency</span>
-                        <span>${prof}%</span>
-                    </div>
-                    <div class="progress-track">
-                        <div class="progress-fill" style="width:0%" data-target="${prof}%"></div>
-                    </div>
-                </div>
+    if (!categoryCardsContainer) return; // Prevent errors on other pages if included
 
-                <a href="${skill.courseUrl}" target="_blank" rel="noopener" class="action-btn skill-course-btn">
-                    <i class="fas fa-external-link-alt"></i> ${skill.courseName}
-                </a>
-            `;
-            skillsContainer.appendChild(card);
-        });
+    // 3. Render Categories
+    function renderCategories() {
+        categoryCardsContainer.innerHTML = '';
+        const categories = Object.keys(localSkillsData);
 
-        // Animate progress bars
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-            skillsContainer.querySelectorAll('.progress-fill').forEach(el => {
-                el.style.width = el.dataset.target;
+        categories.forEach(category => {
+            const card = document.createElement('div');
+            card.className = 'category-card';
+            card.textContent = category;
+            
+            card.addEventListener('click', () => {
+                // Update active state
+                document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                
+                selectedCategory = category;
+                openPanel();
             });
-        }));
 
-        updateStats();
-    }
-
-    renderSkills();
-
-    // ── 6. Add Skill button (opens quiz for current module) ─
-    const addSkillBtn = document.getElementById('btn-add-skill');
-    if (addSkillBtn) {
-        addSkillBtn.addEventListener('click', () => {
-            window.location.href = 'skill-input.html';
+            categoryCardsContainer.appendChild(card);
         });
     }
+
+    // 4. Panel Logic
+    function openPanel() {
+        if (!selectedCategory) return;
+        panelCategoryTitle.textContent = selectedCategory + " Skills";
+        renderSkills();
+        skillPanel.style.display = 'block';
+    }
+
+    function closePanel() {
+        skillPanel.style.display = 'none';
+        document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+        selectedCategory = null;
+    }
+
+    if (btnClosePanel) {
+        btnClosePanel.addEventListener('click', closePanel);
+    }
+
+    function renderSkills() {
+        if (!selectedCategory || !localSkillsData[selectedCategory]) return;
+
+        const categoryData = localSkillsData[selectedCategory];
+
+        ['beginner', 'intermediate', 'advanced'].forEach(level => {
+            const listEl = lists[level];
+            listEl.innerHTML = '';
+            
+            const skills = categoryData[level] || [];
+            skills.forEach((skill, index) => {
+                const li = document.createElement('li');
+                li.className = 'skill-item';
+                li.innerHTML = `
+                    <span class="skill-name">${skill}</span>
+                    <div class="skill-actions">
+                        <button class="action-btn-small edit-btn" data-level="${level}" data-index="${index}" title="Edit"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn-small delete-btn" data-level="${level}" data-index="${index}" title="Delete"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+                listEl.appendChild(li);
+            });
+        });
+    }
+
+    // 5. Add, Edit, Delete Logic
+    // Use event delegation for lists
+    ['beginner', 'intermediate', 'advanced'].forEach(level => {
+        if (lists[level]) {
+            lists[level].addEventListener('click', (e) => {
+                const editBtn = e.target.closest('.edit-btn');
+                const deleteBtn = e.target.closest('.delete-btn');
+
+                if (editBtn) {
+                    const index = editBtn.dataset.index;
+                    const currentSkill = localSkillsData[selectedCategory][level][index];
+                    const newSkill = prompt("Edit skill:", currentSkill);
+                    if (newSkill !== null && newSkill.trim() !== '') {
+                        localSkillsData[selectedCategory][level][index] = newSkill.trim();
+                        saveData();
+                        renderSkills();
+                    }
+                } else if (deleteBtn) {
+                    const index = deleteBtn.dataset.index;
+                    if (confirm("Are you sure you want to delete this skill?")) {
+                        localSkillsData[selectedCategory][level].splice(index, 1);
+                        saveData();
+                        renderSkills();
+                    }
+                }
+            });
+        }
+    });
+
+    // Add buttons
+    document.querySelectorAll('.add-skill-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (!selectedCategory) return;
+            const level = btn.dataset.level;
+            const newSkill = prompt(`Add a new ${level} skill for ${selectedCategory}:`);
+            if (newSkill !== null && newSkill.trim() !== '') {
+                if (!localSkillsData[selectedCategory][level]) {
+                    localSkillsData[selectedCategory][level] = [];
+                }
+                localSkillsData[selectedCategory][level].push(newSkill.trim());
+                saveData();
+                renderSkills();
+            }
+        });
+    });
+
+    // Initial Render
+    renderCategories();
 });

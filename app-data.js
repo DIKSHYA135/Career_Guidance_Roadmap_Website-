@@ -89,3 +89,121 @@ const PATH_SKILLS = {
     { name: "Statistics", category: "Mathematics", level: "beginner", description: "Descriptive stats, correlation, and A/B testing.", proficiency: 0, verified: false, courseUrl: "https://www.khanacademy.org/math/statistics-probability", courseName: "Khan Academy Stats" }
   ]
 };
+
+const SKILLS_DATA = {
+  "Web Development": {
+    "beginner": ["HTML", "CSS", "JavaScript"],
+    "intermediate": ["React", "Tailwind CSS", "TypeScript"],
+    "advanced": ["Next.js", "Performance Optimization", "System Design"]
+  },
+  "Full Stack Development": {
+    "beginner": ["HTML/CSS/JS", "Git & GitHub", "Command Line Basics"],
+    "intermediate": ["Node.js", "Express.js", "SQL / NoSQL"],
+    "advanced": ["Microservices", "Docker & Kubernetes", "Cloud Architecture"]
+  },
+  "Backend / APIs": {
+    "beginner": ["Python / JS", "REST APIs", "SQL Basics"],
+    "intermediate": ["FastAPI / Flask", "Authentication (JWT)", "Database Design"],
+    "advanced": ["GraphQL", "Message Queues", "Caching (Redis)"]
+  },
+  "Data Science": {
+    "beginner": ["Python", "NumPy", "Pandas"],
+    "intermediate": ["Statistics", "Machine Learning", "Data Visualization"],
+    "advanced": ["Deep Learning", "MLOps", "Research Engineering"]
+  },
+  "NLP / AI": {
+    "beginner": ["Python", "Prompt Engineering", "OpenAI APIs"],
+    "intermediate": ["Transformers", "LangChain", "RAG"],
+    "advanced": ["Fine Tuning", "Agentic Systems", "LLM Infrastructure"]
+  },
+  "Cloud / DevOps": {
+    "beginner": ["Linux Basics", "Networking", "Bash Scripting"],
+    "intermediate": ["Docker", "CI/CD Pipelines", "AWS / GCP / Azure Basics"],
+    "advanced": ["Kubernetes", "Terraform / IaC", "Site Reliability Engineering"]
+  },
+  "UI/UX Design": {
+    "beginner": ["Color Theory", "Typography", "Wireframing"],
+    "intermediate": ["Figma", "User Research", "Prototyping"],
+    "advanced": ["Design Systems", "Accessibility (WCAG)", "UX Strategy"]
+  },
+  "Mobile Development": {
+    "beginner": ["JavaScript / Dart", "Mobile UI Patterns", "State Management Basics"],
+    "intermediate": ["React Native / Flutter", "API Integration", "Local Storage"],
+    "advanced": ["Native Modules", "Performance Profiling", "App Store Deployment"]
+  },
+  "Cybersecurity": {
+    "beginner": ["Networking Concepts", "Linux Command Line", "Security Fundamentals"],
+    "intermediate": ["Ethical Hacking", "OWASP Top 10", "Cryptography"],
+    "advanced": ["Penetration Testing", "Reverse Engineering", "Incident Response"]
+  },
+  "Data Analytics": {
+    "beginner": ["Excel / Google Sheets", "SQL Basics", "Basic Statistics"],
+    "intermediate": ["Tableau / Power BI", "Python / R", "Data Cleaning"],
+    "advanced": ["Predictive Modeling", "A/B Testing", "Advanced Data Storytelling"]
+  }
+};
+
+const MODULES_DATA = {
+  "Web Development": {
+    "Beginner": [
+      { id: "wd-beg-1", title: "HTML Fundamentals", desc: "Learn the core structure of the web." },
+      { id: "wd-beg-2", title: "CSS Fundamentals", desc: "Style your websites with modern CSS." },
+      { id: "wd-beg-3", title: "JavaScript Basics", desc: "Add interactivity to your pages." }
+    ],
+    "Intermediate": [
+      { id: "wd-int-1", title: "React", desc: "Build component-based UIs." },
+      { id: "wd-int-2", title: "TypeScript", desc: "Type-safe JavaScript." },
+      { id: "wd-int-3", title: "Tailwind CSS", desc: "Utility-first CSS framework." }
+    ],
+    "Advanced": [
+      { id: "wd-adv-1", title: "Next.js", desc: "React framework for production." },
+      { id: "wd-adv-2", title: "Performance Optimization", desc: "Make your apps blazing fast." },
+      { id: "wd-adv-3", title: "System Design", desc: "Architect scalable frontend systems." }
+    ]
+  },
+  "Data Science": {
+    "Beginner": [
+      { id: "ds-beg-1", title: "Python Basics", desc: "Core Python programming." },
+      { id: "ds-beg-2", title: "NumPy", desc: "Numerical computing." },
+      { id: "ds-beg-3", title: "Pandas", desc: "Data manipulation." }
+    ],
+    "Intermediate": [
+      { id: "ds-int-1", title: "Statistics", desc: "Core statistical concepts." },
+      { id: "ds-int-2", title: "Machine Learning", desc: "Predictive modeling basics." },
+      { id: "ds-int-3", title: "Data Visualization", desc: "Plotting with Matplotlib and Seaborn." }
+    ],
+    "Advanced": [
+      { id: "ds-adv-1", title: "Deep Learning", desc: "Neural networks with PyTorch/TF." },
+      { id: "ds-adv-2", title: "MLOps", desc: "Deploying ML models." },
+      { id: "ds-adv-3", title: "Research Engineering", desc: "Reading and implementing papers." }
+    ]
+  },
+  "NLP / AI": {
+    "Beginner": [
+      { id: "nlp-beg-1", title: "Python for AI", desc: "AI-specific Python skills." },
+      { id: "nlp-beg-2", title: "Prompt Engineering", desc: "Effective prompting." },
+      { id: "nlp-beg-3", title: "OpenAI APIs", desc: "Integrating GPT models." }
+    ],
+    "Intermediate": [
+      { id: "nlp-int-1", title: "Transformers", desc: "Understanding attention mechanisms." },
+      { id: "nlp-int-2", title: "LangChain", desc: "Building LLM applications." },
+      { id: "nlp-int-3", title: "RAG Systems", desc: "Retrieval-Augmented Generation." }
+    ],
+    "Advanced": [
+      { id: "nlp-adv-1", title: "Fine Tuning", desc: "Customizing foundation models." },
+      { id: "nlp-adv-2", title: "Agent Architectures", desc: "Building autonomous agents." },
+      { id: "nlp-adv-3", title: "LLM Infrastructure", desc: "Serving and scaling LLMs." }
+    ]
+  }
+};
+
+[
+  "Full Stack Development", "Backend / APIs", "Cloud / DevOps",
+  "UI/UX Design", "Mobile Development", "Cybersecurity", "Data Analytics"
+].forEach(cat => {
+  MODULES_DATA[cat] = {
+    "Beginner": [{ id: `${cat}-beg-1`, title: `${cat} Basics 1`, desc: "Introduction." }],
+    "Intermediate": [{ id: `${cat}-int-1`, title: `${cat} Core 1`, desc: "Intermediate concepts." }],
+    "Advanced": [{ id: `${cat}-adv-1`, title: `${cat} Advanced 1`, desc: "Advanced concepts." }]
+  };
+});

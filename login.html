@@ -1,83 +1,104 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Sign in to Xyverra — your AI-powered career roadmap platform." />
-    <title>Login — Xyverra</title>
-    <link rel="stylesheet" href="login.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  </head>
-  <body>
-    <div class="centered-layout">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Sign in to Xyvvera — your AI-powered career roadmap platform." />
+  <title>Login — Xyvvera</title>
+  <link rel="stylesheet" href="login.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
 
-      <!-- Brand Header -->
-      <div class="brand-header">
-        <div class="brand-icon">
-          <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" />
-        </div>
-        <h1>Xyverra</h1>
-        <p>Your AI-powered career roadmap</p>
+  <!-- Fullscreen Particle Background Canvas -->
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- Premium Loading Transition Overlay -->
+  <div id="premium-loader" class="premium-loader-overlay">
+    <div class="loader-content">
+      <div class="loader-logo-wrapper">
+        <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" style="width:100%; height:100%; border-radius:18px; object-fit:cover;">
       </div>
-
-      <!-- Login Card -->
-      <div class="card-box auth-card">
-        <h2 class="card-title">Welcome back</h2>
-        <p class="card-subtitle">Sign in to continue your learning journey</p>
-
-        <form id="auth-form" novalidate>
-          <div class="form-group">
-            <label for="login-email">Email address</label>
-            <div class="input-wrapper">
-              <i class="far fa-envelope"></i>
-              <input
-                type="email"
-                id="login-email"
-                placeholder="you@example.com"
-                autocomplete="email"
-                required
-              />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="login-password">Password</label>
-            <div class="input-wrapper">
-              <i class="fas fa-lock"></i>
-              <input
-                type="password"
-                id="login-password"
-                placeholder="Your password"
-                autocomplete="current-password"
-                required
-              />
-              <i class="far fa-eye eye-icon" id="toggle-password" title="Show password"></i>
-            </div>
-          </div>
-
-          <a href="#" class="forgot-link">Forgot password?</a>
-
-          <button type="submit" class="btn btn-primary" id="login-btn">
-            <i class="fas fa-sign-in-alt"></i> Sign In
-          </button>
-        </form>
-
-        <div class="divider">OR</div>
-
-        <a href="signup.html" class="btn btn-outline">
-          <i class="fas fa-user-plus"></i> Create a free account
-        </a>
-
-        <p class="hint-text">
-          Demo: alex@example.com · password123
-        </p>
+      <div class="loader-status">Initializing Career Intelligence...</div>
+      <div class="loader-progress-track">
+        <div class="loader-progress-bar" id="loader-progress-bar"></div>
       </div>
-
-      <p class="auth-footer">
-        Don't have an account? <a href="signup.html">Sign up for free</a>
-      </p>
-
     </div>
-    <script src="login.js"></script>
-  </body>
+  </div>
+
+  <div class="centered-layout">
+
+    <!-- Glowing Centered Logo Header -->
+    <header class="brand-header">
+      <div class="brand-glowing-logo">
+        <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" style="width:100%; height:100%; border-radius:18px; object-fit:cover; box-shadow: 0 0 10px rgba(37, 99, 235, 0.2);">
+      </div>
+      <h1>Xyvvera</h1>
+      <p>AI-Powered Career Intelligence Suite</p>
+    </header>
+
+    <!-- Frosted Glass Login Card -->
+    <div class="card-box auth-card">
+      <h2 class="card-title">Welcome Back</h2>
+      <p class="card-subtitle">Connect your credentials to access your custom roadmap</p>
+
+      <form id="auth-form" novalidate>
+        <div class="form-group">
+          <label for="login-email">Email Address</label>
+          <div class="input-wrapper">
+            <i class="far fa-envelope"></i>
+            <input
+              type="email"
+              id="login-email"
+              placeholder="name@company.com"
+              autocomplete="email"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <div class="input-wrapper">
+            <i class="fas fa-lock"></i>
+            <input
+              type="password"
+              id="login-password"
+              placeholder="••••••••••••"
+              autocomplete="current-password"
+              required
+            />
+            <i class="far fa-eye eye-icon" id="toggle-password" title="Show password"></i>
+          </div>
+        </div>
+
+        <a href="#" class="forgot-link">Forgot Password?</a>
+
+        <button type="submit" class="btn btn-primary" id="login-btn">
+          <i class="fas fa-sign-in-alt"></i> Sign In to Dashboard
+        </button>
+      </form>
+
+      <div class="divider"><span>OR ACCELERATE WITH AI</span></div>
+
+      <a href="signup.html" class="btn btn-outline" style="width: 100%;">
+        <i class="fas fa-user-plus"></i> Initialize New Blueprint Path
+      </a>
+
+      <!-- Demo Accounts Widget -->
+      <div class="hint-text">
+        <span>DEMO ACCESS:</span> alex@example.com · password123
+      </div>
+    </div>
+
+    <p class="auth-footer">
+      Don't have a configured path? <a href="signup.html">Initialize account</a>
+    </p>
+
+  </div>
+
+  <script src="auth-popup.js"></script>
+  <script src="login-particles.js"></script>
+  <script src="login.js"></script>
+</body>
 </html>

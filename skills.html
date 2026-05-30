@@ -58,21 +58,24 @@
                 </a>
             </nav>
             
-            <div style="flex: 1;"></div>
-
+                        <div style="flex: 1;"></div>
+            
+            <div class="user-profile">
+                <div class="profile-click-area" title="View Profile">
+                    <div class="avatar" id="user-avatar"></div>
+                    <div class="profile-text">
+                        <h4 id="user-display-name">Loading...</h4>
+                        <p>User Role</p>
+                    </div>
+                </div>
+                <button class="signout-btn" title="Sign Out" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Compact Top-Right Profile -->
-            <div class="compact-header-profile">
-                <div class="profile-click-area" style="cursor: pointer; display: flex;" title="View Profile">
-                    <div class="compact-avatar" id="user-avatar"></div>
-                </div>
-                <button class="compact-signout signout-btn" title="Sign Out">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
-            </div>
             <div class="dashboard-container">
                 <!-- TOP HEADER SECTION -->
                 <header class="page-header flex-header dashboard-header">
@@ -85,63 +88,51 @@
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                             Export
                         </button>
-                        <button class="btn btn-primary" id="btn-add-skill">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            Add Skill
-                        </button>
                     </div>
                 </header>
 
-                <!-- STATS ROW -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-info">
-                            <span class="stat-label">Total Skills</span>
-                            <span class="stat-value" id="total-skills-count">0</span>
-                        </div>
-                        <div class="stat-icon purple">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-info">
-                            <span class="stat-label">Verified</span>
-                            <span class="stat-value" id="verified-skills-count">0</span>
-                        </div>
-                        <div class="stat-icon green">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-info">
-                            <span class="stat-label">Avg. Proficiency</span>
-                            <span class="stat-value" id="avg-proficiency">0%</span>
-                        </div>
-                        <div class="stat-icon blue">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
-                        </div>
+                <!-- CATEGORIES SECTION -->
+                <div class="categories-section">
+                    <h2 class="section-title">Select a Category</h2>
+                    <div class="category-cards-container" id="category-cards">
+                        <!-- Category cards injected by JS -->
                     </div>
                 </div>
 
-                <!-- FILTER & SEARCH BAR -->
-                <div class="toolbar-card">
-                    <div class="search-box">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <input type="text" id="skill-search" placeholder="Search skills...">
+                <!-- EXPANDING SKILL PANEL -->
+                <div class="skill-panel-container" id="skill-panel" style="display: none;">
+                    <div class="panel-header">
+                        <h3 id="panel-category-title">Category Skills</h3>
+                        <button class="btn btn-outline btn-close-panel" id="btn-close-panel">
+                            <i class="fas fa-times"></i> Close
+                        </button>
                     </div>
-                    <div class="filter-chips" id="filter-chips">
-                        <button class="chip active" data-filter="All">All</button>
-                        <button class="chip" data-filter="Web Fundamentals">Web Fundamentals</button>
-                        <button class="chip" data-filter="Programming">Programming</button>
-                        <button class="chip" data-filter="Frontend">Frontend</button>
-                        <button class="chip" data-filter="Backend">Backend</button>
-                        <button class="chip" data-filter="Tools">Tools</button>
+                    <div class="levels-grid">
+                        <!-- Beginner -->
+                        <div class="level-column beginner-col">
+                            <div class="level-header">
+                                <span class="badge badge-beginner">Beginner</span>
+                                <button class="btn-icon add-skill-btn" data-level="beginner" title="Add Beginner Skill"><i class="fas fa-plus"></i></button>
+                            </div>
+                            <ul class="skill-list" id="list-beginner"></ul>
+                        </div>
+                        <!-- Intermediate -->
+                        <div class="level-column intermediate-col">
+                            <div class="level-header">
+                                <span class="badge badge-intermediate">Intermediate</span>
+                                <button class="btn-icon add-skill-btn" data-level="intermediate" title="Add Intermediate Skill"><i class="fas fa-plus"></i></button>
+                            </div>
+                            <ul class="skill-list" id="list-intermediate"></ul>
+                        </div>
+                        <!-- Advanced -->
+                        <div class="level-column advanced-col">
+                            <div class="level-header">
+                                <span class="badge badge-advanced">Advanced</span>
+                                <button class="btn-icon add-skill-btn" data-level="advanced" title="Add Advanced Skill"><i class="fas fa-plus"></i></button>
+                            </div>
+                            <ul class="skill-list" id="list-advanced"></ul>
+                        </div>
                     </div>
-                </div>
-
-                <!-- SKILLS GRID -->
-                <div class="skills-grid" id="skills-container">
-                    <!-- Cards Injected by JS -->
                 </div>
             </div>
         </main>

@@ -58,16 +58,17 @@
                 </a>
             </nav>
 
-            <div style="flex: 1;"></div>
-            <div class="user-profile" style="display: flex; align-items: center; justify-content: space-between;">
-                <div class="profile-click-area" style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; cursor: pointer;" title="View Profile">
+                        <div style="flex: 1;"></div>
+            
+            <div class="user-profile">
+                <div class="profile-click-area" title="View Profile">
                     <div class="avatar" id="user-avatar"></div>
                     <div class="profile-text">
-                        <h4 id="user-display-name"></h4>
-                        <p></p>
+                        <h4 id="user-display-name">Loading...</h4>
+                        <p>User Role</p>
                     </div>
                 </div>
-                <button class="btn signout-btn" style="background: transparent; border: none; padding: 6px 8px; color: var(--text-muted); cursor: pointer; min-width: auto; box-shadow: none; flex-shrink: 0;" title="Sign Out">
+                <button class="signout-btn" title="Sign Out" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
@@ -160,7 +161,6 @@
         </main>
     </div>
 
-<<<<<<< HEAD
     <!-- Custom Glassmorphic Exit Confirmation Modal -->
     <div class="quiz-exit-modal" id="quiz-exit-modal" style="display: none;">
         <div class="quiz-exit-modal-content">
@@ -172,7 +172,10 @@
             <div class="quiz-exit-buttons">
                 <button class="btn btn-outline" id="btn-cancel-exit">Resume Quiz</button>
                 <button class="btn btn-danger" id="btn-confirm-exit">Exit Quiz</button>
-=======
+            </div>
+        </div>
+    </div>
+
     <!-- AI Quiz Config Overlay -->
     <div class="ai-exit-overlay" id="aiConfigOverlay" style="display: none; align-items: center; justify-content: center; z-index: 99999;">
         <div class="ai-exit-modal" style="max-width: 440px; width: 90%; background: #FFFFFF; border-radius: 24px; padding: 2.2rem; box-shadow: var(--shadow-lg); border: 1px solid var(--border);">
@@ -195,18 +198,51 @@
             <div class="ai-modal-actions" style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--border); padding-top: 1.25rem; margin-top: 0.5rem;">
                 <button class="btn btn-outline" id="btn-cancel-ai" style="padding: 10px 16px; font-size: 0.85rem; width: auto; min-width: auto; height: 38px;">Cancel</button>
                 <button class="btn btn-primary" id="btn-save-ai" style="padding: 10px 16px; font-size: 0.85rem; width: auto; min-width: auto; height: 38px; background: var(--primary); color: white;">Save Config</button>
->>>>>>> 8bf0ba3952f61e1122f26d8b54b97912b4634d36
             </div>
         </div>
     </div>
 
-<<<<<<< HEAD
+    <!-- Assessment Decision Modal -->
+    <div class="ai-exit-overlay" id="assessmentDecisionOverlay" style="display: none; align-items: center; justify-content: center; z-index: 100000;">
+        <div class="ai-exit-modal" style="max-width: 460px; width: 90%; background: #FFFFFF; border-radius: 24px; padding: 2.2rem; box-shadow: var(--shadow-lg); border: 1px solid var(--border); text-align: center;">
+            <div class="ai-avatar-icon" style="background: linear-gradient(135deg, var(--primary), var(--accent)); width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; margin: 0 auto 1.5rem auto; box-shadow: 0 4px 14px rgba(42,101,245,0.3);">
+                <i class="fas fa-clipboard-check"></i>
+            </div>
+            <h3 style="margin: 0 0 1rem; font-size: 1.4rem; font-weight: 800; color: var(--text-dark);">Assessment Complete</h3>
+            
+            <div style="background: #F8FAFC; border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; text-align: left;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.95rem;">
+                    <span style="color: var(--text-muted); font-weight: 600;">Selected Target:</span>
+                    <strong style="color: var(--text-dark);" id="modal-selected-level">Advanced</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.95rem;" id="modal-scores-container">
+                    <!-- Scores injected dynamically -->
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 1.05rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+                    <span style="color: var(--primary); font-weight: 800;">Recommended:</span>
+                    <strong style="color: var(--primary); font-weight: 800;" id="modal-recommended-level">Intermediate</strong>
+                </div>
+            </div>
+
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.5;">
+                We recommend starting at the level that best matches your foundational knowledge. You can override this if you wish to proceed with your selected level anyway.
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <button class="btn btn-primary" id="btn-use-recommended" style="width: 100%; justify-content: center;">
+                    Use Recommended Level
+                </button>
+                <button class="btn btn-outline" id="btn-use-selected" style="width: 100%; justify-content: center; border-color: var(--border); color: var(--text-muted);">
+                    Continue With Selected Level
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="quiz-data.js"></script>
     <script src="localstorage-state-management.js"></script>
     <script src="quiz-lock-manager.js"></script>
     <script src="roadmap-unlock-logic.js"></script>
-=======
->>>>>>> 8bf0ba3952f61e1122f26d8b54b97912b4634d36
     <script src="global-sidebar.js"></script>
     <script src="quiz.js?v=4"></script>
     <script src="ai-recommendation.js"></script>

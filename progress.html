@@ -56,20 +56,27 @@
                     Progress
                 </a>
             </nav>
+            
+            <div style="flex: 1;"></div>
+            
+            <div class="user-profile">
+                <div class="profile-click-area" title="View Profile">
+                    <div class="avatar" id="user-avatar"></div>
+                    <div class="profile-text">
+                        <h4 id="user-display-name">Loading...</h4>
+                        <p>User Role</p>
+                    </div>
+                </div>
+                <button class="signout-btn" title="Sign Out" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Compact Top-Right Profile -->
-            <div class="compact-header-profile">
-                <div class="profile-click-area" style="cursor: pointer; display: flex;" title="View Profile">
-                    <div class="compact-avatar" id="user-avatar"></div>
-                </div>
-                <button class="compact-signout signout-btn" title="Sign Out">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
-            </div>
-            <div class="dashboard-container">
+            
+            <div class="dashboard-container progress-container">
 
                 <!-- Page Header -->
                 <header class="dashboard-header">
@@ -122,7 +129,7 @@
                         </div>
                         <div class="summary-info">
                             <span class="summary-label">Job Readiness</span>
-                            <span class="summary-value" id="job-readiness-value">0%</span>
+                            <span class="summary-value" id="job-readiness-value" style="color: #000000 !important; font-weight: 900;">0%</span>
                             <span class="summary-sublabel" id="job-readiness-label">Beginner</span>
                         </div>
                     </div>
@@ -155,7 +162,15 @@
                         <i class="fas fa-history"></i> Recent Activity
                     </div>
                     <div id="history-list">
-                        <p style="text-align:center;color:var(--text-muted);padding:1.5rem;">Loading activity...</p>
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 1rem; border-bottom: 1px solid var(--border);">
+                            <div style="background: var(--success-bg); color: var(--success); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <p style="margin: 0; font-weight: 600; color: var(--text-dark);">Yeah! A skill has been completed.</p>
+                                <span style="font-size: 0.85rem; color: var(--text-muted);">HTML/CSS Fundamentals - Just now</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
