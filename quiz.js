@@ -629,9 +629,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ── Load / Generate Quiz ──
-    // Silently check for stored API key — no blocking dialogs
     const userLevel = localStorage.getItem("userLevel") || "Beginner";
-    const geminiKey = (localStorage.getItem('gemini_api_key') || '').trim();
+    let geminiKey = (localStorage.getItem('gemini_api_key') || '').trim();
+
+    if (!geminiKey) {
+        geminiKey = window.prompt("To generate dynamic AI questions, please enter your Gemini API Key. \n(Leave blank to use offline fallback questions)");
+        if (geminiKey && geminiKey.trim() !== '') {
+            localStorage.setItem('gemini_api_key', geminiKey.trim());
+        } else {
+            geminiKey = '';
+        }
+    }
 
     if (geminiKey) {
         let topic = quizData.title;
@@ -657,9 +665,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function loadFallbackQuiz() {
+        if (!quizData || !quizData.questions) {
+            console.error("No fallback quiz data found.");
+            return;
+        }
         questions = shuffleArray(quizData.questions).map(q => ({
             ...q,
-            opts: shuffleArray(q.opts)
+            opts: shuffleArray(q.opts || [])
         }));
         questions = questions.slice(0, 5); // 5 questions standard
         
@@ -801,15 +813,18 @@ CRITICAL RULES:
                 quizStatus.textContent = "💡 Gemini API error or invalid response. Loaded pre-defined questions.";
                 quizStatus.className = 'quiz-status warning';
             }
-            loadFallbackQuiz();
-            return;
-        } finally {
             if (aiLoadingScreen && quizCard) {
                 aiLoadingScreen.style.display = 'none';
                 quizCard.style.display = 'block';
             }
+            loadFallbackQuiz();
+            return;
         }
 
+        if (aiLoadingScreen && quizCard) {
+            aiLoadingScreen.style.display = 'none';
+            quizCard.style.display = 'block';
+        }
         loadQuestion();
     }
 
@@ -843,6 +858,10 @@ CRITICAL RULES:
         quizOptionsCont.classList.add('disabled'); // locked during read phase
 
         const optionsToRender = q.opts || [];
+        if (optionsToRender.length === 0) {
+            console.error("No options found for question", q);
+            quizOptionsCont.innerHTML = '<p style="color:var(--danger)">Error: No options loaded for this question.</p>';
+        }
         optionsToRender.forEach((opt, i) => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';

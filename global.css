@@ -7,8 +7,8 @@
 
 :root {
     /* ── Core Palette ── */
-    --primary:         #0B192C; /* Deep Navy (Logo color match) */
-    --primary-light:   #1E293B;
+    --primary:         #2563EB; /* Brand Blue — buttons, highlights, active states */
+    --primary-light:   #1D4ED8; /* Darker blue for hover states */
     --accent:          #2563EB; /* Electric Blue Accent */
     --accent-glow:     rgba(37, 99, 235, 0.4);
     --cyan:            #06B6D4;
@@ -24,7 +24,8 @@
     --white:           #FFFFFF;
     
     /* ── Typography Contrast ── */
-    --text-dark:       #0B192C; /* Deep Navy from logo, not fully black */
+    --text-dark:       #0B192C; /* Deep Navy — headings, emphasis, icons */
+    --brand-navy:      #0B192C; /* Brand Navy for sidebar, accents */
     --text-body:       #1E293B; /* Deep Blue-Slate */
     --text-muted:      #4B5563; /* Rich Blue-Gray */
     --text-light:      #94A3B8; 
