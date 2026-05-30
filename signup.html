@@ -1,76 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Create your free Xyverra account and start your AI-powered career roadmap.">
-    <title>Sign Up — Xyverra</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="signup.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Create your free Xyverra account and start your AI-powered career roadmap." />
+  <title>Sign Up — Xyverra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="login.css" />
 </head>
 <body>
-    <div class="centered-layout">
 
-        <!-- Brand Header -->
-        <div class="brand-header">
-            <div class="brand-icon">
-                <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" />
-            </div>
-            <h1>Xyverra</h1>
-            <p>Your AI-powered career roadmap</p>
+  <!-- Decorative Background -->
+  <div class="login-bg">
+    <div class="bg-blob bg-blob-1"></div>
+    <div class="bg-blob bg-blob-2"></div>
+    <div class="bg-grid"></div>
+  </div>
+
+  <!-- Centered Login Card -->
+  <div class="login-page">
+    <div class="login-card">
+
+      <!-- Brand Header -->
+      <div class="login-brand">
+        <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" class="brand-logo-img">
+        <span class="brand-name">Xyverra</span>
+      </div>
+
+      <div class="login-heading">
+        <h1>Create your account</h1>
+        <p>Start your journey to becoming job-ready</p>
+      </div>
+
+      <!-- Form -->
+      <form id="signup-form" class="login-form" novalidate>
+        
+        <div class="form-group">
+          <label for="signup-name">Full name</label>
+          <div class="input-wrapper">
+            <i class="far fa-user input-icon"></i>
+            <input
+              type="text"
+              id="signup-name"
+              placeholder="Jane Doe"
+              autocomplete="name"
+              required
+            />
+          </div>
         </div>
 
-        <!-- Sign Up Card -->
-        <div class="card-box auth-card">
-            <h2 class="card-title">Create your account</h2>
-            <p class="card-subtitle">Start your journey to becoming job-ready</p>
-
-            <form id="signup-form" novalidate>
-                <div class="form-group">
-                    <label for="signup-name">Full name</label>
-                    <div class="input-wrapper">
-                        <i class="far fa-user"></i>
-                        <input type="text" id="signup-name" placeholder="Jane Doe" autocomplete="name" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="signup-email">Email address</label>
-                    <div class="input-wrapper">
-                        <i class="far fa-envelope"></i>
-                        <input type="email" id="signup-email" placeholder="jane@example.com" autocomplete="email" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="signup-password">Password</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" id="signup-password" placeholder="Min. 6 characters" autocomplete="new-password" required minlength="6">
-                        <i class="far fa-eye eye-icon" id="toggle-password" title="Show password"></i>
-                    </div>
-                    <p class="hint-text">At least 6 characters</p>
-                </div>
-
-                <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">
-                    <i class="fas fa-user-plus"></i> Create Free Account
-                </button>
-            </form>
-
-            <p class="terms-note">
-                By signing up, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
-            </p>
+        <div class="form-group">
+          <label for="signup-email">Email address</label>
+          <div class="input-wrapper">
+            <i class="far fa-envelope input-icon"></i>
+            <input
+              type="email"
+              id="signup-email"
+              placeholder="name@example.com"
+              autocomplete="email"
+              required
+            />
+          </div>
         </div>
 
-        <p class="auth-footer">
-            Already have an account? <a href="login.html">Sign in</a>
-        </p>
+        <div class="form-group">
+          <label for="signup-password">Password</label>
+          <div class="input-wrapper">
+            <i class="fas fa-lock input-icon"></i>
+            <input
+              type="password"
+              id="signup-password"
+              placeholder="Min. 6 characters"
+              autocomplete="new-password"
+              required minlength="6"
+            />
+            <i class="far fa-eye eye-icon" id="toggle-password" title="Show password"></i>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-login" id="signup-btn">
+          <i class="fas fa-user-plus"></i>
+          <span>Create Free Account</span>
+        </button>
+      </form>
+
+      <!-- Divider -->
+      <div class="login-divider"><span>Already have an account?</span></div>
+
+      <!-- Sign In Link -->
+      <a href="login.html" class="btn-signup">
+        Sign in to Xyverra
+      </a>
 
     </div>
-    <script src="auth-popup.js"></script>
-    <script src="signup.js"></script>
+
+    <!-- Footer -->
+    <p class="login-footer">
+      By signing up, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+    </p>
+  </div>
+
+  <script src="signup.js"></script>
 </body>
 </html>

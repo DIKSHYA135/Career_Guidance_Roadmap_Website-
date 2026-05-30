@@ -1,19 +1,19 @@
 /* =========================================================
-   PROGRESS.CSS — Xyverra Progress Tracking Page
+   PROGRESS.CSS — Xyverra Progress Tracking Page (Light Mode)
    ========================================================= */
 @import url('global.css');
 
 /* ── Shared content card ── */
 .content-card {
-    background: var(--white);
+    background: var(--bg-surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-2xl);
     padding: 1.75rem;
     box-shadow: var(--shadow-sm);
     margin-bottom: 1.5rem;
     transition: var(--transition-sm);
 }
-.content-card:hover { box-shadow: var(--shadow-md); }
+.content-card:hover { box-shadow: var(--shadow-md); border-color: var(--border-strong); }
 
 .card-header {
     display: flex;
@@ -21,18 +21,18 @@
     gap: 10px;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border);
     flex-wrap: wrap;
 }
 
 .card-header h2 {
-    font-size: 1.0625rem;
+    font-size: 1.125rem;
     font-weight: 700;
     color: var(--text-dark);
     letter-spacing: -0.02em;
 }
 
-.text-primary { color: var(--primary); }
+.text-primary { color: var(--accent); }
 
 /* ── Badge ── */
 .badge {
@@ -42,9 +42,9 @@
     border-radius: var(--radius-full);
     font-size: 0.72rem;
     font-weight: 700;
-    background: var(--primary-light);
-    color: var(--primary);
-    border: 1px solid rgba(42, 101, 245, 0.18);
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--accent);
+    border: 1px solid rgba(37, 99, 235, 0.2);
     white-space: nowrap;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -52,8 +52,8 @@
 
 /* ── Progress Bar ── */
 .progress-bar-container {
-    height: 7px;
-    background: var(--border-light);
+    height: 6px;
+    background: var(--bg-surface-hover);
     border-radius: var(--radius-full);
     overflow: hidden;
 }
@@ -61,9 +61,9 @@
 
 .progress-bar {
     height: 100%;
-    background: linear-gradient(90deg, var(--primary), var(--accent));
+    background: linear-gradient(90deg, var(--accent), var(--cyan));
     border-radius: var(--radius-full);
-    box-shadow: 0 0 8px rgba(42, 101, 245, 0.35);
+    box-shadow: var(--shadow-sm);
     transition: width 1.2s var(--ease);
 }
 
@@ -77,11 +77,11 @@
 }
 
 .summary-card {
-    background: var(--white);
+    background: var(--bg-surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-xl);
     padding: 1.375rem 1.25rem;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-xs);
     display: flex;
     align-items: center;
     gap: 0.875rem;
@@ -89,7 +89,7 @@
     position: relative;
 }
 
-.summary-card:hover { transform: translateY(-2px); box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.08); border-color: var(--border-strong); }
+.summary-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--border-strong); }
 
 .summary-icon {
     width: 48px;
@@ -104,11 +104,11 @@
 }
 .summary-card:hover .summary-icon { transform: scale(1.04); }
 
-.icon-purple { background: #F1F5F9; color: #475569; }
-.icon-green  { background: #F1F5F9; color: #475569; }
-.icon-blue   { background: #DBEAFE; color: var(--primary); }
-.icon-orange { background: #F1F5F9; color: #475569; }
-.icon-teal   { background: #F1F5F9; color: #475569; }
+.icon-purple { background: rgba(139, 92, 246, 0.1); color: #8B5CF6; }
+.icon-green  { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+.icon-blue   { background: rgba(37, 99, 235, 0.1); color: var(--accent); }
+.icon-orange { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+.icon-teal   { background: rgba(20, 184, 166, 0.1); color: #14B8A6; }
 
 .summary-info {
     display: flex;
@@ -119,16 +119,16 @@
 
 .summary-label {
     font-size: 0.72rem;
-    color: var(--text-light);
+    color: var(--text-muted);
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.07em;
+    letter-spacing: 0.05em;
     margin-bottom: 3px;
 }
 
 .summary-value {
     font-size: 1.5rem;
-    font-weight: 900;
+    font-weight: 800;
     color: var(--text-dark);
     letter-spacing: -0.03em;
     line-height: 1.1;
@@ -141,35 +141,33 @@
     margin-top: 2px;
 }
 
-.summary-card-teal .summary-value { color: #000000 !important; }
-
 /* ── Item icon variants ── */
 .item-icon.success {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: var(--success-bg);
+    background: rgba(16, 185, 129, 0.1);
     color: var(--success);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.1rem;
     flex-shrink: 0;
-    border: 1.5px solid var(--success-border);
+    border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .item-icon.fail {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: var(--error-bg);
-    color: var(--error);
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.1rem;
     flex-shrink: 0;
-    border: 1.5px solid var(--error-border);
+    border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 /* ── Roadmap Steps Track ── */
@@ -180,17 +178,17 @@
     justify-content: space-between;
     margin: 2.5rem 0;
     width: 100%;
-    overflow: visible; /* Ensure glows and hover scales are not clipped */
+    overflow: visible; 
 }
 
 /* Continuous Progress Line */
 .roadmap-progress-line-container {
     position: absolute;
-    top: 24px; /* Center of 48px circle */
+    top: 24px; 
     left: 24px;
     right: 24px;
     height: 2px;
-    background: #E2E8F0; /* Default gray connecting line */
+    background: var(--border-strong);
     border-radius: var(--radius-full);
     z-index: 1;
     transform: translateY(-50%);
@@ -199,8 +197,8 @@
 
 .roadmap-progress-line-fill {
     height: 100%;
-    width: 0%; /* Updated dynamically in JS */
-    background: var(--primary); /* Blue connecting line */
+    width: 0%; 
+    background: var(--accent);
     border-radius: var(--radius-full);
     transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -220,7 +218,7 @@
 
 .roadmap-step:hover .rs-node {
     transform: translateY(-1px);
-    border-color: var(--border-strong);
+    border-color: var(--accent);
 }
 
 .roadmap-step.locked {
@@ -229,6 +227,7 @@
 
 .roadmap-step.locked:hover .rs-node {
     transform: none;
+    border-color: var(--border-strong);
 }
 
 .rs-node {
@@ -240,25 +239,25 @@
     justify-content: center;
     font-weight: 700;
     font-size: 1rem;
-    background: #FFFFFF; /* Pure white circle */
-    border: 2px solid #E2E8F0; /* Gray border */
-    color: #64748B; /* Gray text */
+    background: var(--bg-surface);
+    border: 2px solid var(--border-strong); 
+    color: var(--text-muted);
     transition: var(--transition);
 }
 
 /* Completed Step: Blue circle */
 .roadmap-step.completed .rs-node {
-    background: var(--primary);
-    border-color: var(--primary);
+    background: var(--accent);
+    border-color: var(--accent);
     color: white;
 }
 
-/* Active/Current Step: Blue outline with solid support background */
+/* Active/Current Step */
 .roadmap-step.current .rs-node {
     background: var(--white);
-    border-color: var(--primary);
-    color: var(--primary);
-    box-shadow: 0 0 0 4px #DBEAFE;
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 
 .rs-label {
@@ -278,15 +277,15 @@
 
 /* ── History Card ── */
 .history-card {
-    background: var(--white);
+    background: var(--bg-surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-2xl);
     padding: 1.75rem;
     box-shadow: var(--shadow-sm);
 }
 
 .history-header {
-    font-size: 1.0625rem;
+    font-size: 1.125rem;
     font-weight: 800;
     margin-bottom: 1.5rem;
     display: flex;
@@ -303,7 +302,7 @@
     gap: 1rem;
     padding: 1.125rem;
     border-radius: var(--radius-lg);
-    background: var(--bg-light);
+    background: var(--bg-surface-hover);
     border: 1px solid var(--border);
     margin-bottom: 0.875rem;
     transition: var(--transition-sm);
@@ -314,8 +313,8 @@
 .history-item:hover {
     transform: translateX(4px);
     background: var(--white);
-    border-color: rgba(42, 101, 245, 0.12);
-    box-shadow: var(--shadow-sm);
+    border-color: var(--accent);
+    box-shadow: var(--shadow-xs);
 }
 
 .item-details h4 {
@@ -334,7 +333,7 @@
     font-weight: 500;
 }
 
-.meta-score { font-weight: 700; color: var(--primary); }
+.meta-score { font-weight: 700; color: var(--accent); }
 
 .item-badge {
     margin-left: auto;
@@ -347,8 +346,8 @@
     flex-shrink: 0;
 }
 
-.item-badge.completed { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
-.item-badge.revision  { background: var(--warning-bg); color: #D97706; border: 1px solid var(--warning-border); }
+.item-badge.completed { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+.item-badge.revision  { background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
 
 /* ── Responsive ── */
 @media (max-width: 1200px) {
@@ -396,8 +395,8 @@
     }
     .roadmap-progress-line-fill {
         width: 100%;
-        height: 0%; /* Updated dynamically in JS */
-        background: var(--primary);
+        height: 0%; 
+        background: var(--accent);
         transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
 }

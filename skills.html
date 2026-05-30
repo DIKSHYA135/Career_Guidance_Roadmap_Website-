@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skill Inventory - Xyverra</title>
-    <!-- Google Fonts: Inter -->
+    <meta name="description" content="Manage and track your technical skills across all categories on the Xyverra platform.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Main CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="skills.css">
 </head>
@@ -33,7 +32,7 @@
         <aside class="sidebar" id="sidebar-menu">
             <div class="sidebar-brand">
                 <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" class="sidebar-logo">
-                Xyverra
+                <span>Xyverra</span>
             </div>
             <nav class="nav-menu">
                 <a href="dashboard.html" class="nav-item nav-dashboard">
@@ -49,7 +48,7 @@
                     Skill Gap Analysis
                 </a>
                 <a href="skill-input.html" class="nav-item nav-skill-input">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                     Create Roadmap
                 </a>
                 <a href="progress.html" class="nav-item nav-progress">
@@ -57,9 +56,9 @@
                     Progress
                 </a>
             </nav>
-            
-                        <div style="flex: 1;"></div>
-            
+
+            <div style="flex: 1;"></div>
+
             <div class="user-profile">
                 <div class="profile-click-area" title="View Profile">
                     <div class="avatar" id="user-avatar"></div>
@@ -68,7 +67,7 @@
                         <p>User Role</p>
                     </div>
                 </div>
-                <button class="signout-btn" title="Sign Out" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">
+                <button class="signout-btn" title="Sign Out">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
@@ -77,19 +76,30 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="dashboard-container">
+
                 <!-- TOP HEADER SECTION -->
                 <header class="page-header flex-header dashboard-header">
                     <div class="header-titles">
                         <h1>Skill Inventory</h1>
                         <p>Required skills for: <strong id="skills-path-title">Web Development</strong></p>
                     </div>
-                    <div class="header-actions">
-                        <button class="btn btn-outline" id="btn-export">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <div class="header-actions" style="display:flex;gap:0.75rem;align-items:center;">
+                        <!-- Search -->
+                        <div class="skill-search-wrap">
+                            <i class="fas fa-search skill-search-icon"></i>
+                            <input type="text" id="skill-search" class="skill-search-input" placeholder="Search skills...">
+                        </div>
+                        <button class="btn btn-outline" id="btn-export" style="white-space:nowrap;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                             Export
                         </button>
                     </div>
                 </header>
+
+                <!-- ANALYTICS STRIP -->
+                <div class="skills-analytics-strip" id="skills-analytics">
+                    <!-- Injected by JS -->
+                </div>
 
                 <!-- CATEGORIES SECTION -->
                 <div class="categories-section">
@@ -111,7 +121,7 @@
                         <!-- Beginner -->
                         <div class="level-column beginner-col">
                             <div class="level-header">
-                                <span class="badge badge-beginner">Beginner</span>
+                                <span class="badge badge-beginner">🌱 Beginner</span>
                                 <button class="btn-icon add-skill-btn" data-level="beginner" title="Add Beginner Skill"><i class="fas fa-plus"></i></button>
                             </div>
                             <ul class="skill-list" id="list-beginner"></ul>
@@ -119,7 +129,7 @@
                         <!-- Intermediate -->
                         <div class="level-column intermediate-col">
                             <div class="level-header">
-                                <span class="badge badge-intermediate">Intermediate</span>
+                                <span class="badge badge-intermediate">⚡ Intermediate</span>
                                 <button class="btn-icon add-skill-btn" data-level="intermediate" title="Add Intermediate Skill"><i class="fas fa-plus"></i></button>
                             </div>
                             <ul class="skill-list" id="list-intermediate"></ul>
@@ -127,18 +137,20 @@
                         <!-- Advanced -->
                         <div class="level-column advanced-col">
                             <div class="level-header">
-                                <span class="badge badge-advanced">Advanced</span>
+                                <span class="badge badge-advanced">🚀 Advanced</span>
                                 <button class="btn-icon add-skill-btn" data-level="advanced" title="Add Advanced Skill"><i class="fas fa-plus"></i></button>
                             </div>
                             <ul class="skill-list" id="list-advanced"></ul>
                         </div>
                     </div>
                 </div>
+
             </div>
         </main>
     </div>
 
     <!-- Scripts -->
+    <script src="toast.js"></script>
     <script src="app-data.js"></script>
     <script src="skills.js"></script>
     <script src="global-sidebar.js"></script>

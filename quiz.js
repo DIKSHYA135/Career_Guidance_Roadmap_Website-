@@ -386,6 +386,11 @@ let questions = [];
 let isVerify = false;
 let isMandatory = false;
 
+// Safe stub for missing saveState implementation
+function saveState() {
+    // Save quiz progress logic if needed in the future
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     // Enforce Fullscreen Quiz layout style
     document.body.classList.add('fullscreen-quiz');
@@ -514,11 +519,13 @@ document.addEventListener("DOMContentLoaded", () => {
     updateAiStatus();
 
     // ── Exit button — always goes back to roadmap or verification ──
+    if (btnExitQuiz) {
     btnExitQuiz.addEventListener('click', (e) => {
         e.preventDefault();
         clearInterval(quizTimerInterval);
         window.location.href = isVerify ? 'skill-verification.html' : 'roadmap.html';
     });
+    } // end if(btnExitQuiz)
 
     // ── Restore saved state if exists ──
     let savedState = null;
@@ -622,20 +629,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ── Load / Generate Quiz ──
+    // Silently check for stored API key — no blocking dialogs
     const userLevel = localStorage.getItem("userLevel") || "Beginner";
-    let geminiKey = localStorage.getItem('gemini_api_key');
+    const geminiKey = (localStorage.getItem('gemini_api_key') || '').trim();
 
-    if (!geminiKey || !geminiKey.trim()) {
-        const wantsAi = confirm("Do you want to use Real-time AI for dynamic questions? (Requires a free Google Gemini API Key)");
-        if (wantsAi) {
-            geminiKey = prompt("Please paste your free Google Gemini API Key:\\n(Get it at https://aistudio.google.com/app/apikey)");
-            if (geminiKey && geminiKey.trim()) {
-                localStorage.setItem('gemini_api_key', geminiKey.trim());
-            }
-        }
-    }
-
-    if (geminiKey && geminiKey.trim()) {
+    if (geminiKey) {
         let topic = quizData.title;
         let aiLevel = userLevel;
         
@@ -646,11 +644,15 @@ document.addEventListener("DOMContentLoaded", () => {
             if (moduleTitle) moduleTitle.textContent = `Prerequisite Assessment: ${aiLevel}`;
         }
         
-        generateAiQuiz(geminiKey.trim(), topic, aiLevel);
+        generateAiQuiz(geminiKey, topic, aiLevel);
     } else {
+        // No API key configured — load fallback questions silently
         if (isAssessment) {
             if (moduleTitle) moduleTitle.textContent = `Prerequisite Assessment: ${assessmentPhase === 'beginner' ? 'Beginner' : 'Intermediate'}`;
         }
+        // Ensure quiz card is visible and loading screen is hidden
+        if (aiLoadingScreen) aiLoadingScreen.style.display = 'none';
+        if (quizCard) quizCard.style.display = 'block';
         loadFallbackQuiz();
     }
 
@@ -974,7 +976,7 @@ CRITICAL RULES:
         clearState();
 
         const pct = Math.round((score / questions.length) * 100);
-        const passed = pct >= 70;
+        const passed = pct >= 75; // 75% threshold for module unlocking
 
         if (isAssessment) {
             handleAssessmentResults(pct, passed);
@@ -1005,8 +1007,8 @@ CRITICAL RULES:
 
         scoreDisplay.textContent = `${pct}%`;
         scoreText.textContent = passed
-            ? `You scored ${score}/${questions.length} — Module Verified! 🎉`
-            : `You scored ${score}/${questions.length} — Try again to pass (70% needed).`;
+            ? `You scored ${score}/${questions.length} — Module Unlocked! 🎉`
+            : `You scored ${score}/${questions.length} — Need 75% to unlock next module.`;
 
         // Timer bar full green on completion
         if (timerBar) {
@@ -1066,6 +1068,11 @@ CRITICAL RULES:
             }
         } else {
             // Non-mandatory standard quiz handling
+            // ── Save per-module score for roadmap locking ──
+            const moduleScores = JSON.parse(localStorage.getItem('moduleQuizPassed') || '{}');
+            moduleScores[moduleId] = pct;
+            localStorage.setItem('moduleQuizPassed', JSON.stringify(moduleScores));
+
             if (passed) {
                 let completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
                 if (!completedModules.includes(moduleId)) {

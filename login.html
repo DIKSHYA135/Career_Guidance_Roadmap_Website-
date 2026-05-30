@@ -3,17 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Sign in to Xyvvera — your AI-powered career roadmap platform." />
-  <title>Login — Xyvvera</title>
-  <link rel="stylesheet" href="login.css" />
+  <meta name="description" content="Sign in to Xyverra — your AI-powered career roadmap platform." />
+  <title>Login — Xyverra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="login.css" />
 </head>
 <body>
 
-  <!-- Fullscreen Particle Background Canvas -->
-  <canvas id="particles-canvas"></canvas>
-
-  <!-- Premium Loading Transition Overlay -->
+  <!-- Premium Loading Overlay -->
   <div id="premium-loader" class="premium-loader-overlay">
     <div class="loader-content">
       <div class="loader-logo-wrapper">
@@ -26,27 +25,34 @@
     </div>
   </div>
 
-  <div class="centered-layout">
+  <!-- Decorative Background -->
+  <div class="login-bg">
+    <div class="bg-blob bg-blob-1"></div>
+    <div class="bg-blob bg-blob-2"></div>
+    <div class="bg-grid"></div>
+  </div>
 
-    <!-- Glowing Centered Logo Header -->
-    <header class="brand-header">
-      <div class="brand-glowing-logo">
-        <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" style="width:100%; height:100%; border-radius:18px; object-fit:cover; box-shadow: 0 0 10px rgba(37, 99, 235, 0.2);">
+  <!-- Centered Login Card -->
+  <div class="login-page">
+    <div class="login-card">
+
+      <!-- Brand Header -->
+      <div class="login-brand">
+        <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" class="brand-logo-img">
+        <span class="brand-name">Xyverra</span>
       </div>
-      <h1>Xyvvera</h1>
-      <p>AI-Powered Career Intelligence Suite</p>
-    </header>
 
-    <!-- Frosted Glass Login Card -->
-    <div class="card-box auth-card">
-      <h2 class="card-title">Welcome Back</h2>
-      <p class="card-subtitle">Connect your credentials to access your custom roadmap</p>
+      <div class="login-heading">
+        <h1>Welcome back</h1>
+        <p>Sign in to continue your AI-powered career journey</p>
+      </div>
 
-      <form id="auth-form" novalidate>
+      <!-- Form -->
+      <form id="auth-form" class="login-form" novalidate>
         <div class="form-group">
-          <label for="login-email">Email Address</label>
+          <label for="login-email">Email address</label>
           <div class="input-wrapper">
-            <i class="far fa-envelope"></i>
+            <i class="far fa-envelope input-icon"></i>
             <input
               type="email"
               id="login-email"
@@ -58,9 +64,12 @@
         </div>
 
         <div class="form-group">
-          <label for="login-password">Password</label>
+          <div class="label-row">
+            <label for="login-password">Password</label>
+            <a href="#" class="forgot-link">Forgot password?</a>
+          </div>
           <div class="input-wrapper">
-            <i class="fas fa-lock"></i>
+            <i class="fas fa-lock input-icon"></i>
             <input
               type="password"
               id="login-password"
@@ -72,33 +81,35 @@
           </div>
         </div>
 
-        <a href="#" class="forgot-link">Forgot Password?</a>
-
-        <button type="submit" class="btn btn-primary" id="login-btn">
-          <i class="fas fa-sign-in-alt"></i> Sign In to Dashboard
+        <button type="submit" class="btn-login" id="login-btn">
+          <span>Sign in to Dashboard</span>
+          <i class="fas fa-arrow-right"></i>
         </button>
       </form>
 
-      <div class="divider"><span>OR ACCELERATE WITH AI</span></div>
+      <!-- Divider -->
+      <div class="login-divider"><span>New to Xyverra?</span></div>
 
-      <a href="signup.html" class="btn btn-outline" style="width: 100%;">
-        <i class="fas fa-user-plus"></i> Initialize New Blueprint Path
+      <!-- Sign Up Link -->
+      <a href="signup.html" class="btn-signup">
+        <i class="fas fa-rocket"></i>
+        Create your free account
       </a>
 
-      <!-- Demo Accounts Widget -->
-      <div class="hint-text">
-        <span>DEMO ACCESS:</span> alex@example.com · password123
+      <!-- Demo hint -->
+      <div class="demo-hint">
+        <i class="fas fa-info-circle"></i>
+        <span>Demo: <strong>alex@example.com</strong> · <strong>password123</strong></span>
       </div>
+
     </div>
 
-    <p class="auth-footer">
-      Don't have a configured path? <a href="signup.html">Initialize account</a>
+    <!-- Footer -->
+    <p class="login-footer">
+      By signing in, you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>
     </p>
-
   </div>
 
-  <script src="auth-popup.js"></script>
-  <script src="login-particles.js"></script>
   <script src="login.js"></script>
 </body>
 </html>

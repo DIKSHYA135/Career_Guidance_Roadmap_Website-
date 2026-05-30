@@ -1,14 +1,21 @@
 /* ==========================================================================
-   PATH BLUEPRINT - ROADMAP PAGE LAYOUT
+   PATH BLUEPRINT - ROADMAP PAGE LAYOUT (Premium SaaS)
    ========================================================================== */
 @import url('global.css');
 
-/* Page Header overrides */
+.app-layout {
+    display: flex;
+    height: 100vh;
+    background-color: var(--bg-base);
+    overflow: hidden;
+}
+
+/* Page Header */
 .page-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
     flex-wrap: wrap;
     gap: 1rem;
 }
@@ -16,279 +23,22 @@
 .page-header h2 {
     font-size: 2rem;
     font-weight: 800;
-    letter-spacing: -0.04em;
-    background: linear-gradient(135deg, var(--text-dark) 50%, var(--primary) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--text-dark);
 }
 
 .page-header p {
-    color: var(--text-body);
-    font-size: 0.92rem;
-}
-
-/* Timeline grid & spacing wrapper */
-.roadmap-wrapper {
-    padding: 0.5rem 0;
-}
-
-#roadmap-timeline {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    position: relative;
-    padding: 0.75rem 0;
-}
-
-/* Vertical Laser Connector Cable */
-#roadmap-timeline::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 22px;
-    width: 2px;
-    background: #E2E8F0;
-    z-index: 0;
-}
-
-/* Timeline node items */
-.timeline-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 1.8rem;
-    position: relative;
-    z-index: 1;
-    animation: timelineEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-@keyframes timelineEntrance {
-    0% { opacity: 0; transform: translateX(-10px); }
-    100% { opacity: 1; transform: translateX(0); }
-}
-
-.timeline-item:nth-child(1) { animation-delay: 0.05s; }
-.timeline-item:nth-child(2) { animation-delay: 0.10s; }
-.timeline-item:nth-child(3) { animation-delay: 0.15s; }
-.timeline-item:nth-child(4) { animation-delay: 0.20s; }
-.timeline-item:nth-child(5) { animation-delay: 0.25s; }
-
-/* The left circle node overlay */
-.timeline-item::before {
-    content: '';
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: var(--bg-surface-solid);
-    border: 3px solid var(--border);
-    box-shadow: 0 0 0 5px var(--bg-base);
-    margin-top: 1.45rem;
-    z-index: 5;
-    flex-shrink: 0;
-    transition: var(--transition);
-}
-
-/* Node State Styles */
-.timeline-item.active::before {
-    background: var(--primary);
-    border-color: var(--primary);
-    box-shadow: 0 0 0 5px var(--bg-base), 0 0 0 9px #DBEAFE;
-}
-
-.timeline-item.completed::before {
-    background: #10B981;
-    border-color: #10B981;
-    box-shadow: 0 0 0 5px var(--bg-base);
-}
-
-.timeline-item.locked::before {
-    background: #E2E8F0;
-    border-color: #E2E8F0;
-    box-shadow: 0 0 0 5px var(--bg-base);
-}
-
-/* Timeline Minimal White Card Content */
-.timeline-content {
-    flex: 1;
-    background: #FFFFFF;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
-    padding: 1.8rem 2.2rem;
-    box-shadow: var(--shadow-premium);
-    transition: var(--transition);
-    position: relative;
-    overflow: hidden;
-}
-
-.timeline-content:hover {
-    transform: translateY(-2px);
-    border-color: var(--border-strong);
-    box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.08);
-}
-
-.timeline-item.active .timeline-content {
-    border-color: var(--primary);
-    background: #FFFFFF;
-    box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.12);
-}
-
-.timeline-item.completed .timeline-content {
-    border-color: var(--border);
-    background: #FFFFFF;
-}
-
-.timeline-item.locked .timeline-content {
-    opacity: 0.65;
-    background: #F8FAFC;
-    border-color: var(--border);
-}
-
-/* Card typography details */
-.timeline-content h4 {
-    font-size: 1.15rem;
-    font-weight: 800;
-    color: var(--text-dark);
-    margin-bottom: 0.5rem;
-    letter-spacing: -0.02em;
-    transition: var(--transition-sm);
-}
-
-.timeline-item.active h4 {
-    color: var(--primary);
-    text-shadow: 0 0 8px rgba(37, 99, 235, 0.2);
-}
-
-.timeline-content > p {
-    color: var(--text-body);
-    font-size: 0.88rem;
-    line-height: 1.55;
-}
-
-/* Custom Status Pills */
-.timeline-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    margin-top: 1rem;
-    padding: 4px 10px;
-    border-radius: 9999px;
-    font-size: 0.68rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    background: #F1F5F9;
     color: var(--text-muted);
-    border: 1px solid #E2E8F0;
+    font-size: 1rem;
 }
 
-.timeline-pill.current {
-    background: rgba(37, 99, 235, 0.1);
-    color: var(--primary);
-    border-color: rgba(37, 99, 235, 0.3);
-    box-shadow: 0 0 10px rgba(37, 99, 235, 0.15);
-}
-
-.timeline-item.completed .timeline-pill {
-    background: rgba(16, 185, 129, 0.1);
-    color: #059669;
-    border-color: rgba(16, 185, 129, 0.2);
-}
-
-/* Course Recommendations Section */
-.course-suggestions {
-    margin-top: 1.2rem;
-    padding-top: 1.2rem;
-    border-top: 1px dashed var(--border);
-}
-
-.course-suggestions strong {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.72rem;
-    font-weight: 800;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    display: block;
-    margin-bottom: 0.6rem;
-}
-
-.course-suggestions ul {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    list-style: none;
-}
-
-.course-suggestions li {
-    font-size: 0.82rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--text-body);
-}
-
-.course-suggestions li::before {
-    content: '→';
-    color: var(--primary);
-    font-weight: 700;
-}
-
-.course-suggestions a {
-    color: var(--primary);
-    font-weight: 600;
-    transition: var(--transition-sm);
-}
-
-.course-suggestions a:hover {
-    color: var(--text-dark);
-}
-
-/* Active Course Action Buttons */
-.course-links {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border);
-}
-
-.course-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border-radius: var(--radius-md);
-    background: #FFFFFF;
-    color: var(--primary);
-    font-weight: 600;
-    font-size: 0.82rem;
-    border: 1px solid var(--border-strong);
-    transition: var(--transition);
-    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.05);
-}
-
-.course-btn:hover {
-    background: var(--primary);
-    color: #FFFFFF;
-    transform: translateX(4px);
-    box-shadow: 0 8px 16px rgba(37, 99, 235, 0.2);
-    border-color: var(--primary);
-}
-
-/* ==========================================================================
-   ROADMAP ACCORDION & PROGRESS UI
-   ========================================================================== */
-
-/* Overall Roadmap Progress Tracker */
+/* Overall Progress Tracker */
 .overall-progress-card {
-    background: #FFFFFF;
+    background: var(--bg-surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: var(--shadow-premium);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-6);
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-sm);
 }
 
 .overall-progress-header {
@@ -299,66 +49,112 @@
 }
 
 .overall-progress-header h3 {
-    font-size: 1.2rem;
-    font-weight: 800;
+    font-size: 1.25rem;
+    font-weight: 700;
     color: var(--text-dark);
 }
 
 .overall-progress-header .progress-pct {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: 800;
-    color: var(--primary);
+    color: var(--accent);
 }
 
-/* Accordion Grouping (Beginner, Intermediate, Advanced) */
-.accordion-group {
-    margin-bottom: 1.5rem;
-}
-
+/* Group Title */
 .accordion-group-title {
-    font-size: 1.1rem;
-    font-weight: 800;
+    font-size: 1.125rem;
+    font-weight: 700;
     color: var(--text-dark);
-    margin-bottom: 0.8rem;
+    margin-bottom: 1rem;
+    margin-top: 2rem;
     display: flex;
     align-items: center;
     gap: 8px;
-    padding-left: 5px;
+    padding-left: 4px;
 }
 
-/* Accordion Items */
+/* ==========================================================================
+   ROADMAP ACCORDION ITEMS (Timeline Style)
+   ========================================================================== */
+.accordion-group {
+    position: relative;
+    padding-left: 24px; /* Space for the timeline line */
+}
+
+/* Timeline Vertical Line */
+.accordion-group::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 8px;
+    width: 2px;
+    background: var(--border-strong);
+    border-radius: 2px;
+    z-index: 0;
+}
+
 .accordion-item {
-    background: #FFFFFF;
+    background: var(--bg-surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    margin-bottom: 0.8rem;
-    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
-    overflow: hidden;
+    border-radius: var(--radius-xl);
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    z-index: 1;
     transition: var(--transition-sm);
 }
 
+/* Node Dot on Timeline */
+.accordion-item::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 24px;
+    width: 12px;
+    height: 12px;
+    background: var(--bg-surface);
+    border: 2px solid var(--border-strong);
+    border-radius: 50%;
+    z-index: 2;
+    transition: var(--transition-sm);
+    box-shadow: 0 0 0 4px var(--bg-base);
+}
+
+.accordion-item:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
 .accordion-item.active {
-    border-color: var(--primary);
-    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.08);
+    border-color: var(--accent);
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.1);
+}
+
+.accordion-item.active::before {
+    border-color: var(--accent);
+    background: var(--accent);
+    box-shadow: 0 0 0 4px var(--bg-base), 0 0 0 8px rgba(37, 99, 235, 0.2);
 }
 
 .accordion-item.completed {
-    border-color: #10B981;
-    background: rgba(16, 185, 129, 0.02);
+    border-color: var(--success);
 }
 
+.accordion-item.completed::before {
+    border-color: var(--success);
+    background: var(--success);
+}
+
+/* Accordion Header */
 .accordion-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1.2rem 1.5rem;
+    padding: 1.25rem 1.5rem;
     cursor: pointer;
     background: transparent;
-    transition: var(--transition-sm);
-}
-
-.accordion-header:hover {
-    background: #F8FAFC;
 }
 
 .accordion-header-left {
@@ -367,47 +163,42 @@
     gap: 12px;
 }
 
-.accordion-header-left .toggle-icon {
+.toggle-icon {
     color: var(--text-muted);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    font-size: 0.9rem;
+    transition: transform 0.3s var(--ease);
+    font-size: 0.875rem;
 }
 
 .accordion-item.active .toggle-icon {
     transform: rotate(90deg);
-    color: var(--primary);
+    color: var(--accent);
 }
 
 .accordion-header-left h4 {
-    font-size: 1.05rem;
+    font-size: 1.125rem;
     font-weight: 700;
     color: var(--text-dark);
-    margin-bottom: 0;
+    margin: 0;
 }
 
 .accordion-header-right {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 16px;
 }
 
 .module-progress-wrapper {
     display: flex;
     align-items: center;
-    gap: 10px;
-    width: 120px;
-}
-
-.module-progress-wrapper .progress-bar-container {
-    height: 6px;
-    flex: 1;
+    gap: 12px;
+    width: 140px;
 }
 
 .module-progress-text {
-    font-size: 0.75rem;
-    font-weight: 700;
+    font-size: 0.8125rem;
+    font-weight: 600;
     color: var(--text-muted);
-    min-width: 35px;
+    min-width: 40px;
     text-align: right;
 }
 
@@ -415,8 +206,8 @@
 .accordion-content {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    background: #FAFCFF;
+    transition: max-height 0.4s var(--ease);
+    background: var(--bg-surface-hover);
 }
 
 .accordion-content-inner {
@@ -424,48 +215,46 @@
 }
 
 .accordion-content p.module-desc {
-    font-size: 0.88rem;
+    font-size: 0.9375rem;
     color: var(--text-body);
-    margin-bottom: 1.2rem;
-    line-height: 1.5;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
 }
 
 /* Course Items */
 .course-list {
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
+    gap: 0.75rem;
 }
 
 .course-item {
     display: flex;
     align-items: center;
     gap: 12px;
-    background: #FFFFFF;
+    background: var(--white);
     border: 1px solid var(--border);
-    padding: 0.8rem 1rem;
-    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-lg);
     transition: var(--transition-sm);
+    box-shadow: var(--shadow-xs);
 }
 
 .course-item:hover {
     border-color: var(--border-strong);
-    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+    box-shadow: var(--shadow-sm);
 }
 
 .course-item.completed {
     background: #F8FAFC;
-    border-color: #E2E8F0;
+    opacity: 0.7;
 }
 
 /* Custom Checkbox */
-.course-checkbox {
-    display: none;
-}
-
+.course-checkbox { display: none; }
 .checkbox-custom {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     border: 2px solid var(--border-strong);
     border-radius: 6px;
     display: flex;
@@ -475,29 +264,10 @@
     transition: var(--transition-sm);
     flex-shrink: 0;
 }
-
-.checkbox-custom i {
-    color: #FFFFFF;
-    font-size: 0.7rem;
-    opacity: 0;
-    transform: scale(0.5);
-    transition: var(--transition-sm);
-}
-
-.course-checkbox:checked + .checkbox-custom {
-    background: #10B981;
-    border-color: #10B981;
-}
-
-.course-checkbox:checked + .checkbox-custom i {
-    opacity: 1;
-    transform: scale(1);
-}
-
-.course-checkbox:checked ~ .course-details h5 {
-    color: var(--text-muted);
-    text-decoration: line-through;
-}
+.checkbox-custom i { color: #FFF; font-size: 0.75rem; opacity: 0; transform: scale(0.5); transition: var(--transition-sm); }
+.course-checkbox:checked + .checkbox-custom { background: var(--success); border-color: var(--success); }
+.course-checkbox:checked + .checkbox-custom i { opacity: 1; transform: scale(1); }
+.course-checkbox:checked ~ .course-details h5 { color: var(--text-muted); text-decoration: line-through; }
 
 .course-details {
     flex: 1;
@@ -507,62 +277,116 @@
 }
 
 .course-details h5 {
-    font-size: 0.9rem;
+    font-size: 0.9375rem;
     font-weight: 600;
     color: var(--text-dark);
     margin: 0;
-    transition: var(--transition-sm);
 }
 
 .course-link {
-    font-size: 0.75rem;
-    color: var(--primary);
+    font-size: 0.8125rem;
+    color: var(--accent);
     font-weight: 600;
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    background: rgba(37, 99, 235, 0.05);
 }
-
 .course-link:hover {
+    background: rgba(37, 99, 235, 0.1);
     color: #1D4ED8;
-    text-decoration: underline;
 }
 
-/* Responsive adjustments */
+/* ── Module Locked State ── */
+.accordion-item.module-locked {
+    border-color: var(--border);
+    background: var(--bg-surface-hover);
+    opacity: 0.7;
+}
+.accordion-item.module-locked .accordion-header { cursor: not-allowed; }
+.accordion-item.module-locked .toggle-icon { color: var(--text-light); }
+.accordion-item.module-locked h4 { color: var(--text-muted); }
+
+.lock-badge {
+    background: #FEF2F2;
+    color: var(--danger);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    border: 1px solid #FECACA;
+}
+
+.module-locked-overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem 1rem;
+    gap: 1rem;
+}
+.lock-icon-big { font-size: 2.5rem; color: var(--text-light); }
+.module-locked-overlay p { font-size: 0.9375rem; color: var(--text-muted); max-width: 320px; }
+
+/* ── Module Quiz Action Button ── */
+.module-quiz-action {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.btn-take-quiz {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--text-dark);
+    color: #FFF;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    transition: var(--transition-xs);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-take-quiz:hover {
+    background: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    color: #FFF;
+}
+
+.btn-take-quiz.btn-quiz-passed {
+    background: var(--success);
+    pointer-events: none;
+    box-shadow: none;
+}
+
+.quiz-unlock-hint {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+}
+
+/* Responsive */
 @media (max-width: 1024px) {
-    .app-layout {
-        height: auto;
-        overflow-y: auto;
-    }
-    
-    .roadmap-grid-layout {
-        grid-template-columns: 1fr !important;
-    }
+    .app-layout { height: auto; overflow: visible; }
 }
 
-@media (max-width: 640px) {
-    #roadmap-timeline::before { left: 14px; }
-    .timeline-item { gap: 1rem; }
-    .timeline-item::before {
-        width: 16px;
-        height: 16px;
-        box-shadow: 0 0 0 4px var(--bg-base);
-        margin-top: 1.15rem;
-    }
-    
-    .timeline-item.active::before {
-        box-shadow: 0 0 0 4px var(--bg-base), 0 0 15px rgba(37, 99, 235, 0.4);
-    }
-    
-    .timeline-content {
-        padding: 1.2rem;
-    }
-    
-    .timeline-content h4 {
-        font-size: 1rem;
-    }
-    
-    .course-btn {
-        width: 100%;
-    }
+@media (max-width: 768px) {
+    .accordion-group { padding-left: 16px; }
+    .accordion-group::before { left: 4px; }
+    .accordion-item::before { left: -16px; width: 10px; height: 10px; }
+    .accordion-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    .accordion-header-right { width: 100%; justify-content: space-between; }
+    .module-progress-wrapper { width: 100%; flex: 1; }
+    .course-details { flex-direction: column; align-items: flex-start; gap: 8px; }
 }

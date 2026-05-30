@@ -151,24 +151,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ── 3.5 Profile Modal — click on avatar/name area only ──
-    // We attach the handler to the inner .profile-info div (NOT to .user-profile)
-    // to avoid the signout button triggering the modal.
+    // ── 3.5 Profile Page Redirect ──
     document.querySelectorAll('.profile-click-area').forEach(area => {
         area.style.cursor = 'pointer';
         area.addEventListener('click', () => {
-            showProfileModal(userName, userEmail, selectedPath, initials);
+            window.location.href = 'profile.html';
         });
     });
 
-    // Fallback: if pages use the old pattern (no .profile-click-area), wire to .user-profile
-    // but guard against the signout button
     document.querySelectorAll('.user-profile').forEach(profileDiv => {
-        // Only add listener if there's no dedicated .profile-click-area inside
         if (!profileDiv.querySelector('.profile-click-area')) {
             profileDiv.addEventListener('click', e => {
                 if (e.target.closest('.signout-btn') || e.target.closest('#signout-btn')) return;
-                showProfileModal(userName, userEmail, selectedPath, initials);
+                window.location.href = 'profile.html';
             });
         }
     });
@@ -193,75 +188,86 @@ document.addEventListener('DOMContentLoaded', () => {
             zIndex: '9999', opacity: '0', transition: 'opacity 0.25s ease'
         });
 
+        const completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
+        const totalCompleted = completedModules.length;
+
         modal.innerHTML = `
             <div class="profile-modal-card" style="
-                background: #fff; border-radius: 20px; padding: 2rem;
-                width: 90%; max-width: 420px; text-align: center;
-                position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-                animation: slideUpModal 0.3s cubic-bezier(0.4,0,0.2,1) forwards;
+                background: #ffffff; border-radius: 24px; padding: 2.5rem 2rem;
+                width: 90%; max-width: 440px; text-align: center;
+                position: relative; box-shadow: 0 24px 80px rgba(15,23,42,0.2), 0 0 0 1px rgba(226,232,240,0.8);
+                animation: slideUpModal 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards;
+                font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
             ">
                 <button class="close-modal-btn" style="
-                    position: absolute; top: 14px; right: 16px;
-                    background: #F1F5F9; border: none; border-radius: 50%;
-                    width: 32px; height: 32px; font-size: 18px; line-height: 1;
+                    position: absolute; top: 16px; right: 16px;
+                    background: #F1F5F9; border: none; border-radius: 12px;
+                    width: 34px; height: 34px; font-size: 20px; line-height: 1;
                     cursor: pointer; color: #64748B; display: flex;
                     align-items: center; justify-content: center;
-                    transition: background 0.2s;
+                    transition: all 0.2s;
                 ">&times;</button>
 
-                <!-- Avatar -->
-                <div style="
-                    background: linear-gradient(135deg, #6366F1, #8B5CF6);
-                    color: white; width: 80px; height: 80px; border-radius: 50%;
-                    display: flex; align-items: center; justify-content: center;
-                    font-size: 30px; font-weight: 800; margin: 0 auto 1rem;
-                    box-shadow: 0 8px 20px rgba(99,102,241,0.3);
-                ">${init}</div>
+                <!-- Avatar & Header -->
+                <div style="position: relative; margin: 0 auto 1.5rem; width: 90px; height: 90px;">
+                    <div style="
+                        background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+                        color: white; width: 100%; height: 100%; border-radius: 50%;
+                        display: flex; align-items: center; justify-content: center;
+                        font-size: 32px; font-weight: 800;
+                        box-shadow: 0 12px 24px rgba(59,130,246,0.3);
+                        position: relative; z-index: 2;
+                    ">${init}</div>
+                    <div style="position: absolute; bottom: 0; right: -4px; background: #10B981; border: 3px solid #fff; border-radius: 50%; width: 24px; height: 24px; z-index: 3;"></div>
+                </div>
 
-                <!-- Name -->
-                <h2 style="margin: 0 0 0.25rem; color: #0F172A; font-size: 1.3rem; font-weight: 800;">${name}</h2>
-                <p style="color: #6366F1; font-size: 0.85rem; font-weight: 600; margin-bottom: 1.5rem; background: rgba(99,102,241,0.08); display: inline-block; padding: 3px 12px; border-radius: 20px;">${path}</p>
+                <h2 style="margin: 0 0 0.25rem; color: #0F172A; font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em;">${name}</h2>
+                <div style="color: #64748B; font-size: 0.9rem; font-weight: 500; margin-bottom: 1.5rem;">${displayEmail}</div>
 
-                <!-- Info rows -->
-                <div style="text-align: left; background: #F8FAFC; border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 1.25rem; border: 1px solid #E2E8F0;">
-                    <div class="modal-info-row" style="display:flex; align-items:center; gap:10px; padding: 0.5rem 0; border-bottom: 1px solid #E2E8F0;">
-                        <span style="font-size:16px;">📧</span>
-                        <div>
-                            <div style="font-size:0.72rem; font-weight:600; color:#94A3B8; text-transform:uppercase; letter-spacing:0.05em;">Email / Gmail</div>
-                            <div style="font-size:0.9rem; color:#0F172A; font-weight:600; word-break:break-all;">${displayEmail}</div>
+                <!-- Path & Level Tag -->
+                <div style="display:flex; justify-content:center; gap: 8px; margin-bottom: 1.5rem;">
+                    <span style="background: rgba(59,130,246,0.1); color: #2563EB; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">${path}</span>
+                    <span style="background: rgba(139,92,246,0.1); color: #7C3AED; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">${level}</span>
+                </div>
+
+                <!-- Stats Grid -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.5rem;">
+                    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 16px; padding: 1rem; text-align: left;">
+                        <div style="font-size: 0.75rem; color: #64748B; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Skill Score</div>
+                        <div style="display:flex; align-items:baseline; gap: 4px;">
+                            <span style="font-size: 1.5rem; font-weight: 800; color: #0F172A; line-height: 1;">${score}</span>
+                            <span style="font-size: 0.8rem; color: #94A3B8; font-weight: 600;">/ 100</span>
                         </div>
                     </div>
-                    <div class="modal-info-row" style="display:flex; align-items:center; gap:10px; padding: 0.5rem 0; border-bottom: 1px solid #E2E8F0;">
-                        <span style="font-size:16px;">🎯</span>
-                        <div>
-                            <div style="font-size:0.72rem; font-weight:600; color:#94A3B8; text-transform:uppercase; letter-spacing:0.05em;">Selected Path</div>
-                            <div style="font-size:0.9rem; color:#0F172A; font-weight:600;">${path}</div>
+                    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 16px; padding: 1rem; text-align: left;">
+                        <div style="font-size: 0.75rem; color: #64748B; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Current Streak</div>
+                        <div style="display:flex; align-items:baseline; gap: 4px;">
+                            <span style="font-size: 1.5rem; font-weight: 800; color: #F59E0B; line-height: 1;">${streak}</span>
+                            <span style="font-size: 0.8rem; color: #94A3B8; font-weight: 600;">Days 🔥</span>
                         </div>
                     </div>
-                    <div class="modal-info-row" style="display:flex; align-items:center; gap:10px; padding: 0.5rem 0; border-bottom: 1px solid #E2E8F0;">
-                        <span style="font-size:16px;">📊</span>
-                        <div>
-                            <div style="font-size:0.72rem; font-weight:600; color:#94A3B8; text-transform:uppercase; letter-spacing:0.05em;">Level · Skill Score</div>
-                            <div style="font-size:0.9rem; color:#0F172A; font-weight:600;">${level} &nbsp;·&nbsp; ${score}/100</div>
-                        </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div style="text-align: left; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 2px 4px rgba(15,23,42,0.02);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 0.6rem;">
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #1E293B;">Modules Completed</span>
+                        <span style="font-size: 0.85rem; font-weight: 800; color: #2563EB;">${totalCompleted}</span>
                     </div>
-                    <div class="modal-info-row" style="display:flex; align-items:center; gap:10px; padding: 0.5rem 0;">
-                        <span style="font-size:16px;">🔥</span>
-                        <div>
-                            <div style="font-size:0.72rem; font-weight:600; color:#94A3B8; text-transform:uppercase; letter-spacing:0.05em;">Current Streak</div>
-                            <div style="font-size:0.9rem; color:#0F172A; font-weight:600;">${streak} Days</div>
-                        </div>
+                    <div style="width: 100%; height: 8px; background: #F1F5F9; border-radius: 4px; overflow: hidden;">
+                        <div style="width: ${Math.min((totalCompleted / 12) * 100, 100)}%; height: 100%; background: linear-gradient(90deg, #3B82F6, #8B5CF6); border-radius: 4px; transition: width 1s cubic-bezier(0.34,1.56,0.64,1);"></div>
                     </div>
                 </div>
 
                 <!-- Sign Out -->
                 <button id="modal-signout-btn" style="
-                    width: 100%; padding: 11px; background: #FEE2E2; color: #EF4444;
-                    border: 1px solid #FCA5A5; border-radius: 10px; font-weight: 700;
-                    cursor: pointer; font-size: 0.9rem; transition: all 0.2s;
+                    width: 100%; padding: 12px; background: #FFFFFF; color: #EF4444;
+                    border: 2px solid #FCA5A5; border-radius: 14px; font-weight: 700;
+                    cursor: pointer; font-size: 0.95rem; transition: all 0.2s;
                     display: flex; align-items: center; justify-content: center; gap: 8px;
-                ">
-                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                    box-shadow: 0 4px 12px rgba(239,68,68,0.1);
+                " onmouseover="this.style.background='#FEF2F2'" onmouseout="this.style.background='#FFFFFF'">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out Securely
                 </button>
             </div>
         `;

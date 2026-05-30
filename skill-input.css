@@ -1,5 +1,5 @@
 /* =========================================================
-   SKILL-INPUT.CSS — Xyverra Skill Input / Create Roadmap
+   SKILL-INPUT.CSS — Xyverra Skill Input / Create Roadmap (Light Mode)
    ========================================================= */
 @import url('global.css');
 
@@ -7,17 +7,17 @@
 .form-card {
     max-width: 680px;
     margin: 0 auto;
-    background: var(--white);
+    background: var(--bg-surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-2xl);
     padding: 2.5rem;
-    box-shadow: var(--shadow-premium);
+    box-shadow: var(--shadow-sm);
 }
 
 .form-card-header {
     margin-bottom: 2rem;
     padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border);
 }
 
 .form-card-header h2 {
@@ -81,14 +81,14 @@
 }
 
 .level-btn:hover {
-    border-color: rgba(42, 101, 245, 0.35);
-    color: var(--primary);
-    background: var(--primary-light);
+    border-color: rgba(37, 99, 235, 0.35);
+    color: var(--accent);
+    background: rgba(37, 99, 235, 0.05);
 }
 
 .level-btn.active {
-    background: var(--primary);
-    border-color: var(--primary);
+    background: var(--accent);
+    border-color: var(--accent);
     color: white;
 }
 
@@ -98,7 +98,7 @@
     padding: 10px 12px;
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    background: #F8FAFC;
+    background: var(--bg-surface-hover);
     display: flex;
     flex-wrap: wrap;
     gap: 7px;
@@ -108,9 +108,9 @@
 }
 
 .tag-input-container:focus-within {
-    background: var(--white);
-    border-color: var(--primary);
-    box-shadow: 0 0 0 4px #DBEAFE;
+    background: var(--bg-surface);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 
 .tags-wrapper {
@@ -126,8 +126,8 @@
     align-items: center;
     gap: 6px;
     padding: 4px 11px;
-    background: #DBEAFE;
-    color: var(--primary);
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--accent);
     border: 1px solid rgba(37, 99, 235, 0.15);
     border-radius: var(--radius-full);
     font-size: 0.8125rem;
@@ -175,7 +175,7 @@ textarea#experience-field {
     padding: 13px 14px;
     border: 1.5px solid var(--border);
     border-radius: var(--radius-md);
-    background: var(--bg-light);
+    background: var(--bg-surface-hover);
     font-size: 0.9rem;
     font-family: inherit;
     color: var(--text-dark);
@@ -188,9 +188,9 @@ textarea#experience-field {
 }
 textarea#experience-field::placeholder { color: var(--text-light); font-weight: 400; }
 textarea#experience-field:focus {
-    background: var(--white);
-    border-color: var(--primary);
-    box-shadow: 0 0 0 4px var(--primary-light);
+    background: var(--bg-surface);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 
 /* ── Error Message ── */
@@ -200,12 +200,12 @@ textarea#experience-field:focus {
     gap: 8px;
     padding: 0.875rem 1rem;
     border-radius: var(--radius-md);
-    background: var(--error-bg);
-    color: var(--error);
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
     font-size: 0.875rem;
     font-weight: 600;
     margin-bottom: 1rem;
-    border: 1px solid var(--error-border);
+    border: 1px solid rgba(239, 68, 68, 0.2);
 }
 .error-message.visible { display: flex; }
 
@@ -237,7 +237,7 @@ textarea#experience-field:focus {
     padding: 13px 44px 13px 14px;
     border: 1.5px solid var(--border);
     border-radius: var(--radius-md);
-    background: var(--bg-light);
+    background: var(--bg-surface-hover);
     font-size: 0.9rem;
     font-family: inherit;
     font-weight: 600;
@@ -250,9 +250,9 @@ textarea#experience-field:focus {
 }
 
 .module-select:focus {
-    background: var(--white);
-    border-color: var(--primary);
-    box-shadow: 0 0 0 4px var(--primary-light);
+    background: var(--bg-surface);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 
 .module-select option {
@@ -268,7 +268,7 @@ textarea#experience-field:focus {
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--text-muted);
-    background: var(--bg-light);
+    background: var(--bg-surface-hover);
 }
 
 .module-select-icon {
@@ -280,7 +280,7 @@ textarea#experience-field:focus {
     transition: var(--transition-sm);
 }
 .module-select:focus + .module-select-icon {
-    color: var(--primary);
+    color: var(--accent);
     transform: rotate(180deg);
 }
 
@@ -292,8 +292,8 @@ textarea#experience-field:focus {
     margin-top: 0.875rem;
     padding: 1rem 1.125rem;
     border-radius: var(--radius-lg);
-    background: var(--primary-light);
-    border: 1.5px solid rgba(42, 101, 245, 0.18);
+    background: rgba(37, 99, 235, 0.05);
+    border: 1px solid rgba(37, 99, 235, 0.15);
     animation: fadeInUp 0.25s var(--ease) both;
 }
 
@@ -301,8 +301,8 @@ textarea#experience-field:focus {
     width: 40px;
     height: 40px;
     border-radius: 11px;
-    background: rgba(42, 101, 245, 0.15);
-    color: var(--primary);
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--accent);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -348,22 +348,22 @@ textarea#experience-field:focus {
 }
 
 .module-preview-badge.badge-beginner {
-    background: var(--success-bg);
-    color: #059669;
-    border: 1px solid var(--success-border);
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.2);
 }
 .module-preview-badge.badge-intermediate {
-    background: var(--warning-bg);
-    color: #D97706;
-    border: 1px solid var(--warning-border);
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+    border: 1px solid rgba(245, 158, 11, 0.2);
 }
 .module-preview-badge.badge-advanced {
-    background: var(--primary-light);
-    color: var(--primary);
-    border: 1px solid rgba(42, 101, 245, 0.2);
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--accent);
+    border: 1px solid rgba(37, 99, 235, 0.2);
 }
 .module-preview-badge.badge-none {
-    background: var(--bg-light);
+    background: var(--bg-surface-hover);
     color: var(--text-muted);
     border: 1px solid var(--border);
 }
@@ -381,7 +381,7 @@ textarea#experience-field:focus {
 .recommendations-section {
     margin-top: 3rem;
     padding-top: 2rem;
-    border-top: 1px solid var(--glass-border);
+    border-top: 1px solid var(--border);
     animation: fadeIn 0.5s ease-out forwards;
 }
 
@@ -407,12 +407,12 @@ textarea#experience-field:focus {
 }
 
 .skills-gap-container {
-    background: rgba(255, 255, 255, 0.3);
-    border: 1px solid var(--glass-border);
-    border-radius: 16px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-2xl);
     padding: 1.5rem;
-    backdrop-filter: blur(10px);
     margin-bottom: 2rem;
+    box-shadow: var(--shadow-sm);
 }
 
 .gap-legend {
@@ -436,8 +436,8 @@ textarea#experience-field:focus {
     height: 10px;
     border-radius: 50%;
 }
-.dot-learn { background-color: var(--primary); }
-.dot-known { background-color: #10b981; }
+.dot-learn { background-color: var(--accent); }
+.dot-known { background-color: var(--success); }
 
 .skill-tags-grid {
     display: flex;
@@ -451,39 +451,39 @@ textarea#experience-field:focus {
     align-items: center;
     gap: 0.5rem;
     padding: 10px 16px;
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     user-select: none;
-    border: 1.5px solid transparent;
+    border: 1px solid transparent;
 }
 
 /* Default state: "Want to Learn" */
 .gap-tag.status-learn {
-    background: rgba(99, 102, 241, 0.1);
-    color: var(--primary);
-    border-color: rgba(99, 102, 241, 0.3);
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--accent);
+    border-color: rgba(37, 99, 235, 0.2);
 }
 
 .gap-tag.status-learn:hover {
-    background: rgba(99, 102, 241, 0.15);
+    background: rgba(37, 99, 235, 0.15);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+    box-shadow: var(--shadow-xs);
 }
 
 /* Toggled state: "Already Know" */
 .gap-tag.status-known {
     background: rgba(16, 185, 129, 0.1);
-    color: #059669;
-    border-color: rgba(16, 185, 129, 0.3);
+    color: var(--success);
+    border-color: rgba(16, 185, 129, 0.2);
 }
 
 .gap-tag.status-known:hover {
     background: rgba(16, 185, 129, 0.15);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+    box-shadow: var(--shadow-xs);
 }
 
 .gap-tag i {
@@ -493,4 +493,83 @@ textarea#experience-field:focus {
 .recommendations-actions {
     display: flex;
     justify-content: center;
+}
+
+/* ── Roadmap Preview List styling ── */
+.roadmap-preview-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background: var(--bg-surface);
+    transition: var(--transition-xs);
+    gap: 1.5rem;
+}
+
+.roadmap-preview-item:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-sm);
+}
+
+.roadmap-preview-item.preview-item-completed {
+    border-left: 4px solid var(--success);
+    background: rgba(16, 185, 129, 0.02);
+}
+
+.roadmap-preview-item.preview-item-unlocked {
+    border-left: 4px solid var(--accent);
+    background: rgba(37, 99, 235, 0.02);
+}
+
+.roadmap-preview-item.preview-item-locked {
+    opacity: 0.6;
+    background: var(--bg-surface-hover);
+    border-style: dashed;
+}
+
+.preview-item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.preview-item-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.preview-item-desc {
+    font-size: 0.825rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.preview-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.preview-status-badge.status-completed {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.preview-status-badge.status-unlocked {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--accent);
+}
+
+.preview-status-badge.status-locked {
+    background: rgba(100, 116, 139, 0.1);
+    color: var(--text-muted);
 }
