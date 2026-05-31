@@ -135,12 +135,15 @@
                     </div>
 
                     <!-- Result Screen (hidden initially) -->
-                    <div class="result-container" id="quiz-result-container" style="display: none;">
+                    <div class="result-container" id="quiz-result-container" style="display: none; padding-bottom: 2rem;">
                         <div class="result-icon success" id="result-icon">
                             <i class="fas fa-check-circle"></i>
                         </div>
                         <div class="score-display" id="score-display">0%</div>
                         <div class="score-text" id="score-text">Results loading...</div>
+                        <div class="detailed-results" id="detailed-results" style="margin-top: 20px; text-align: left; width: 100%; max-height: 350px; overflow-y: auto; background: var(--glass-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
+                            <!-- Populated dynamically -->
+                        </div>
                     </div>
 
                     <!-- Footer with status & buttons -->
