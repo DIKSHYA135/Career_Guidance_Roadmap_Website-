@@ -228,6 +228,14 @@ const ROADMAP_DATA = {
                 { name: "edX UX Research", url: "https://www.edx.org/learn/ux-design" }
             ]
         },
+        {
+            id: "accessibility-design-systems", title: "Accessibility & Design Systems", desc: "WCAG guidelines, inclusive design, and building scalable component libraries.", keywords: ["accessibility", "wcag", "design systems", "components"],
+            courses: [
+                { name: "web.dev Learn Accessibility (Free)", url: "https://web.dev/learn/accessibility/" },
+                { name: "A11y Project", url: "https://www.a11yproject.com/" },
+                { name: "Coursera UI/UX Design Specialization", url: "https://www.coursera.org/specializations/ui-ux-design" }
+            ]
+        },
         { id: "capstone", title: "Design Capstone", desc: "Design a complete app prototype with research backing.", keywords: [], courses: [] }
     ],
     "Mobile Development": [
@@ -252,6 +260,14 @@ const ROADMAP_DATA = {
             courses: [
                 { name: "React Navigation Docs (Free)", url: "https://reactnavigation.org/" },
                 { name: "GeeksforGeeks React Native", url: "https://www.geeksforgeeks.org/react-native/" }
+            ]
+        },
+        {
+            id: "mobile-advanced", title: "Performance & App Store Deployment", desc: "Optimize performance, handle native modules, and publish to Google Play & App Store.", keywords: ["performance", "native modules", "app store", "google play"],
+            courses: [
+                { name: "Google Play Developer Docs (Free)", url: "https://developer.android.com/distribute" },
+                { name: "Apple Developer Documentation (Free)", url: "https://developer.apple.com/documentation/" },
+                { name: "React Native Performance (YouTube)", url: "https://www.youtube.com/watch?v=ZgaZrjgEGD8" }
             ]
         },
         { id: "capstone", title: "Mobile Capstone", desc: "Publish a working app to an app store.", keywords: [], courses: [] }
@@ -280,6 +296,14 @@ const ROADMAP_DATA = {
                 { name: "GeeksforGeeks Ethical Hacking", url: "https://www.geeksforgeeks.org/ethical-hacking-tutorials/" }
             ]
         },
+        {
+            id: "cyber-advanced", title: "Advanced Threats & Incident Response", desc: "Reverse engineering, exploit development, and incident handling.", keywords: ["reverse engineering", "exploit", "incident response", "ctf"],
+            courses: [
+                { name: "TryHackMe — Advanced Path (Free)", url: "https://tryhackme.com/paths" },
+                { name: "Malware Traffic Analysis (Free)", url: "https://www.malware-traffic-analysis.net/" },
+                { name: "SANS Cyber Aces (Free)", url: "https://www.cyberaces.org/" }
+            ]
+        },
         { id: "capstone", title: "Security Capstone", desc: "Perform and document a penetration test.", keywords: [], courses: [] }
     ],
     "Data Analytics": [
@@ -305,6 +329,14 @@ const ROADMAP_DATA = {
                 { name: "Tableau Public Free Training", url: "https://www.tableau.com/learn/training/20221" },
                 { name: "Power BI Tutorial (YouTube)", url: "https://www.youtube.com/watch?v=TmhQCQr_DCA" },
 { name: "edX Data Analysis", url: "https://www.edx.org/learn/data-analysis" }
+            ]
+        },
+        {
+            id: "analytics-advanced", title: "Predictive Analytics & Storytelling", desc: "A/B testing, predictive modeling, and presenting insights for business decisions.", keywords: ["predictive modeling", "a/b testing", "storytelling", "analytics"],
+            courses: [
+                { name: "Kaggle Intro to ML (Free)", url: "https://www.kaggle.com/learn/intro-to-machine-learning" },
+                { name: "Google Analytics Academy (Free)", url: "https://analytics.google.com/analytics/academy/" },
+                { name: "edX Data Science (Audit Free)", url: "https://www.edx.org/learn/data-science" }
             ]
         },
         { id: "capstone", title: "Analytics Capstone", desc: "Analyze a dataset and present a BI dashboard.", keywords: [], courses: [] }

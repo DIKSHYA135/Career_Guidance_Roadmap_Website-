@@ -197,13 +197,107 @@ const MODULES_DATA = {
   }
 };
 
-[
-  "Full Stack Development", "Backend / APIs", "Cloud / DevOps",
-  "UI/UX Design", "Mobile Development", "Cybersecurity", "Data Analytics"
-].forEach(cat => {
-  MODULES_DATA[cat] = {
-    "Beginner": [{ id: `${cat}-beg-1`, title: `${cat} Basics 1`, desc: "Introduction." }],
-    "Intermediate": [{ id: `${cat}-int-1`, title: `${cat} Core 1`, desc: "Intermediate concepts." }],
-    "Advanced": [{ id: `${cat}-adv-1`, title: `${cat} Advanced 1`, desc: "Advanced concepts." }]
-  };
-});
+// Full Stack Development
+MODULES_DATA["Full Stack Development"] = {
+  "Beginner": [
+    { id: "web-dev-basics", title: "Web Basics (HTML/CSS/JS)", desc: "Core web technologies for building interfaces." },
+    { id: "nodejs",         title: "Node.js & Express",        desc: "Build backend REST APIs using JavaScript." }
+  ],
+  "Intermediate": [
+    { id: "database", title: "Databases (SQL/NoSQL)",          desc: "Data modeling, CRUD operations, and querying." },
+    { id: "react",    title: "Frontend Frameworks (React)",    desc: "Build interactive client-side interfaces." }
+  ],
+  "Advanced": [
+    { id: "capstone", title: "Full Stack Capstone", desc: "Build a full stack MERN or PERN application." }
+  ]
+};
+
+// Backend / APIs
+MODULES_DATA["Backend / APIs"] = {
+  "Beginner": [
+    { id: "programming-basics", title: "Backend Language (Python/Node)", desc: "Learn a core backend language like Python or Node.js." },
+    { id: "api-design",         title: "API Design & REST",              desc: "Principles of designing stateless APIs." }
+  ],
+  "Intermediate": [
+    { id: "database", title: "Databases & ORMs",            desc: "SQL/NoSQL and connecting to them securely." },
+    { id: "auth",     title: "Authentication & Security",   desc: "JWT, OAuth, and securing your endpoints." }
+  ],
+  "Advanced": [
+    { id: "capstone", title: "Backend Capstone", desc: "Build a secure REST API with authentication and database." }
+  ]
+};
+
+// Cloud / DevOps
+MODULES_DATA["Cloud / DevOps"] = {
+  "Beginner": [
+    { id: "linux-bash", title: "Linux & Bash Scripting",      desc: "Master the command line and shell scripting." },
+    { id: "docker",     title: "Containerization (Docker)",   desc: "Package applications consistently with Docker." }
+  ],
+  "Intermediate": [
+    { id: "cicd",            title: "CI/CD Pipelines",                    desc: "GitHub Actions or Jenkins for automation." },
+    { id: "cloud-providers", title: "Cloud Platforms (AWS/GCP/Azure)",    desc: "Deploying applications to the cloud." }
+  ],
+  "Advanced": [
+    { id: "capstone", title: "DevOps Capstone", desc: "Deploy an automated multi-container app to the cloud." }
+  ]
+};
+
+// UI/UX Design
+MODULES_DATA["UI/UX Design"] = {
+  "Beginner": [
+    { id: "design-fundamentals", title: "Design Principles",  desc: "Color theory, typography, spacing, and visual hierarchy." },
+    { id: "figma",               title: "Figma Mastery",      desc: "Components, auto-layout, prototyping, and collaboration." }
+  ],
+  "Intermediate": [
+    { id: "user-research",               title: "User Research & Testing",        desc: "Personas, wireframes, and usability testing." },
+    { id: "accessibility-design-systems", title: "Accessibility & Design Systems", desc: "WCAG guidelines and scalable component libraries." }
+  ],
+  "Advanced": [
+    { id: "capstone", title: "Design Capstone", desc: "Design a complete app prototype with research backing." }
+  ]
+};
+
+// Mobile Development
+MODULES_DATA["Mobile Development"] = {
+  "Beginner": [
+    { id: "mobile-fundamentals",  title: "Programming Fundamentals",    desc: "JavaScript for React Native or Dart for Flutter." },
+    { id: "react-native-flutter", title: "Cross-Platform Frameworks",   desc: "React Native or Flutter basics." }
+  ],
+  "Intermediate": [
+    { id: "mobile-ui",      title: "Mobile UI & Navigation",              desc: "Stack navigation, tabs, and gestures." },
+    { id: "mobile-advanced", title: "Performance & App Store Deployment", desc: "Optimize performance and publish your app." }
+  ],
+  "Advanced": [
+    { id: "capstone", title: "Mobile Capstone", desc: "Publish a working app to an app store." }
+  ]
+};
+
+// Cybersecurity
+MODULES_DATA["Cybersecurity"] = {
+  "Beginner": [
+    { id: "networking-basics",    title: "Networking & Protocols",    desc: "TCP/IP, DNS, HTTP/S, and OSI model." },
+    { id: "security-fundamentals", title: "Security Fundamentals",    desc: "Cryptography, hashes, and security postures." }
+  ],
+  "Intermediate": [
+    { id: "ethical-hacking", title: "Ethical Hacking",                      desc: "Penetration testing and vulnerability scanning." },
+    { id: "cyber-advanced",  title: "Advanced Threats & Incident Response", desc: "Reverse engineering, exploit development, and incident handling." }
+  ],
+  "Advanced": [
+    { id: "capstone", title: "Security Capstone", desc: "Perform and document a penetration test." }
+  ]
+};
+
+// Data Analytics
+MODULES_DATA["Data Analytics"] = {
+  "Beginner": [
+    { id: "excel-advanced", title: "Advanced Excel/Spreadsheets", desc: "Pivot tables, VLOOKUP, and macros." },
+    { id: "sql-analytics",  title: "SQL for Analytics",           desc: "Aggregations, joins, and window functions." }
+  ],
+  "Intermediate": [
+    { id: "bi-tools",           title: "BI Tools (Tableau/Power BI)",        desc: "Creating interactive dashboards." },
+    { id: "analytics-advanced", title: "Predictive Analytics & Storytelling", desc: "A/B testing, predictive modeling, and data storytelling." }
+  ],
+  "Advanced": [
+    { id: "capstone", title: "Analytics Capstone", desc: "Analyze a dataset and present a BI dashboard." }
+  ]
+};

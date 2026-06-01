@@ -329,7 +329,7 @@ h4 { font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; }
     min-height: 100vh;
     padding: var(--spacing-8);
     position: relative;
-    background: #09090B; /* Dark background for Auth pages to feel premium */
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%); /* Clean SaaS light gradient */
 }
 
 .brand-header {
@@ -357,10 +357,10 @@ h4 { font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; }
 
 .brand-header h1 {
     font-size: 1.75rem;
-    color: #FFF;
+    color: var(--text-dark);
     letter-spacing: -0.04em;
 }
 .brand-header p {
-    color: #A1A1AA;
+    color: var(--text-muted);
     font-size: 0.9375rem;
 }

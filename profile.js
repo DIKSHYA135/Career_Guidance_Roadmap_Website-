@@ -64,34 +64,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const usersDataObj = JSON.parse(localStorage.getItem('xyverra_users')) || {};
     const userData = usersDataObj[currentEmail] || {};
 
-    // Ensure structures exist
-    if (!userData.profile) {
-        userData.profile = { picture: '', fullName: userData.name || '', username: currentEmail.split('@')[0], bio: '', learningGoal: '' };
-    }
-    if (!userData.progress) {
-        userData.progress = { modulesCompleted: 0, coursesCompleted: 0, learningStreak: 0, totalLearningHours: 0, certificatesEarned: 0, roadmapsGenerated: 0 };
-    }
-    if (!userData.roadmapHistory) {
-        userData.roadmapHistory = [];
-    }
-
     const currentCategory = userData.path || "Not Selected";
     const currentLevel = userData.level || "Beginner";
 
     // ── Render Profile UI ──
     const renderProfile = () => {
         // Header
-        const initials = userData.profile.fullName ? userData.profile.fullName.substring(0,2).toUpperCase() : 'U';
-        document.getElementById('profile-avatar').textContent = initials;
-        document.getElementById('global-user-avatar').textContent = initials;
+        const name = userData.name || "User Name";
+        const initials = name.substring(0,2).toUpperCase();
         
-        document.getElementById('profile-name').textContent = userData.profile.fullName || "User Name";
-        document.getElementById('global-user-name').textContent = userData.profile.fullName || "User Name";
+        const avatarEl = document.getElementById('profile-avatar');
+        if (avatarEl) avatarEl.textContent = initials;
         
-        document.getElementById('profile-username').textContent = '@' + userData.profile.username;
-        document.getElementById('profile-email').innerHTML = `<i class="fas fa-envelope"></i> ${currentEmail}`;
-        document.getElementById('profile-bio').textContent = userData.profile.bio || "No bio added yet.";
-        document.getElementById('profile-goal').textContent = userData.profile.learningGoal || "No specific goal set.";
+        const globalAvatarEl = document.getElementById('global-user-avatar');
+        if (globalAvatarEl) globalAvatarEl.textContent = initials;
+        
+        const nameEl = document.getElementById('profile-name');
+        if (nameEl) nameEl.textContent = name;
+        
+        const globalNameEl = document.getElementById('global-user-name');
+        if (globalNameEl) globalNameEl.textContent = name;
+        
+        const emailEl = document.getElementById('profile-email');
+        if (emailEl) emailEl.innerHTML = `<i class="fas fa-envelope"></i> ${currentEmail}`;
     };
 
     renderProfile();
@@ -102,10 +97,19 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem('xyverra_users', JSON.stringify(usersDataObj));
         
         // Also update standard local variables for app compatibility
-        localStorage.setItem('xyverra_user_name', userData.profile.fullName);
+        localStorage.setItem('xyverra_user_name', userData.name);
         if (userData.path) localStorage.setItem('xyverra_selected_path', userData.path);
         if (userData.level) localStorage.setItem('userLevel', userData.level);
     };
+
+    // ── Update Display Elements ──
+    const updatePathDisplay = () => {
+        const catEl = document.getElementById('display-category');
+        if (catEl) catEl.textContent = userData.path || 'Not Selected';
+        const lvlEl = document.getElementById('display-level');
+        if (lvlEl) lvlEl.textContent = userData.level || 'Beginner';
+    };
+    updatePathDisplay();
 
     // ── Modals Logic ──
     const editProfileBtn = document.getElementById('edit-profile-btn');
@@ -113,22 +117,65 @@ document.addEventListener("DOMContentLoaded", () => {
     const closeProfileModal = document.getElementById('close-profile-modal');
     const saveProfileBtn = document.getElementById('save-profile-btn');
 
-    editProfileBtn.addEventListener('click', () => {
-        document.getElementById('edit-name').value = userData.profile.fullName;
-        document.getElementById('edit-bio').value = userData.profile.bio;
-        document.getElementById('edit-goal').value = userData.profile.learningGoal;
-        editProfileModal.classList.add('active');
-    });
+    if (editProfileBtn) {
+        editProfileBtn.addEventListener('click', () => {
+            document.getElementById('edit-name').value = userData.name || "";
+            editProfileModal.classList.add('active');
+        });
+    }
 
-    closeProfileModal.addEventListener('click', () => editProfileModal.classList.remove('active'));
+    if (closeProfileModal) {
+        closeProfileModal.addEventListener('click', () => editProfileModal.classList.remove('active'));
+    }
 
-    saveProfileBtn.addEventListener('click', () => {
-        userData.profile.fullName = document.getElementById('edit-name').value;
-        userData.profile.bio = document.getElementById('edit-bio').value;
-        userData.profile.learningGoal = document.getElementById('edit-goal').value;
-        
-        saveUserData();
-        renderProfile();
-        editProfileModal.classList.remove('active');
-    });
+    if (saveProfileBtn) {
+        saveProfileBtn.addEventListener('click', () => {
+            userData.name = document.getElementById('edit-name').value;
+            
+            saveUserData();
+            renderProfile();
+            editProfileModal.classList.remove('active');
+            
+            // Show toast if Toast API exists
+            if (typeof showToast === 'function') {
+                showToast('Profile updated successfully!', 'success');
+            }
+        });
+    }
+
+    // ── Learning Path Modal Logic ──
+    const editLearningBtn = document.getElementById('edit-learning-btn');
+    const editLearningModal = document.getElementById('edit-learning-modal');
+    const closeLearningModal = document.getElementById('close-learning-modal');
+    const saveLearningBtn = document.getElementById('save-learning-btn');
+
+    if (editLearningBtn) {
+        editLearningBtn.addEventListener('click', () => {
+            document.getElementById('edit-category').value = userData.path || 'Web Development';
+            document.getElementById('edit-level').value = userData.level || 'Beginner';
+            editLearningModal.classList.add('active');
+        });
+    }
+
+    if (closeLearningModal) {
+        closeLearningModal.addEventListener('click', () => editLearningModal.classList.remove('active'));
+    }
+
+    if (saveLearningBtn) {
+        saveLearningBtn.addEventListener('click', () => {
+            const newPath = document.getElementById('edit-category').value;
+            const newLevel = document.getElementById('edit-level').value;
+            
+            userData.path = newPath;
+            userData.level = newLevel;
+            
+            saveUserData();
+            updatePathDisplay();
+            editLearningModal.classList.remove('active');
+            
+            if (typeof showToast === 'function') {
+                showToast('Learning path updated!', 'success');
+            }
+        });
+    }
 });

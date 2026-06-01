@@ -5,7 +5,7 @@
 
 /* Background */
 body {
-    background: #F8FAFC !important;
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%) !important;
 }
 
 /* Auth-specific card sizing */
@@ -70,4 +70,28 @@ body {
 .auth-footer a:hover { color: #1D4ED8; text-decoration: underline; }
 
 /* Form group override for tighter spacing */
-.form-group { margin-bottom: 1.25rem; }
+.form-group { margin-bottom: 0.0rem; }
+
+/* Error Messages */
+.error-message {
+    color: #DC2626;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    font-weight: 500;
+    min-height: 1rem;
+    transition: all 0.2s ease;
+}
+
+.input-error {
+    border-color: #DC2626 !important;
+}
+
+.input-error + i {
+    color: #DC2626 !important;
+}
+
+/* Loading State */
+.btn-primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}

@@ -9,7 +9,7 @@
     --accent-light:  #EFF6FF;
     --accent-hover:  #1D4ED8;
     --success:       #10B981;
-    --bg-base:       #F8FAFC;
+    --bg-base:       #FFFFFF;
     --bg-surface:    #FFFFFF;
     --bg-hover:      #F1F5F9;
     --text-dark:     #0F172A;
@@ -32,7 +32,7 @@ html { font-size: 16px; }
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--bg-base);
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%) !important;
     color: var(--text-body);
     min-height: 100vh;
     display: flex;
@@ -44,42 +44,81 @@ body {
     position: relative;
     overflow: hidden;
 }
+body {
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%) !important;
+    color: var(--text-body);
+    min-height: 100vh;
+}
 
-/* ── Decorative background ── */
-.login-bg {
+.login-bg,
+.bg-blob,
+.bg-grid {
+    display: none !important;
+}
+
+login-bg {
+
     position: fixed;
+
     inset: 0;
+
     pointer-events: none;
+
     z-index: 0;
+
 }
 
 .bg-blob {
+
     position: absolute;
+
     border-radius: 50%;
+
     filter: blur(80px);
+
     opacity: 0.35;
+
 }
 
 .bg-blob-1 {
+
     width: 500px; height: 500px;
+
     background: radial-gradient(circle, #DBEAFE 0%, #BFDBFE 100%);
+
     top: -150px; right: -100px;
+
 }
+
+
 
 .bg-blob-2 {
+
     width: 400px; height: 400px;
+
     background: radial-gradient(circle, #E0E7FF 0%, #C7D2FE 100%);
+
     bottom: -100px; left: -80px;
+
 }
 
+
+
 .bg-grid {
+
     position: absolute;
+
     inset: 0;
+
     background-image:
+
         linear-gradient(rgba(37,99,235,0.03) 1px, transparent 1px),
+
         linear-gradient(90deg, rgba(37,99,235,0.03) 1px, transparent 1px);
+
     background-size: 40px 40px;
-}
+
+}/* ── Decorative background ── */
 
 /* ── Login Page Wrapper ── */
 .login-page {

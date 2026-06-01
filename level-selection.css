@@ -291,6 +291,11 @@
     margin-top: 0.5rem;
 }
 
+.btn-disabled {
+    opacity: 0.6;
+    cursor: not-allowed !important;
+}
+
 @media (max-width: 768px) {
     .large-card {
         padding: 1.8rem 1.2rem;

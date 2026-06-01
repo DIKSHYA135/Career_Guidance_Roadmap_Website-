@@ -72,11 +72,13 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             try {
-                // Show loading state if desired (optional)
+                // Show loading state
                 continueBtn.innerHTML = 'Saving... <i class="fas fa-spinner fa-spin"></i>';
                 continueBtn.style.pointerEvents = 'none';
 
-                // Send POST request to backend
+                console.log("Attempting to save path:", selectedPath, "for email:", email);
+
+                // Send POST request to backend - Using localhost consistently
                 const response = await fetch('http://localhost:5000/api/user/save-path', {
                     method: 'POST',
                     headers: {
@@ -88,6 +90,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     })
                 });
 
+                console.log("Response status:", response.status);
+                
                 const data = await response.json();
 
                 if (response.ok) {
@@ -95,6 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     // Navigate to next page after successful save
                     window.location.href = 'level-selection.html';
                 } else {
+                    console.warn("Save failed:", data.message);
                     alert(data.message || "Failed to save path.");
                     // Re-enable button
                     continueBtn.innerHTML = 'Continue <i class="fas fa-arrow-right"></i>';
@@ -102,8 +107,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
             } catch (error) {
-                console.error("Error saving path:", error);
-                alert("Server connection error. Please try again later.");
+                console.error("Fetch/Network Error:", error);
+                alert("Connection Error: " + error.message + "\n\nPlease ensure your backend server is running on port 5000 and returns JSON.");
                 // Re-enable button
                 continueBtn.innerHTML = 'Continue <i class="fas fa-arrow-right"></i>';
                 continueBtn.style.pointerEvents = 'auto';
