@@ -35,5 +35,58 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem('userLevel', 'Beginner');
         localStorage.setItem('xyverra_selected_level', 'I am a Beginner');
     }
+
+    // ── Handle Continue Button Click ──
+    const continueBtn = document.getElementById('level-continue-btn');
+    if (continueBtn) {
+        continueBtn.addEventListener('click', async (e) => {
+            e.preventDefault(); // Stop default navigation to handle fetch first
+
+            const selectedLevel = localStorage.getItem('userLevel');
+            const email = localStorage.getItem('xyverra_user_email');
+
+            if (!email) {
+                alert('User email not found. Please log in again.');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                // Change button state
+                continueBtn.innerHTML = 'Saving... <i class="fas fa-spinner fa-spin"></i>';
+                continueBtn.style.pointerEvents = 'none';
+
+                const response = await fetch('http://localhost:5000/api/user/save-level', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        selectedLevel: selectedLevel
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    console.log('Level saved to MongoDB:', data.selectedLevel);
+                    // Proceed to next page
+                    window.location.href = 'skill-input.html';
+                } else {
+                    alert('Error saving level: ' + (data.message || 'Unknown error'));
+                    // Reset button
+                    continueBtn.innerHTML = 'Continue <i class="fas fa-arrow-right"></i>';
+                    continueBtn.style.pointerEvents = 'auto';
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                alert('Could not connect to server. Make sure backend is running and returns JSON.');
+                // Reset button
+                continueBtn.innerHTML = 'Continue <i class="fas fa-arrow-right"></i>';
+                continueBtn.style.pointerEvents = 'auto';
+            }
+        });
+    }
 });
 

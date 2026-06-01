@@ -202,39 +202,71 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================
-    // Generate Button
+    // Generate Button (Now connects to Backend)
     // =========================
 
-    generateBtn.addEventListener('click', () => {
+    generateBtn.addEventListener('click', async () => {
 
         validateForm();
 
         if (generateBtn.disabled) return;
 
-        // Save Data
-        localStorage.setItem(
-            'userLevel',
-            currentLevel
-        );
+        // Get user email from localStorage
+        const email = localStorage.getItem('xyverra_user_email');
+        if (!email) {
+            alert("User email not found. Please log in again.");
+            window.location.href = 'login.html';
+            return;
+        }
 
-        localStorage.setItem(
-            'userSkills',
-            JSON.stringify(userSkills)
-        );
+        // Show loading state
+        generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        generateBtn.disabled = true;
 
-        localStorage.setItem(
-            'userExperience',
-            experienceField.value
-        );
+        try {
+            // 1. Save Level to MongoDB
+            const levelResponse = await fetch('http://localhost:5000/api/user/save-level', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, selectedLevel: currentLevel })
+            });
 
-        // Page transition
-        document.body.style.opacity = '0';
-        document.body.style.transition =
-            'opacity 0.3s ease';
+            // 2. Save Skills to MongoDB
+            const skillsResponse = await fetch('http://localhost:5000/api/user/save-skills', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, skills: userSkills })
+            });
 
-        setTimeout(() => {
-            window.location.href = 'skill-verification.html';
-        }, 300);
+            const skillsData = await skillsResponse.json();
+
+            if (skillsResponse.ok) {
+                console.log("Skills saved to MongoDB:", skillsData.skills);
+                
+                // Also save to localStorage for fallback/immediate use
+                localStorage.setItem('userLevel', currentLevel);
+                localStorage.setItem('userSkills', JSON.stringify(userSkills));
+                localStorage.setItem('userExperience', experienceField.value);
+
+                // Page transition
+                document.body.style.opacity = '0';
+                document.body.style.transition = 'opacity 0.3s ease';
+
+                setTimeout(() => {
+                    window.location.href = 'skill-verification.html';
+                }, 300);
+            } else {
+                alert(skillsData.message || "Failed to save skills.");
+                generateBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> Generate Roadmap';
+                generateBtn.disabled = false;
+            }
+
+        } catch (error) {
+            console.error("Error saving to backend:", error);
+            alert("Connection error. Please ensure the backend is running.");
+            generateBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> Generate Roadmap';
+            generateBtn.disabled = false;
+        }
     });
 
     // =========================

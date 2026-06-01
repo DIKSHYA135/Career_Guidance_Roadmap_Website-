@@ -1,4 +1,5 @@
 require('dotenv').config();
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -13,36 +14,68 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+// Request Logger
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
+});
+
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.error('MongoDB connection error:', err));
+    .then(() => console.log('✅ Connected to MongoDB Atlas'))
+    .catch(err => {
+        console.error('❌ MongoDB connection error:', err.message);
+        process.exit(1);
+    });
 
-// Routes
+// Home Route
+app.get('/', (req, res) => {
+    res.json({ message: "Works" });
+});
 
-app.get('/', async(req, res) => {
-    try{
-        res.status(200).json({message: "Works"});
-    }
-    catch (error) {
-        console.log("Error in server while creating user");
-        res.status(500).json({ message: 'Server error', error: error.message });
-}});
+// Health Check
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'UP',
+        db: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
+        time: new Date().toISOString()
+    });
+});
 
+// ==========================
+// REGISTER ROUTE
+// ==========================
 app.post('/api/auth/register', async (req, res) => {
+    console.log('Registration attempt for:', req.body.email);
+
     try {
         const { email, password, name } = req.body;
 
-        // Check if user already exists
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ message: 'User already exists' });
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email and password are required'
+            });
         }
 
-        // Hash password
+        if (password.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: 'Password must be at least 6 characters long'
+            });
+        }
+
+        const existingUser = await User.findOne({ email });
+
+        if (existingUser) {
+            return res.status(400).json({
+                success: false,
+                message: 'User already exists'
+            });
+        }
+
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create new user
         const newUser = new User({
             email,
             password: hashedPassword,
@@ -51,71 +84,83 @@ app.post('/api/auth/register', async (req, res) => {
 
         await newUser.save();
 
-        // Create JWT for immediate login after registration
         const token = jwt.sign(
-            { userId: newUser._id, email: newUser.email },
-            process.env.JWT_SECRET || 'your_jwt_secret',
-            { expiresIn: '1h' }
+            {
+                userId: newUser._id,
+                email: newUser.email
+            },
+            process.env.JWT_SECRET || 'secretkey',
+            { expiresIn: '24h' }
         );
 
-        res.status(201).json({ 
-            message: 'User created successfully',
+        res.status(201).json({
+            success: true,
+            message: 'User registered successfully',
             token,
             user: {
                 id: newUser._id,
                 email: newUser.email,
-                name: newUser.name,
-                selectedPath: newUser.selectedPath
+                name: newUser.name
             }
         });
-    } catch (error) {
-        console.log("Error in server while creating user");
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-});
 
-// Get all users
-app.get('/api/users', async (req, res) => {
-    try {
-        const users = await User.find().select('-password');
-
-        res.status(200).json({
-            count: users.length,
-            users
-        });
     } catch (error) {
-        console.log("Error fetching users");
+        console.error('Registration Error:', error);
+
         res.status(500).json({
+            success: false,
             message: 'Server error',
             error: error.message
         });
     }
 });
 
+// ==========================
+// LOGIN ROUTE
+// ==========================
 app.post('/api/auth/login', async (req, res) => {
+    console.log('Login attempt for:', req.body.email);
+
     try {
         const { email, password } = req.body;
 
-        // Find user
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email and password are required'
+            });
+        }
+
         const user = await User.findOne({ email });
+
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
         }
 
-        // Check password
         const isMatch = await bcrypt.compare(password, user.password);
+
         if (!isMatch) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid credentials'
+            });
         }
 
-        // Create JWT
         const token = jwt.sign(
-            { userId: user._id, email: user.email },
-            process.env.JWT_SECRET || 'your_jwt_secret',
-            { expiresIn: '1h' }
+            {
+                userId: user._id,
+                email: user.email
+            },
+            process.env.JWT_SECRET || 'secretkey',
+            { expiresIn: '24h' }
         );
 
         res.json({
+            success: true,
+            message: 'Login successful',
             token,
             user: {
                 id: user._id,
@@ -124,61 +169,171 @@ app.post('/api/auth/login', async (req, res) => {
                 selectedPath: user.selectedPath
             }
         });
+
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        console.error('Login Error:', error);
+
+        res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error: error.message
+        });
     }
 });
 
-// Update Selected Path
-app.put('/api/user/path', async (req, res) => {
-    try {
-        const { email, selectedPath } = req.body;
-        
-        const user = await User.findOneAndUpdate(
-            { email },
-            { selectedPath },
-            { new: true }
-        );
-
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        res.json({ message: 'Path updated successfully', selectedPath: user.selectedPath });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-});
-
-// Save Selected Path (New POST route as requested)
+// ==========================
+// SAVE PATH ROUTE
+// ==========================
 app.post('/api/user/save-path', async (req, res) => {
     try {
         const { email, selectedPath } = req.body;
+        console.log(`Saving path "${selectedPath}" for: ${email}`);
 
         if (!email || !selectedPath) {
-            return res.status(400).json({ message: 'Email and selectedPath are required' });
+            return res.status(400).json({
+                success: false,
+                message: 'Email and selected path are required'
+            });
         }
-        
-        const user = await User.findOneAndUpdate(
-            { email },
+
+        const cleanEmail = email.trim().toLowerCase();
+
+        const updatedUser = await User.findOneAndUpdate(
+            { email: cleanEmail },
             { selectedPath },
             { new: true }
         );
 
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+        if (!updatedUser) {
+            console.warn(`User not found for path save: ${cleanEmail}`);
+            return res.status(404).json({
+                success: false,
+                message: 'User not found in database'
+            });
         }
 
-        res.json({ 
-            success: true, 
-            message: 'Path saved successfully', 
-            selectedPath: user.selectedPath 
+        return res.json({
+            success: true,
+            message: 'Path saved successfully',
+            selectedPath: updatedUser.selectedPath
         });
+
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        console.error('Save Path Error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error while saving path',
+            error: error.message
+        });
     }
 });
 
+// ==========================
+// SAVE LEVEL ROUTE
+// ==========================
+app.post('/api/user/save-level', async (req, res) => {
+    try {
+        const { email, selectedLevel } = req.body;
+        console.log(`Saving level "${selectedLevel}" for: ${email}`);
+
+        if (!email || !selectedLevel) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email and selected level are required'
+            });
+        }
+
+        const cleanEmail = email.trim().toLowerCase();
+
+        const updatedUser = await User.findOneAndUpdate(
+            { email: cleanEmail },
+            { selectedLevel },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        return res.json({
+            success: true,
+            message: 'Level saved successfully',
+            selectedLevel: updatedUser.selectedLevel
+        });
+
+    } catch (error) {
+        console.error('Save Level Error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error while saving level',
+            error: error.message
+        });
+    }
+});
+
+// ==========================
+// SAVE SKILLS ROUTE
+// ==========================
+app.post('/api/user/save-skills', async (req, res) => {
+    try {
+        const { email, skills } = req.body;
+        console.log(`Saving skills for: ${email}`, skills);
+
+        if (!email || !Array.isArray(skills)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email and skills array are required'
+            });
+        }
+
+        const cleanEmail = email.trim().toLowerCase();
+
+        const updatedUser = await User.findOneAndUpdate(
+            { email: cleanEmail },
+            { skills },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        return res.json({
+            success: true,
+            message: 'Skills saved successfully',
+            skills: updatedUser.skills
+        });
+
+    } catch (error) {
+        console.error('Save Skills Error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error while saving skills',
+            error: error.message
+        });
+    }
+});
+
+// ==========================
+// 404 HANDLER (MUST BE LAST)
+// ==========================
+app.use((req, res) => {
+    console.warn(`404 Not Found: ${req.method} ${req.url}`);
+    res.status(404).json({
+        success: false,
+        message: `Route ${req.method} ${req.url} not found on this server`
+    });
+});
+
+// ==========================
+// START SERVER
+// ==========================
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

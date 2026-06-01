@@ -1,91 +1,67 @@
-// Login JS
 document.addEventListener("DOMContentLoaded", () => {
-
-    // ── Password visibility toggle ──
+    // --- Password visibility toggle ---
     const toggleBtn = document.getElementById('toggle-password');
     const passwordInput = document.getElementById('login-password');
     if (toggleBtn && passwordInput) {
         toggleBtn.addEventListener('click', () => {
             const isText = passwordInput.type === 'text';
             passwordInput.type = isText ? 'password' : 'text';
-            toggleBtn.className = isText
-                ? 'far fa-eye eye-icon'
-                : 'far fa-eye-slash eye-icon';
+            toggleBtn.className = isText ? 'far fa-eye eye-icon' : 'far fa-eye-slash eye-icon';
         });
     }
 
-    // ── Form submit ──
+    // --- Form submit ---
     const form = document.getElementById('auth-form');
     if (form) {
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
+
             const emailInput = document.getElementById('login-email');
-            if (emailInput && emailInput.value) {
-                const email = emailInput.value;
-                const inferredName = email.split('@')[0].replace(/[^a-zA-Z]/g, ' ');
-                const capitalizedName = inferredName
-                    .split(' ')
-                    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-                    .join(' ');
+            const passwordInput = document.getElementById('login-password');
 
-                // ── 1. Save any existing session just in case ──
-                const currentEmail = localStorage.getItem('xyverra_user_email');
-                if (currentEmail) {
-                    const usersDataObj = JSON.parse(localStorage.getItem('xyverra_users')) || {};
-                    usersDataObj[currentEmail] = {
-                        name: localStorage.getItem('xyverra_user_name'),
-                        path: localStorage.getItem('xyverra_selected_path'),
-                        role: localStorage.getItem('xyverra_user_role'),
-                        level: localStorage.getItem('userLevel'),
-                        skills: localStorage.getItem('userSkills'),
-                        modules: localStorage.getItem('completedModules'),
-                        score: localStorage.getItem('xyverra_skill_score'),
-                        streak: localStorage.getItem('xyverra_user_streak')
-                    };
-                    localStorage.setItem('xyverra_users', JSON.stringify(usersDataObj));
-                }
+            if (!emailInput.value || !passwordInput.value) {
+                alert("Please enter both email and password.");
+                return;
+            }
 
-                // ── 2. Clear current session data ──
-                const keysToRemove = [
-                    'xyverra_user_name', 'xyverra_user_role', 'xyverra_selected_path',
-                    'userLevel', 'userSkills', 'completedModules', 'xyverra_skill_score',
-                    'xyverra_user', 'xyverra_user_streak', 'xyverra_user_email'
-                ];
-                keysToRemove.forEach(k => localStorage.removeItem(k));
+            const email = emailInput.value;
+            const password = passwordInput.value;
 
-                // ── 3. Load user specific data or create new ──
-                const usersData = JSON.parse(localStorage.getItem('xyverra_users')) || {};
-                const userData = usersData[email];
+            try {
+                // Change cursor to wait
+                document.body.style.cursor = 'wait';
 
-                if (userData) {
-                    // Restore existing user data
-                    localStorage.setItem('xyverra_user_name', userData.name || capitalizedName);
-                    localStorage.setItem('xyverra_user_email', email);
-                    if (userData.path) localStorage.setItem('xyverra_selected_path', userData.path);
-                    if (userData.role) localStorage.setItem('xyverra_user_role', userData.role);
-                    if (userData.level) localStorage.setItem('userLevel', userData.level);
-                    if (userData.skills) localStorage.setItem('userSkills', userData.skills);
-                    if (userData.modules) localStorage.setItem('completedModules', userData.modules);
-                    if (userData.score) localStorage.setItem('xyverra_skill_score', userData.score);
-                    if (userData.streak) localStorage.setItem('xyverra_user_streak', userData.streak);
+                const response = await fetch('http://localhost:5000/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
 
-                    // Redirect based on whether they have a path
-                    window.location.href = userData.path ? 'dashboard.html' : 'path-selection.html';
+                const data = await response.json();
+                document.body.style.cursor = 'default';
+
+                if (response.ok) {
+                    // Success!
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('xyverra_user_name', data.user.name);
+                    localStorage.setItem('xyverra_user_email', data.user.email);
+                    
+                    // Check if user already has a path
+                    if (data.user.selectedPath) {
+                        localStorage.setItem('xyverra_selected_path', data.user.selectedPath);
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        window.location.href = 'path-selection.html';
+                    }
                 } else {
-                    // New login for this email
-                    localStorage.setItem('xyverra_user_name', capitalizedName);
-                    localStorage.setItem('xyverra_user_email', email);
-                    window.location.href = 'path-selection.html';
+                    // Server returned error (e.g. 401 Invalid credentials)
+                    alert(data.message || 'Login failed');
                 }
+            } catch (error) {
+                document.body.style.cursor = 'default';
+                console.error("Login Fetch Error:", error);
+                alert('Server connection error. Please ensure the backend is running.');
             }
         });
     }
-
-    // ── Block # links (mock prototype) ──
-    document.querySelectorAll('a[href="#"]').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            alert("This feature is a mock in the frontend prototype.");
-        });
-    });
 });
