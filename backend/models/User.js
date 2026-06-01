@@ -30,52 +30,15 @@ const userSchema = new mongoose.Schema({
         default: null
     },
 
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-
-    profile: {
-        picture: { type: String, default: '' },
-        fullName: { type: String, default: '' },
-        username: { type: String, default: '' },
-        bio: { type: String, default: '' },
-        learningGoal: { type: String, default: '' }
-    },
-
-    learningProfile: {
-        category: { type: String, default: '' },
-        level: { type: String, default: 'Beginner' },
-        currentModule: { type: String, default: '' }
-    },
-
-    progress: {
-        modulesCompleted: { type: Number, default: 0 },
-        coursesCompleted: { type: Number, default: 0 },
-        learningStreak: { type: Number, default: 0 },
-        totalLearningHours: { type: Number, default: 0 },
-        certificatesEarned: { type: Number, default: 0 },
-        roadmapsGenerated: { type: Number, default: 0 }
-    },
-
     skills: {
         type: [String],
         default: []
     },
 
-    roadmapHistory: [{
-        name: String,
-        category: String,
-        level: String,
-        date: {
-            type: Date,
-            default: Date.now
-        },
-        status: {
-            type: String,
-            default: 'In Progress'
-        }
-    }]
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
 });
 
 module.exports = mongoose.model('User', userSchema);

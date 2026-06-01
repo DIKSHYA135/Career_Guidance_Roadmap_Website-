@@ -315,7 +315,7 @@ app.get('/api/user/profile', authMiddleware, async (req, res) => {
 app.put('/api/user/profile', authMiddleware, async (req, res) => {
     try {
         // Only allow updating specific fields
-        const allowedUpdates = ['profile', 'learningProfile', 'progress', 'skills', 'roadmapHistory', 'name'];
+        const allowedUpdates = ['name', 'selectedPath', 'selectedLevel', 'skills'];
         const updates = {};
         for (const key of Object.keys(req.body)) {
             if (allowedUpdates.includes(key)) {
