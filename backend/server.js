@@ -252,7 +252,6 @@ app.post('/api/user/save-path', async (req, res) => {
     }
 });
 
-<<<<<<< HEAD
 // ==========================
 // SAVE LEVEL ROUTE
 // ==========================
@@ -297,7 +296,6 @@ app.post('/api/user/save-level', async (req, res) => {
             error: error.message
         });
     }
-=======
 // GET Profile
 app.get('/api/user/profile', authMiddleware, async (req, res) => {
     try {
@@ -338,9 +336,6 @@ app.put('/api/user/profile', authMiddleware, async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
->>>>>>> origin/jharana
 });
 
 // ==========================
