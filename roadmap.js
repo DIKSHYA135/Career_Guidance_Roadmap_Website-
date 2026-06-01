@@ -551,43 +551,6 @@ document.addEventListener("DOMContentLoaded", () => {
             groupDiv.appendChild(accItem);
         });
         
-        
-        // --- ADD QUIZ BUTTON TO GROUP ---
-        const completedLevels = JSON.parse(localStorage.getItem('completedLevels') || '{}');
-        const pathLevels = completedLevels[matchedPathKey] || [];
-        const isPassed = pathLevels.includes(title);
-        
-        const quizContainer = document.createElement("div");
-        quizContainer.style.padding = "20px";
-        quizContainer.style.marginTop = "10px";
-        quizContainer.style.background = isPassed ? "rgba(16, 185, 129, 0.1)" : "rgba(99, 102, 241, 0.05)";
-        quizContainer.style.borderRadius = "12px";
-        quizContainer.style.display = "flex";
-        quizContainer.style.justifyContent = "space-between";
-        quizContainer.style.alignItems = "center";
-        quizContainer.style.border = isPassed ? "1px solid rgba(16, 185, 129, 0.3)" : "1px solid rgba(99, 102, 241, 0.3)";
-        
-        const quizText = document.createElement("div");
-        quizText.innerHTML = `<h4 style="margin:0; font-size:1.05rem; color: ${isPassed ? 'var(--success)' : 'var(--text-dark)'};">${title} Assessment</h4>
-            <p style="margin:5px 0 0; font-size:0.85rem; color:var(--text-muted);">Pass to unlock the next stage (>= 70%).</p>`;
-        
-        const quizBtn = document.createElement("button");
-        quizBtn.className = isPassed ? "btn btn-outline" : "btn btn-primary";
-        quizBtn.innerHTML = isPassed ? '<i class="fas fa-check"></i> Passed' : 'Take Assessment <i class="fas fa-arrow-right"></i>';
-        if (isPassed) {
-            quizBtn.style.borderColor = "var(--success)";
-            quizBtn.style.color = "var(--success)";
-        }
-        
-        quizBtn.onclick = () => {
-            window.location.href = `quiz.html?category=${encodeURIComponent(matchedPathKey)}&level=${encodeURIComponent(title)}`;
-        };
-        
-        quizContainer.appendChild(quizText);
-        quizContainer.appendChild(quizBtn);
-        groupDiv.appendChild(quizContainer);
-        // --------------------------------
-        
         if (accordionContainer) accordionContainer.appendChild(groupDiv);
     };
 
@@ -610,18 +573,16 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    if (userLevelStr === "Beginner") {
-        renderGroup("Beginner", beginnerModules);
-        visibleModulesData.push(...beginnerModules);
-    }
-    
-    if (userLevelStr === "Beginner" || userLevelStr === "Intermediate") {
-        renderGroup("Intermediate", intermediateModules);
-        visibleModulesData.push(...intermediateModules);
-    }
+    // Update side panel target path
+    const sideTargetPath = document.getElementById('side-target-path');
+    if (sideTargetPath) sideTargetPath.textContent = matchedPathKey;
 
-    renderGroup("Advanced", advancedModules);
-    visibleModulesData.push(...advancedModules);
+    // ── Always render ALL 3 groups (with correct start indexes for locking) ──
+    renderGroup("🌱 Beginner",     beginnerModules,     0);
+    renderGroup("⚡ Intermediate", intermediateModules, 2);
+    renderGroup("🚀 Advanced",     advancedModules,     4);
+
+    visibleModulesData.push(...beginnerModules, ...intermediateModules, ...advancedModules);
 
     updateOverallProgress();
 
