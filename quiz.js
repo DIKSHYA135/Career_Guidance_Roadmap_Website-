@@ -375,14 +375,44 @@ const QUIZ_DATA = {
 const OPTION_LABELS = ['A', 'B', 'C', 'D'];
 
 // ── State ──
-let quizTimerInterval = null;
+let quizTimer = null;
 let timeLeft = 20;
 let quizPhase = 'read';      // 'read' | 'answer'
 let currentQuestionIndex = 0;
 let selectedOptionIndex = null;
 let score = 0;
 let moduleId = 'html';
-let questions = [];
+let quizQuestions = [];
+let totalQuestions = 0;
+let quizTimerInterval;
+
+// ── Utility Functions ──
+function isValidQuestion(q) {
+    // New format validation
+    if (q && q.question && Array.isArray(q.options) && q.options.length === 4 && q.answer) {
+        const hasEmptyOption = q.options.some(opt => typeof opt !== 'string' || opt.trim() === '');
+        if (!hasEmptyOption) return true;
+    }
+    
+    // Legacy format validation
+    if (!q || typeof q.q !== 'string' || q.q.trim() === '') return false;
+    if (!Array.isArray(q.opts) || q.opts.length !== 4) return false;
+    let hasCorrect = false;
+    for (const opt of q.opts) {
+        if (!opt || typeof opt.text !== 'string' || opt.text.trim() === '') return false;
+        if (opt.correct === true) hasCorrect = true;
+    }
+    return hasCorrect;
+}
+
+function shuffleArray(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
 
 document.addEventListener("DOMContentLoaded", () => {
     // ── Read module from URL ──
@@ -392,7 +422,78 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // TODO: Replace with GET /api/quiz/:moduleId
     const quizData = QUIZ_DATA[moduleId] || QUIZ_DATA['html'];
-    questions = quizData.questions;
+    
+    window.generateNewQuiz = function() {
+        // Fetch recent from session storage to avoid reuse across reloads
+        let recentlyUsed = JSON.parse(sessionStorage.getItem('xyverra_recent_qs_' + moduleId) || '[]');
+        
+        // Ensure all questions have a unique ID if missing
+        let allQuestions = (quizData.questions || []).map(q => {
+            if (!q.id) q.id = 'q_' + Math.random().toString(36).substr(2, 9);
+            // Normalize to new format for validation
+            if (q.q && q.opts && !q.question) {
+                return {
+                    id: q.id,
+                    question: q.q,
+                    options: q.opts.map(o => o.text),
+                    answer: (q.opts.find(o => o.correct) || {}).text || ""
+                };
+            }
+            return q;
+        });
+
+        // Validate strictly
+        let validPool = allQuestions.filter(q => {
+            if (!q.question || typeof q.question !== 'string' || q.question.trim() === '') return false;
+            if (!q.options || !Array.isArray(q.options) || q.options.length !== 4) return false;
+            if (q.options.some(opt => !opt || opt.trim() === '')) return false;
+            if (!q.answer || typeof q.answer !== 'string' || q.answer.trim() === '') return false;
+            return true;
+        });
+
+        // Filter out recently used
+        let unusedPool = validPool.filter(q => !recentlyUsed.includes(q.id));
+        
+        // If not enough unused, clear recent memory
+        if (unusedPool.length < 6) {
+            recentlyUsed = [];
+            unusedPool = validPool;
+        }
+
+        const shuffled = shuffleArray(unusedPool);
+        quizQuestions = shuffled.slice(0, 10);
+        totalQuestions = quizQuestions.length;
+
+        // Add to recently used
+        quizQuestions.forEach(q => recentlyUsed.push(q.id));
+        sessionStorage.setItem('xyverra_recent_qs_' + moduleId, JSON.stringify(recentlyUsed));
+
+        console.log("Quiz Loaded:", quizQuestions);
+        console.log("Question Count:", quizQuestions.length);
+
+        if (quizQuestions.length === 0) {
+            console.error("No valid quiz questions generated");
+        }
+    };
+
+    // Initialize the quiz
+    generateNewQuiz();
+
+    // BEFORE starting a quiz:
+    if (!quizQuestions || !Array.isArray(quizQuestions) || quizQuestions.length === 0) {
+        generateNewQuiz();
+    }
+    
+    // Ensure at least 6 valid questions before allowing start
+    if (quizQuestions.length < 6) {
+        console.error("Not enough valid questions to start quiz. Found:", quizQuestions.length);
+        const quizStatus = document.getElementById('quiz-status');
+        if (quizStatus) {
+            quizStatus.textContent = 'Error: Not enough valid questions available to start the quiz.';
+            quizStatus.className = 'quiz-status error';
+        }
+        return; // Halt initialization
+    }
 
     // ── Set page title ──
     const moduleTitle = document.getElementById('quiz-module-title');
@@ -412,9 +513,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ── Exit button — always goes back to roadmap or verification ──
     btnExitQuiz.addEventListener('click', (e) => {
-        // Prevent default only if we are dynamically changing href later, but for standard click, just redirect
         e.preventDefault();
         clearInterval(quizTimerInterval);
+        
+        // Exit quiz behavior
+        // clear current quiz state
+        quizQuestions = [];
+        currentQuestionIndex = 0;
+        score = 0;
+        
+        // generate a completely new randomized quiz, avoid recently used, start from Q1
+        generateNewQuiz();
+        
+        // In case the user stays on the page (though normally we redirect):
+        loadQuestion();
+        
+        // Redirect as per normal UX
         window.location.href = isVerify ? 'skill-verification.html' : 'roadmap.html';
     });
 
@@ -431,39 +545,113 @@ document.addEventListener("DOMContentLoaded", () => {
     function loadQuestion() {
         clearInterval(quizTimerInterval);
         selectedOptionIndex = null;
-        btnNextQuestion.style.display = 'none';
+        if (btnNextQuestion) btnNextQuestion.style.display = 'none';
         quizPhase = 'read';
 
-        if (currentQuestionIndex >= questions.length) {
+        // Quiz rendering: Do not show results page until currentQuestionIndex >= totalQuestions
+        if (currentQuestionIndex >= totalQuestions) {
             showResults();
             return;
         }
 
-        const q = questions[currentQuestionIndex];
+        let currentQuestion = quizQuestions[currentQuestionIndex];
+        
+        // 2. Before rendering a question run validation
+        if (
+            !currentQuestion ||
+            !currentQuestion.options ||
+            !Array.isArray(currentQuestion.options) ||
+            currentQuestion.options.length !== 4 ||
+            currentQuestion.options.some(opt => !opt || opt.trim() === '') ||
+            !currentQuestion.answer
+        ) {
+            console.warn("Invalid question detected during render, regenerating...", currentQuestion);
+            // If validation fails: regenerate that question, do not continue with broken data.
+            // Remove the broken question from the pool and fetch a new one to replace it
+            quizQuestions.splice(currentQuestionIndex, 1);
+            
+            // Generate a single replacement question avoiding recent uses
+            let recentlyUsed = JSON.parse(sessionStorage.getItem('xyverra_recent_qs_' + moduleId) || '[]');
+            let validPool = (QUIZ_DATA[moduleId] || QUIZ_DATA['html']).questions.map(q => {
+                if (!q.id) q.id = 'q_' + Math.random().toString(36).substr(2, 9);
+                if (q.q && q.opts && !q.question) {
+                    return { id: q.id, question: q.q, options: q.opts.map(o => o.text), answer: (q.opts.find(o => o.correct) || {}).text || "" };
+                }
+                return q;
+            }).filter(q => {
+                if (!q.question || typeof q.question !== 'string' || q.question.trim() === '') return false;
+                if (!q.options || !Array.isArray(q.options) || q.options.length !== 4) return false;
+                if (q.options.some(opt => !opt || opt.trim() === '')) return false;
+                if (!q.answer || typeof q.answer !== 'string' || q.answer.trim() === '') return false;
+                // Don't pick ones already in quizQuestions
+                if (quizQuestions.some(existing => existing.id === q.id)) return false;
+                return true;
+            });
+            
+            let replacementPool = validPool.filter(q => !recentlyUsed.includes(q.id));
+            if (replacementPool.length === 0) replacementPool = validPool;
+            
+            if (replacementPool.length > 0) {
+                const replacement = replacementPool[Math.floor(Math.random() * replacementPool.length)];
+                quizQuestions.splice(currentQuestionIndex, 0, replacement);
+                recentlyUsed.push(replacement.id);
+                sessionStorage.setItem('xyverra_recent_qs_' + moduleId, JSON.stringify(recentlyUsed));
+            } else {
+                // If absolutely no replacement available, reduce total questions so it doesn't crash
+                totalQuestions = quizQuestions.length;
+            }
+            
+            loadQuestion(); 
+            return;
+        }
+
+        console.log("Current Question:", currentQuestion);
+
+        // 5. Add debugging
+        console.log("QUESTION", currentQuestion);
+        console.log("OPTIONS", currentQuestion.options);
+        
+        // Build a normalized options array
+        let optionsToRender = currentQuestion.options.map(optText => ({
+            text: optText,
+            correct: optText === currentQuestion.answer
+        }));
+        
+        // Shuffle options to randomize order
+        optionsToRender = shuffleArray(optionsToRender);
+        
+        // Attach options to question object for selection reference
+        currentQuestion.currentRenderedOptions = optionsToRender;
 
         // Update question counter
         if (questionMeta) {
-            questionMeta.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+            questionMeta.textContent = `Question ${currentQuestionIndex + 1} of ${totalQuestions}`;
         }
 
         // Set question text
-        quizQuestionTxt.textContent = q.q;
+        quizQuestionTxt.textContent = currentQuestion.question;
 
         // Clear and disable options during reading time
         quizOptionsCont.innerHTML = '';
         quizOptionsCont.classList.add('disabled');
 
-        // Render option buttons (hidden during reading)
-        const optionsToRender = q.opts || [];
+        // 6. Render option text inside every option card
+        // 7. Ensure HTML tags display as text (using textContent)
         optionsToRender.forEach((opt, i) => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
             btn.id = `option-${i}`;
+            
+            // Build the HTML structure
             btn.innerHTML = `
                 <span class="option-letter">${OPTION_LABELS[i]}</span>
-                <span class="option-text">${opt.text}</span>
+                <span class="option-text"></span>
             `;
-            btn.addEventListener('click', () => selectOption(i, opt.correct, q.opts));
+            
+            // Safely set the text content so HTML tags like <br> are not parsed by the browser
+            btn.querySelector('.option-text').textContent = opt.text;
+            
+            btn.addEventListener('click', () => selectOption(i, opt.correct, optionsToRender));
             quizOptionsCont.appendChild(btn);
         });
 
@@ -499,8 +687,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     clearInterval(quizTimerInterval);
                     quizOptionsCont.classList.add('disabled');
                     // Highlight correct answer
-                    if (q.opts) {
-                        q.opts.forEach((opt, i) => {
+                    if (currentQuestion.currentRenderedOptions) {
+                        currentQuestion.currentRenderedOptions.forEach((opt, i) => {
                             if (opt.correct) {
                                 const btn = document.getElementById(`option-${i}`);
                                 if (btn) btn.classList.add('correct');
@@ -510,8 +698,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     quizStatus.textContent = "⏰ Time's up! The correct answer is highlighted.";
                     quizStatus.className = 'quiz-status error';
                     timerText.textContent = 'Time Up!';
-                    btnNextQuestion.style.display = 'inline-flex';
-                    btnNextQuestion.textContent = currentQuestionIndex + 1 < questions.length ? 'Next Question →' : 'See Results →';
+                    if (btnNextQuestion) {
+                        btnNextQuestion.style.display = 'inline-flex';
+                        btnNextQuestion.textContent = currentQuestionIndex + 1 < totalQuestions ? 'Next Question →' : 'See Results →';
+                    }
                 }
             }
         }, 1000);
@@ -547,9 +737,11 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        timerText.textContent = 'Answered';
-        btnNextQuestion.style.display = 'inline-flex';
-        btnNextQuestion.textContent = currentQuestionIndex + 1 < questions.length ? 'Next Question →' : 'See Results →';
+        if (timerText) timerText.textContent = 'Answered';
+        if (btnNextQuestion) {
+            btnNextQuestion.style.display = 'inline-flex';
+            btnNextQuestion.textContent = currentQuestionIndex + 1 < totalQuestions ? 'Next Question →' : 'See Results →';
+        }
     }
 
     // ────────────────────────────────────────────────────
@@ -566,7 +758,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function showResults() {
         clearInterval(quizTimerInterval);
 
-        const pct = Math.round((score / questions.length) * 100);
+        const pct = Math.round((score / totalQuestions) * 100);
         const passed = pct >= 70;
 
         // Hide quiz body, show result
@@ -584,8 +776,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         scoreDisplay.textContent = `${pct}%`;
         scoreText.textContent = passed
-            ? `You scored ${score}/${questions.length} — Module Verified! 🎉`
-            : `You scored ${score}/${questions.length} — Try again to pass (70% needed).`;
+            ? `You scored ${score}/${totalQuestions} — Module Verified! 🎉`
+            : `You scored ${score}/${totalQuestions} — Try again to pass (70% needed).`;
 
         // Timer bar full green on completion
         const timerBar = document.getElementById('quiz-timer');
@@ -615,11 +807,11 @@ document.addEventListener("DOMContentLoaded", () => {
              }
         });
         
-        btnNextQuestion.style.display = 'none';
+        if (btnNextQuestion) btnNextQuestion.style.display = 'none';
 
         // Save if passed
         if (passed) {
-            // TODO: POST /api/quiz/submit { moduleId, score, total: questions.length }
+            // TODO: POST /api/quiz/submit { moduleId, score, total: totalQuestions }
             let completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
             if (!completedModules.includes(moduleId)) {
                 completedModules.push(moduleId);

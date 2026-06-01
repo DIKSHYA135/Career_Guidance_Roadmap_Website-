@@ -41,6 +41,30 @@ app.get('/health', (req, res) => {
         time: new Date().toISOString()
     });
 });
+// Auth Middleware
+const authMiddleware = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'No token provided' });
+    }
+    const token = authHeader.split(' ')[1];
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret');
+        req.user = decoded;
+        next();
+    } catch (err) {
+        return res.status(401).json({ message: 'Invalid token' });
+    }
+};
+
+app.get('/', async(req, res) => {
+    try{
+        res.status(200).json({message: "Works"});
+    }
+    catch (error) {
+        console.log("Error in server while creating user");
+        res.status(500).json({ message: 'Server error', error: error.message });
+}});
 
 // ==========================
 // REGISTER ROUTE
@@ -228,6 +252,7 @@ app.post('/api/user/save-path', async (req, res) => {
     }
 });
 
+<<<<<<< HEAD
 // ==========================
 // SAVE LEVEL ROUTE
 // ==========================
@@ -272,6 +297,50 @@ app.post('/api/user/save-level', async (req, res) => {
             error: error.message
         });
     }
+=======
+// GET Profile
+app.get('/api/user/profile', authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId).select('-password');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+// PUT Profile (Update)
+app.put('/api/user/profile', authMiddleware, async (req, res) => {
+    try {
+        // Only allow updating specific fields
+        const allowedUpdates = ['profile', 'learningProfile', 'progress', 'skills', 'roadmapHistory', 'name'];
+        const updates = {};
+        for (const key of Object.keys(req.body)) {
+            if (allowedUpdates.includes(key)) {
+                updates[key] = req.body[key];
+            }
+        }
+        
+        const user = await User.findByIdAndUpdate(
+            req.user.userId,
+            { $set: updates },
+            { new: true }
+        ).select('-password');
+        
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+>>>>>>> origin/jharana
 });
 
 // ==========================

@@ -3,14 +3,17 @@
 
 <div class="ai-exit-overlay" id="aiExitOverlay">
     <div class="ai-exit-modal" id="aiExitModal">
-        <!-- Header Section -->
-        <div class="ai-modal-header">
-            <div class="ai-avatar-icon"><i class="fas fa-robot"></i></div>
-            <div>
-                <h3 class="ai-modal-title">Wait! Before you go...</h3>
-                <p class="ai-modal-subtitle" id="aiModalQuestion">Why are you leaving this course/roadmap?</p>
+        <!-- Header -->
+        <div class="ai-modal-header" style="justify-content: space-between;">
+            <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="ai-avatar-icon"><i class="fas fa-robot"></i></div>
+                <div>
+                    <h3 class="ai-modal-title">Wait! Before you go...</h3>
+                    <p class="ai-modal-subtitle" id="aiModalQuestion">Why are you leaving this course/roadmap?</p>
+                </div>
             </div>
-        </div>        
+            <i class="fas fa-times ai-modal-close" id="aiModalClose"></i>
+        </div>
         
         <!-- Selectable Reasons -->
         <div class="ai-reasons-grid" id="aiReasonsContainer">
@@ -43,8 +46,6 @@
 
         <!-- Footer Actions -->
         <div class="ai-modal-actions">
-            <button class="ai-btn ai-btn-exit" id="aiBtnExitAnyway">Exit Anyway</button>
-            <button class="ai-btn ai-btn-secondary" id="aiBtnPause" style="display: none;">Pause Course</button>
             <button class="ai-btn ai-btn-primary" id="aiBtnContinue">Continue Learning</button>
         </div>
     </div>

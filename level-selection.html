@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Choose your experience level to get a personalised Xyverra learning roadmap.">
-    <title>Level Selection - Xyverra</title>
+    <meta name="description" content="Choose your experience level to get a personalised Xyvvera learning roadmap.">
+    <title>Level Selection - Xyvvera</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -13,90 +13,152 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+
     <div class="centered-layout">
 
-
-        <div class="brand-header">
-            <div class="brand-icon">
-                <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" />
+        <!-- Glowing Brand Header -->
+        <header class="brand-header">
+            <div class="brand-glowing-logo" style="width: 70px; height: 70px; margin-bottom: 0.4rem;">
+                <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" style="width:100%; height:100%; border-radius:18px; object-fit:cover; box-shadow: 0 0 10px rgba(37, 99, 235, 0.2);">
             </div>
             <h1>Choose Your Starting Level</h1>
-            <p>This helps us personalise your learning roadmap</p>
-        </div>
+            <p>Our A.I. engine customizes your blueprint based on your experience</p>
+        </header>
 
         <div class="card-box large-card">
 
-            <!-- Progress Steps -->
+            <!-- Futuristic Multi-Step Progress Tabs -->
             <div class="onboarding-steps">
-                <div class="step done"><i class="fas fa-check"></i> Path</div>
+                <div class="step done">
+                    <svg class="step-check" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    <span>✓ Path</span>
+                </div>
+                <div class="step-divider done"></div>
+                <div class="step active">
+                    <div class="step-num">2</div>
+                    <span>Level</span>
+                </div>
                 <div class="step-divider"></div>
-                <div class="step active">2 · Level</div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <span>Skills</span>
+                </div>
                 <div class="step-divider"></div>
-                <div class="step">3 · Skills</div>
-                <div class="step-divider"></div>
-                <div class="step">4 · Roadmap</div>
+                <div class="step">
+                    <div class="step-num">4</div>
+                    <span>Roadmap</span>
+                </div>
             </div>
 
-            <!-- Context: selected path -->
+            <!-- Path Context Label -->
             <div class="selection-context">
-                <i class="fas fa-globe" style="color: #60A5FA; font-size: 22px;"></i>
+                <div class="context-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>
+                    </svg>
+                </div>
                 <div class="context-text">
-                    <span id="selected-path-label">Web Development</span>
-                    <span class="context-sub">How much do you already know?</span>
+                    <div class="context-path-name" id="selected-path-label">Web Development Pathway</div>
+                    <span class="context-sub">Assess your starting knowledge level</span>
                 </div>
             </div>
 
-            <!-- Level Cards -->
+            <!-- Level Interactive Bento Cards -->
             <div class="level-options">
-                <!-- Option 1 -->
+                
+                <!-- Option 1: Beginner -->
                 <div class="level-card active" data-level="Beginner">
+                    <div class="card-glow-element"></div>
+                    <span class="level-check">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    </span>
                     <div class="level-card-left">
-                        <span class="level-emoji">🌱</span>
-                        <div>
-                            <h4>I am a Beginner</h4>
-                            <p>Starting fresh — I have little or no experience in this field</p>
+                        <div class="level-icon icon-green">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2 22s2-4 10-4 10 4 10 4"/>
+                                <circle cx="12" cy="8" r="4"/>
+                            </svg>
+                        </div>
+                        <div class="level-card-text">
+                            <h4>Beginner</h4>
+                            <p>Starting completely fresh. Core coding fundamentals and highly-structured learning guides.</p>
                         </div>
                     </div>
-                    <span class="score-badge">Score: 0–20% · Beginner</span>
+                    <span class="score-badge badge-green">Score Match: 0–20%</span>
                 </div>
 
-                <!-- Option 2 (Intermediate) -->
+                <!-- Option 2: Intermediate -->
                 <div class="level-card" data-level="Intermediate">
+                    <div class="card-glow-element"></div>
+                    <span class="level-check">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    </span>
                     <div class="level-card-left">
-                        <span class="level-emoji">🌿</span>
-                        <div>
-                            <h4>I am Intermediate</h4>
-                            <p>I know the basics and want to level up my skills</p>
+                        <div class="level-icon icon-blue">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+                            </svg>
+                        </div>
+                        <div class="level-card-text">
+                            <h4>Intermediate</h4>
+                            <p>Already know some basics. Focus on practical projects, filling skill gaps, and custom framework modules.</p>
                         </div>
                     </div>
-                    <span class="score-badge">Score: 21–60% · Intermediate</span>
+                    <span class="score-badge badge-blue">Score Match: 20–60%</span>
                 </div>
 
-                <!-- Option 3 -->
+                <!-- Option 2 -->
                 <div class="level-card" data-level="Advanced">
+                    <div class="card-glow-element"></div>
+                    <span class="level-check">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    </span>
                     <div class="level-card-left">
-                        <span class="level-emoji">🚀</span>
-                        <div>
-                            <h4>I Already Know Some</h4>
-                            <p>I have existing knowledge — let me show what I know via a skill quiz</p>
+                        <div class="level-icon icon-purple">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4.5 16.5c-1.5 1.26-2.5 3.19-2.5 5.5h20c0-2.31-1-4.24-2.5-5.5"/>
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/>
+                            </svg>
+                        </div>
+                        <div class="level-card-text">
+                            <h4>Advanced</h4>
+                            <p>Professional experience. Complete automated assessment quizzes to map fast-track career projections.</p>
                         </div>
                     </div>
-                    <span class="score-badge">Score calculated from skills</span>
+                    <span class="score-badge badge-purple">Score Match: 60–100%</span>
                 </div>
+
             </div>
 
-            <!-- Bottom Actions -->
+            <!-- Bottom Control Navigation -->
             <div class="bottom-actions">
                 <a href="path-selection.html" class="btn btn-outline back-btn">
-                    <i class="fas fa-arrow-left"></i> Back
+                    <svg viewBox="0 0 20 20" fill="currentColor" style="width: 16px; height: 16px;">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Back
                 </a>
-                <a href="skill-input.html" id="level-continue-btn" class="btn btn-primary">
-                    Continue <i class="fas fa-arrow-right"></i>
+                <a href="#" id="level-continue-btn" class="btn btn-primary">
+                    Proceed to Skill Selection
+                    <svg viewBox="0 0 20 20" fill="currentColor" style="width: 16px; height: 16px;">
+                        <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
                 </a>
             </div>
 
         </div>
     </div>
+    
     <script src="global-sidebar.js"></script>
     <script src="level-selection.js"></script>
 </body>

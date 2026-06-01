@@ -72,30 +72,71 @@ document.addEventListener("DOMContentLoaded", () => {
     const trackContainer = document.querySelector(".roadmap-steps-track");
     if (trackContainer) {
         trackContainer.innerHTML = "";
+
+        // Calculate progress line fill percentage
+        const totalSteps = pathData.length;
+        const completedStepsCount = pathData.filter(m => completedModules.includes(m.id)).length;
+        const lineFillPercentage = totalSteps <= 1 ? 0 : Math.min(100, (completedStepsCount / (totalSteps - 1)) * 100);
+
+        // Inject continuous progress line
+        const lineContainer = document.createElement("div");
+        lineContainer.className = "roadmap-progress-line-container";
+        
+        const lineFill = document.createElement("div");
+        lineFill.className = "roadmap-progress-line-fill";
+        lineContainer.appendChild(lineFill);
+        
+        trackContainer.appendChild(lineContainer);
+
+        // Set line properties dynamically depending on layout orientation (responsive resize)
+        const updateLineProgress = () => {
+            const isMobile = window.innerWidth <= 768;
+            if (isMobile) {
+                lineFill.style.width = "100%";
+                lineFill.style.height = `${lineFillPercentage}%`;
+            } else {
+                lineFill.style.height = "100%";
+                lineFill.style.width = `${lineFillPercentage}%`;
+            }
+        };
+
+        // Delay slightly for initial load to enable transition animation
+        setTimeout(updateLineProgress, 100);
+        window.addEventListener("resize", updateLineProgress);
+
+        // Render roadmap step nodes
         pathData.forEach((module, index) => {
             const isDone    = completedModules.includes(module.id);
             const isCurrent = !isDone && module.id === (currentModule ? currentModule.id : null);
+            const isLocked  = !isDone && !isCurrent;
 
             const stepDiv = document.createElement("div");
-            stepDiv.className = `roadmap-step ${isDone ? "completed" : (isCurrent ? "current" : "")}`;
+            stepDiv.className = `roadmap-step ${isDone ? "completed" : (isCurrent ? "current" : "locked")}`;
+            stepDiv.setAttribute("data-id", module.id);
+            stepDiv.setAttribute("title", isLocked ? "Locked step" : `Take ${module.title} Quiz`);
 
-            let nodeClass = "locked-node";
             let iconOrNum = index + 1;
-            if (isDone)         { nodeClass = "done";         iconOrNum = '<i class="fas fa-check"></i>'; }
-            else if (isCurrent) { nodeClass = "current-node"; }
-            if (module.id === "capstone" && !isDone && !isCurrent) iconOrNum = "⚑";
+            if (isDone) {
+                iconOrNum = '<i class="fas fa-check"></i>';
+            } else if (module.id === "capstone") {
+                iconOrNum = '<i class="fas fa-flag"></i>';
+            } else if (isLocked) {
+                iconOrNum = '<i class="fas fa-lock" style="font-size: 0.75rem; opacity: 0.7;"></i>';
+            }
 
             stepDiv.innerHTML = `
-                <div class="rs-node ${nodeClass}">${iconOrNum}</div>
-                <span class="rs-label">${module.title.replace(" ", "<br>")}</span>
+                <div class="rs-node">${iconOrNum}</div>
+                <span class="rs-label">${module.title}</span>
             `;
-            trackContainer.appendChild(stepDiv);
 
-            if (index < pathData.length - 1) {
-                const connector = document.createElement("div");
-                connector.className = `rs-connector ${isDone ? "active-connector" : ""}`;
-                trackContainer.appendChild(connector);
-            }
+            // Handle navigation clicks for active/completed steps
+            stepDiv.addEventListener("click", () => {
+                if (!isLocked) {
+                    window.location.href = `quiz.html?module=${module.id}`;
+                }
+            });
+
+            trackContainer.appendChild(stepDiv);
         });
     }
 

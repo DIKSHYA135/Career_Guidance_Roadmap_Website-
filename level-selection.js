@@ -86,6 +86,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 continueBtn.innerHTML = 'Continue <i class="fas fa-arrow-right"></i>';
                 continueBtn.style.pointerEvents = 'auto';
             }
+    const continueBtn = document.getElementById('level-continue-btn');
+    if (continueBtn) {
+        continueBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'skill-input.html';
         });
     }
 });

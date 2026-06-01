@@ -304,7 +304,7 @@ const ROADMAP_DATA = {
             courses: [
                 { name: "Tableau Public Free Training", url: "https://www.tableau.com/learn/training/20221" },
                 { name: "Power BI Tutorial (YouTube)", url: "https://www.youtube.com/watch?v=TmhQCQr_DCA" },
-                { name: "edX Data Analysis", url: "https://www.edx.org/learn/data-analysis" }
+{ name: "edX Data Analysis", url: "https://www.edx.org/learn/data-analysis" }
             ]
         },
         { id: "capstone", title: "Analytics Capstone", desc: "Analyze a dataset and present a BI dashboard.", keywords: [], courses: [] }
@@ -312,109 +312,303 @@ const ROADMAP_DATA = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-    const timelineContainer = document.getElementById("roadmap-timeline");
+    const accordionContainer = document.getElementById("roadmap-accordion");
+    const overallProgressText = document.getElementById("overall-progress-text");
+    const overallProgressBar = document.getElementById("overall-progress-bar");
     const topQuizBtn = document.getElementById("top-quiz-btn");
     const headerTitle = document.getElementById("roadmap-header-title");
     
     // Load state
     const selectedPath = localStorage.getItem("xyverra_selected_path") || "Web Development";
-    const userLevel = localStorage.getItem("userLevel") || "Beginner";
-    
-    // Fallback logic for path selection text mismatch (if any)
     let matchedPathKey = selectedPath;
     if (!ROADMAP_DATA[matchedPathKey]) {
-        // Find closest match or default to Frontend
         matchedPathKey = Object.keys(ROADMAP_DATA).find(key => selectedPath.includes(key)) || "Web Development";
     }
     
-    let userSkills = [];
-    try {
-        const storedSkills = localStorage.getItem("userSkills");
-        if (storedSkills) {
-            userSkills = JSON.parse(storedSkills).map(s => s.toLowerCase().trim());
-        }
-    } catch (e) {
-        console.error("Error parsing user skills");
-    }
-
     if (headerTitle) {
         headerTitle.innerText = `${matchedPathKey} Roadmap`;
     }
 
     const pathData = ROADMAP_DATA[matchedPathKey];
-    if (timelineContainer) timelineContainer.innerHTML = ""; // Clear existing nodes
-    
-    let currentModuleFound = false;
+    if (accordionContainer) accordionContainer.innerHTML = "";
+
     let completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
+    let completedCourses = JSON.parse(localStorage.getItem('completedCourses') || '[]');
 
-    pathData.forEach((module, index) => {
-        const isCapstone = module.id === 'capstone';
-        let isCompleted = completedModules.includes(module.id);
-
-        let statusClass = "locked";
-        let statusText = "Locked";
-        
-        if (isCompleted) {
-            statusClass = "completed";
-            statusText = "Completed";
-        } else if (!currentModuleFound && !isCapstone) {
-            statusClass = "active";
-            statusText = "Current Module";
-            currentModuleFound = true;
-            
-            // Set top quiz button URL to this module
-            if (topQuizBtn) {
-                topQuizBtn.href = `quiz.html?module=${module.id}`;
-                topQuizBtn.style.display = "inline-flex"; // Show it
+    // Respect "Start from Module"
+    const selectedStartModule = localStorage.getItem('selectedStartModule') || '';
+    if (selectedStartModule) {
+        const startIdx = pathData.findIndex(m => m.id === selectedStartModule);
+        if (startIdx > 0) {
+            for (let i = 0; i < startIdx; i++) {
+                const m = pathData[i];
+                if (m.id !== 'capstone' && !completedModules.includes(m.id)) {
+                    completedModules.push(m.id);
+                }
             }
-        } else if (isCapstone && !currentModuleFound) {
-            // If all previous were skipped/completed, capstone is current
-            statusClass = "active";
-            statusText = "Current Module";
-            currentModuleFound = true;
-        } else if (isCapstone) {
-            statusClass = "locked capstone";
-            statusText = "Requires previous completion";
+            localStorage.setItem('completedModules', JSON.stringify(completedModules));
         }
+    }
 
-        // Render HTML for node
-        const itemDiv = document.createElement("div");
-        itemDiv.className = `timeline-item ${statusClass}`;
+    let visibleModulesData = [];
+
+    // Helper: update overall progress
+    const updateOverallProgress = () => {
+        if (!visibleModulesData.length) return;
+        let cCount = 0;
+        visibleModulesData.forEach(m => {
+            if (completedModules.includes(m.id)) cCount++;
+        });
+        const pct = Math.round((cCount / visibleModulesData.length) * 100);
+        if (overallProgressText) overallProgressText.innerText = `${pct}%`;
+        if (overallProgressBar) overallProgressBar.style.width = `${pct}%`;
+    };
+
+    // Helper: Build course ID
+    const getCourseId = (moduleId, courseName) => `${moduleId}_${courseName.replace(/\s+/g, '')}`;
+
+    // Helper: Check if a module is considered passed (quiz >= 75% OR pre-completed)
+    const isModulePassed = (modId) => {
+        if (completedModules.includes(modId)) return true;
+        const scores = JSON.parse(localStorage.getItem('moduleQuizPassed') || '{}');
+        return (scores[modId] || 0) >= 75;
+    };
+
+    // Helper: Render a group
+    const renderGroup = (title, modulesToRender, pathStartIndex) => {
+        if (!modulesToRender || modulesToRender.length === 0) return;
         
-        let coursesHTML = "";
-        if (module.courses && module.courses.length > 0) {
-            coursesHTML = `<div class="course-suggestions" style="margin-top: 10px; font-size: 0.9em;">
-                <strong>Recommended Free Resources:</strong>
-                <ul style="list-style-type: none; padding-left: 0; margin-top: 5px;">
-                    ${module.courses.map(course => 
-                        `<li style="margin-bottom: 3px;">
-                            <i class="fas fa-external-link-alt" style="color: #4F46E5; font-size: 0.8em; margin-right: 5px;"></i>
-                            <a href="${course.url}" target="_blank" style="color: #4F46E5; text-decoration: none;">${course.name}</a>
-                        </li>`
-                    ).join('')}
-                </ul>
-            </div>`;
-        }
-
-        let actionBtnHTML = "";
-        if (statusClass === "active" && !isCapstone) {
-            actionBtnHTML = `<a href="quiz.html?module=${module.id}" class="btn btn-outline" style="margin-top: 15px; font-size: 0.85em; padding: 6px 12px; display: inline-block;">Take Module Quiz</a>`;
-        }
-
-        itemDiv.innerHTML = `
-            <div class="timeline-content">
-                <h4>${module.title}</h4>
-                <p>${module.desc}</p>
-                ${statusClass !== "completed" && statusClass !== "locked" && statusClass !== "locked capstone" ? coursesHTML : ""}
-                ${actionBtnHTML}
-                <span class="timeline-pill ${statusClass === 'active' ? 'current' : ''}">${statusText}</span>
-            </div>
-        `;
+        const groupDiv = document.createElement("div");
+        groupDiv.className = "accordion-group";
         
-        if (timelineContainer) timelineContainer.appendChild(itemDiv);
-    });
+        const groupTitle = document.createElement("div");
+        groupTitle.className = "accordion-group-title";
+        groupTitle.innerHTML = `<i class="fas fa-layer-group" style="color:var(--primary); font-size:0.9rem;"></i> ${title}`;
+        groupDiv.appendChild(groupTitle);
 
-    if (!currentModuleFound && topQuizBtn) {
-        topQuizBtn.style.display = "none";
+        modulesToRender.forEach((module, localIdx) => {
+            const globalIdx = pathStartIndex + localIdx;
+
+            // Lock if previous module hasn't been quiz-passed or pre-completed
+            const isLocked = globalIdx > 0 && !isModulePassed(pathData[globalIdx - 1].id);
+
+            // Check course completion status
+            const totalCourses = module.courses && module.courses.length > 0 ? module.courses.length : 1;
+            let completedCount = 0;
+            
+            if (module.courses && module.courses.length > 0) {
+                module.courses.forEach(c => {
+                    if (completedCourses.includes(getCourseId(module.id, c.name))) {
+                        completedCount++;
+                    }
+                });
+            } else {
+                if (completedCourses.includes(getCourseId(module.id, 'dummy_capstone'))) {
+                    completedCount++;
+                }
+            }
+
+            // Auto mark module complete if courses are 100%
+            if (completedCount === totalCourses && !completedModules.includes(module.id)) {
+                completedModules.push(module.id);
+                localStorage.setItem('completedModules', JSON.stringify(completedModules));
+            }
+            
+            const moduleCompleted = completedCount === totalCourses || completedModules.includes(module.id);
+            const modulePct = moduleCompleted ? 100 : Math.round((completedCount / totalCourses) * 100);
+
+            const accItem = document.createElement("div");
+            accItem.className = `accordion-item ${moduleCompleted ? 'completed' : ''} ${isLocked ? 'module-locked' : ''}`;
+            
+            accItem.innerHTML = `
+                <div class="accordion-header">
+                    <div class="accordion-header-left">
+                        <i class="fas ${isLocked ? 'fa-lock' : 'fa-chevron-right'} toggle-icon"></i>
+                        <h4>${module.title}</h4>
+                        ${isLocked ? '<span class="lock-badge">Locked</span>' : ''}
+                    </div>
+                    <div class="accordion-header-right">
+                        <div class="module-progress-wrapper">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: ${modulePct}%; ${moduleCompleted ? 'background: #10B981;' : ''}"></div>
+                            </div>
+                            <span class="module-progress-text">${modulePct}%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-content-inner">
+                        ${isLocked ? `
+                        <div class="module-locked-overlay">
+                            <div class="lock-icon-big">🔒</div>
+                            <p>Complete the previous module's quiz with <strong>75% or higher</strong> to unlock this module.</p>
+                        </div>` : `
+                        <p class="module-desc">${module.desc}</p>
+                        <div class="course-list">
+                            <!-- courses go here -->
+                        </div>
+                        <div class="module-quiz-action">
+                            <a href="quiz.html?module=${module.id}" class="btn-take-quiz ${moduleCompleted ? 'btn-quiz-passed' : ''}">
+                                ${moduleCompleted 
+                                    ? '<i class="fas fa-check-circle"></i> Quiz Passed ✓' 
+                                    : '<i class="fas fa-bolt"></i> Take Module Quiz'}
+                            </a>
+                            ${moduleCompleted ? '' : '<span class="quiz-unlock-hint">Score 75%+ to unlock the next module</span>'}
+                        </div>`}
+                    </div>
+                </div>
+            `;
+            
+            // Only add course checkboxes if module is not locked
+            if (!isLocked) {
+                const courseListContainer = accItem.querySelector('.course-list');
+                if (courseListContainer) {
+                    const addCourseItem = (cName, cUrl, isDummy = false) => {
+                        const cId = getCourseId(module.id, cName);
+                        const isChecked = completedCourses.includes(cId) || moduleCompleted;
+                        
+                        const cItem = document.createElement("label");
+                        cItem.className = `course-item ${isChecked ? 'completed' : ''}`;
+                        cItem.innerHTML = `
+                            <input type="checkbox" class="course-checkbox" value="${cId}" ${isChecked ? 'checked' : ''}>
+                            <div class="checkbox-custom">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="course-details">
+                                <h5>${isDummy ? 'Submit ' + module.title : cName}</h5>
+                                ${cUrl ? `<a href="${cUrl}" target="_blank" class="course-link">View Course <i class="fas fa-external-link-alt"></i></a>` : ''}
+                            </div>
+                        `;
+                        
+                        const checkbox = cItem.querySelector('.course-checkbox');
+                        checkbox.addEventListener('change', (e) => {
+                            if (e.target.checked) {
+                                if (!completedCourses.includes(cId)) completedCourses.push(cId);
+                                cItem.classList.add('completed');
+                            } else {
+                                completedCourses = completedCourses.filter(id => id !== cId);
+                                cItem.classList.remove('completed');
+                            }
+                            localStorage.setItem('completedCourses', JSON.stringify(completedCourses));
+                            
+                            let currentCount = 0;
+                            if (module.courses && module.courses.length > 0) {
+                                module.courses.forEach(cx => {
+                                    if (completedCourses.includes(getCourseId(module.id, cx.name))) currentCount++;
+                                });
+                            } else {
+                                if (completedCourses.includes(getCourseId(module.id, 'dummy_capstone'))) currentCount++;
+                            }
+                            
+                            const newPct = Math.round((currentCount / totalCourses) * 100);
+                            accItem.querySelector('.progress-bar').style.width = `${newPct}%`;
+                            accItem.querySelector('.module-progress-text').innerText = `${newPct}%`;
+                            
+                            if (currentCount === totalCourses) {
+                                if (!completedModules.includes(module.id)) {
+                                    completedModules.push(module.id);
+                                    localStorage.setItem('completedModules', JSON.stringify(completedModules));
+                                }
+                                accItem.classList.add('completed');
+                                accItem.querySelector('.progress-bar').style.background = '#10B981';
+                            } else {
+                                completedModules = completedModules.filter(id => id !== module.id);
+                                localStorage.setItem('completedModules', JSON.stringify(completedModules));
+                                accItem.classList.remove('completed');
+                                accItem.querySelector('.progress-bar').style.background = 'var(--primary)';
+                            }
+                            
+                            updateOverallProgress();
+                        });
+                        
+                        courseListContainer.appendChild(cItem);
+                    };
+
+                    if (module.courses && module.courses.length > 0) {
+                        module.courses.forEach(c => addCourseItem(c.name, c.url));
+                    } else {
+                        addCourseItem('dummy_capstone', null, true);
+                    }
+                }
+            }
+            
+            const header = accItem.querySelector('.accordion-header');
+            const content = accItem.querySelector('.accordion-content');
+            header.addEventListener('click', () => {
+                if (isLocked) return; // Don't expand locked modules
+                const isActiveNow = accItem.classList.contains('active');
+                document.querySelectorAll('.accordion-item').forEach(item => {
+                    item.classList.remove('active');
+                    item.querySelector('.accordion-content').style.maxHeight = null;
+                });
+                
+                if (!isActiveNow) {
+                    accItem.classList.add('active');
+                    content.style.maxHeight = content.scrollHeight + "px";
+                }
+            });
+
+            groupDiv.appendChild(accItem);
+        });
+        
+        if (accordionContainer) accordionContainer.appendChild(groupDiv);
+    };
+
+    const beginnerModules = pathData.slice(0, 2);
+    const intermediateModules = pathData.slice(2, 4);
+    const advancedModules = pathData.slice(4);
+
+    const quizLevel = localStorage.getItem('quizResultLevel');
+    const quizScore = localStorage.getItem('quizResultScore');
+    const userLevelStr = quizLevel || localStorage.getItem("userLevel") || "Beginner";
+
+    if (quizLevel) {
+        const resultBanner = document.getElementById('quiz-result-banner');
+        if (resultBanner) {
+            resultBanner.style.display = 'block';
+            const scoreEl = document.getElementById('quiz-score-display');
+            const levelEl = document.getElementById('quiz-level-display');
+            if (scoreEl) scoreEl.textContent = quizScore;
+            if (levelEl) levelEl.textContent = quizLevel;
+        }
+    }
+
+    // Update side panel target path
+    const sideTargetPath = document.getElementById('side-target-path');
+    if (sideTargetPath) sideTargetPath.textContent = matchedPathKey;
+
+    // ── Always render ALL 3 groups (with correct start indexes for locking) ──
+    renderGroup("🌱 Beginner",     beginnerModules,     0);
+    renderGroup("⚡ Intermediate", intermediateModules, 2);
+    renderGroup("🚀 Advanced",     advancedModules,     4);
+
+    visibleModulesData.push(...beginnerModules, ...intermediateModules, ...advancedModules);
+
+    updateOverallProgress();
+
+    setTimeout(() => {
+        const allItems = document.querySelectorAll('.accordion-item');
+        let expanded = false;
+        allItems.forEach(item => {
+            if (!item.classList.contains('completed') && !expanded) {
+                item.classList.add('active');
+                const content = item.querySelector('.accordion-content');
+                content.style.maxHeight = content.scrollHeight + "px";
+                expanded = true;
+            }
+        });
+        if (!expanded && allItems.length > 0) {
+            const lastItem = allItems[allItems.length - 1];
+            lastItem.classList.add('active');
+            const content = lastItem.querySelector('.accordion-content');
+            content.style.maxHeight = content.scrollHeight + "px";
+        }
+    }, 100);
+
+    if (typeof LocalStorageState !== 'undefined' && LocalStorageState.isMandatoryQuizPending()) {
+        if (typeof QuizLockManager !== 'undefined') {
+            QuizLockManager.applyRoadmapOverlay();
+            QuizLockManager.disableNavigation();
+        }
     }
 });

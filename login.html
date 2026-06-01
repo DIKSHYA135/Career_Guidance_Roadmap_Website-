@@ -1,83 +1,108 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Sign in to Xyverra — your AI-powered career roadmap platform." />
-    <title>Login — Xyverra</title>
-    <link rel="stylesheet" href="login.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  </head>
-  <body>
-    <div class="centered-layout">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Sign in to Xyverra — your AI-powered career roadmap platform." />
+  <title>Login — Xyverra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="login.css" />
+</head>
+<body>
+
+  <!-- Premium Loading Overlay -->
+  <div id="premium-loader" class="premium-loader-overlay">
+    <div class="loader-content">
+      <div class="loader-logo-wrapper">
+        <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" style="width:100%; height:100%; border-radius:18px; object-fit:cover;">
+      </div>
+      <div class="loader-status">Initializing Career Intelligence...</div>
+      <div class="loader-progress-track">
+        <div class="loader-progress-bar" id="loader-progress-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Centered Login Card -->
+  <div class="login-page">
+    <div class="login-card">
 
       <!-- Brand Header -->
-      <div class="brand-header">
-        <div class="brand-icon">
-          <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" />
+      <div class="login-brand">
+        <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" class="brand-logo-img">
+        <span class="brand-name">Xyverra</span>
+      </div>
+
+      <div class="login-heading">
+        <h1>Welcome back</h1>
+        <p>Sign in to continue your AI-powered career journey</p>
+      </div>
+
+      <!-- Form -->
+      <form id="auth-form" class="login-form" novalidate>
+        <div class="form-group">
+          <label for="login-email">Email address</label>
+          <div class="input-wrapper">
+            <i class="far fa-envelope input-icon"></i>
+            <input
+              type="email"
+              id="login-email"
+              placeholder="name@company.com"
+              autocomplete="email"
+              required
+            />
+          </div>
         </div>
-        <h1>Xyverra</h1>
-        <p>Your AI-powered career roadmap</p>
-      </div>
 
-      <!-- Login Card -->
-      <div class="card-box auth-card">
-        <h2 class="card-title">Welcome back</h2>
-        <p class="card-subtitle">Sign in to continue your learning journey</p>
-
-        <form id="auth-form" novalidate>
-          <div class="form-group">
-            <label for="login-email">Email address</label>
-            <div class="input-wrapper">
-              <i class="far fa-envelope"></i>
-              <input
-                type="email"
-                id="login-email"
-                placeholder="you@example.com"
-                autocomplete="email"
-                required
-              />
-            </div>
-          </div>
-
-          <div class="form-group">
+        <div class="form-group">
+          <div class="label-row">
             <label for="login-password">Password</label>
-            <div class="input-wrapper">
-              <i class="fas fa-lock"></i>
-              <input
-                type="password"
-                id="login-password"
-                placeholder="Your password"
-                autocomplete="current-password"
-                required
-              />
-              <i class="far fa-eye eye-icon" id="toggle-password" title="Show password"></i>
-            </div>
+            <a href="#" class="forgot-link">Forgot password?</a>
           </div>
+          <div class="input-wrapper">
+            <i class="fas fa-lock input-icon"></i>
+            <input
+              type="password"
+              id="login-password"
+              placeholder="••••••••••••"
+              autocomplete="current-password"
+              required
+            />
+            <i class="far fa-eye eye-icon" id="toggle-password" title="Show password"></i>
+          </div>
+        </div>
 
-          <a href="#" class="forgot-link">Forgot password?</a>
+        <button type="submit" class="btn-login" id="login-btn">
+          <span>Sign in to Dashboard</span>
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </form>
 
-          <button type="submit" class="btn btn-primary" id="login-btn">
-            <i class="fas fa-sign-in-alt"></i> Sign In
-          </button>
-        </form>
+      <!-- Divider -->
+      <div class="login-divider"><span>New to Xyverra?</span></div>
 
-        <div class="divider">OR</div>
+      <!-- Sign Up Link -->
+      <a href="signup.html" class="btn-signup">
+        <i class="fas fa-rocket"></i>
+        Create your free account
+      </a>
 
-        <a href="signup.html" class="btn btn-outline">
-          <i class="fas fa-user-plus"></i> Create a free account
-        </a>
-
-        <p class="hint-text">
-          Demo: alex@example.com · password123
-        </p>
+      <!-- Demo hint -->
+      <div class="demo-hint">
+        <i class="fas fa-info-circle"></i>
+        <span>Demo: <strong>alex@example.com</strong> · <strong>password123</strong></span>
       </div>
-
-      <p class="auth-footer">
-        Don't have an account? <a href="signup.html">Sign up for free</a>
-      </p>
 
     </div>
-    <script src="login.js"></script>
-  </body>
+
+    <!-- Footer -->
+    <p class="login-footer">
+      By signing in, you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>
+    </p>
+  </div>
+
+  <script src="login.js"></script>
+</body>
 </html>

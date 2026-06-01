@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roadmap - Xyverra</title>
+    <title>Roadmap - Xyvvera</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="roadmap.css">
     <link rel="stylesheet" href="ai-recommendation.css">
@@ -14,13 +14,14 @@
 </head>
 <body>
     <div class="app-layout">
+        
         <!-- Mobile Header Toggle -->
         <div class="mobile-nav-toggle">
             <div class="sidebar-brand" style="margin-bottom: 0; padding: 0;">
                 <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" class="sidebar-logo">
-                Xyverra
+                <span>Xyverra</span>
             </div>
-            <button id="sidebar-toggle-btn" class="btn" style="padding: 5px; background: transparent;">
+            <button id="sidebar-toggle-btn" class="btn" style="padding: 5px; background: transparent; color: var(--primary);">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
         </div>
@@ -32,74 +33,199 @@
         <aside class="sidebar" id="sidebar-menu">
             <div class="sidebar-brand">
                 <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" class="sidebar-logo">
-                Xyverra
+                <span>Xyverra</span>
             </div>
             <nav class="nav-menu">
                 <a href="dashboard.html" class="nav-item nav-dashboard">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                     Dashboard
                 </a>
                 <a href="skills.html" class="nav-item nav-skills">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                     Skills
                 </a>
                 <a href="skill-gap.html" class="nav-item nav-skill-gap">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg>
                     Skill Gap Analysis
                 </a>
-                <a href="skill-input.html" class="nav-item nav-skill-input">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <a href="skill-input.html" class="nav-item active nav-skill-input">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     Create Roadmap
                 </a>
                 <a href="progress.html" class="nav-item nav-progress">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                    Progress
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                    Progress Tracker
                 </a>
             </nav>
             
             <div style="flex: 1;"></div>
-                        <div class="user-profile" style="display: flex; align-items: center; justify-content: space-between;">
-                <div class="profile-click-area" style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; cursor: pointer;" title="View Profile">
+            
+            <div class="user-profile">
+                <div class="profile-click-area" title="View Profile">
                     <div class="avatar" id="user-avatar"></div>
                     <div class="profile-text">
-                        <h4 id="user-display-name"></h4>
-                        <p></p>
+                        <h4 id="user-display-name">Loading Candidate...</h4>
+                        <p>Platform Architect</p>
                     </div>
                 </div>
-                <button class="btn signout-btn" style="background: transparent; border: none; padding: 6px 8px; color: var(--text-muted); cursor: pointer; min-width: auto; box-shadow: none; flex-shrink: 0;" title="Sign Out">
+                <button class="signout-btn" title="Sign Out" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
         </aside>
 
-        <!-- Main Content -->
+        <!-- Main Content Workspace -->
         <main class="main-content">
-            <div class="page-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <!-- Header section -->
+            <div class="page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2rem;">
                 <div>
-                    <h2 id="roadmap-header-title">Your Learning Path</h2>
-                    <p>Follow the points below from beginning to end to progress towards job-readiness.</p>
+                    <h2 id="roadmap-header-title" style="font-size:1.875rem; font-weight:800; color:var(--text-dark); letter-spacing:-0.03em; margin-bottom:0.35rem;">Dynamic Learning Pathway</h2>
+                    <p style="color:var(--text-body); font-size:0.9375rem; font-weight:500;">A.I. generated competency milestones tailored to your active gaps.</p>
                 </div>
-                <div style="display: flex; gap: 10px;">
+                <div class="header-action-group" style="display: flex; gap: 10px;">
                     <button class="btn btn-outline ai-exit-trigger" style="width:auto; padding: 10px 20px;">
                         <i class="fas fa-pause"></i> Pause Learning
                     </button>
-                    <a href="quiz.html" id="top-quiz-btn" class="btn btn-primary" style="width:auto; padding: 10px 20px; display: none;">
-                        Take Module Quiz <i class="fas fa-arrow-right"></i>
+                    <a href="quiz.html" id="top-quiz-btn" class="btn btn-primary" style="width:auto; padding: 10px 20px; display: inline-flex;">
+                        Take Skill Assessment <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
             </div>
 
-            <div class="roadmap-wrapper card-box">
-                <div class="roadmap-timeline" id="roadmap-timeline">
-                    <!-- Nodes will be dynamically populated here by roadmap.js -->
+            <!-- Two-Column Dynamic Bento Grid -->
+            <div class="roadmap-grid-layout" style="display: grid; grid-template-columns: 1.3fr 0.95fr; gap: 1.5rem; align-items: start;">
+                
+                <!-- Left Column: The Timeline Pathway -->
+                <!-- Left Column: The Accordion Pathway -->
+                <div class="roadmap-accordion-section">
+                    
+                    <!-- Assessment Result Banner -->
+                    <div class="overall-progress-card" id="quiz-result-banner" style="display:none; border-left: 4px solid var(--primary);">
+                        <div class="overall-progress-header" style="margin-bottom: 0.5rem;">
+                            <h3>Assessment Result</h3>
+                        </div>
+                        <div style="display: flex; gap: 2rem; font-size: 0.95rem; color: var(--text-dark);">
+                            <p><strong>Score:</strong> <span id="quiz-score-display" style="color: var(--primary); font-weight: 800;"></span>%</p>
+                            <p><strong>Detected Level:</strong> <span id="quiz-level-display" style="color: var(--primary); font-weight: 800;"></span></p>
+                        </div>
+                    </div>
+
+                    <!-- Overall Roadmap Progress Tracker -->
+                    <div class="overall-progress-card">
+                        <div class="overall-progress-header">
+                            <h3>Overall Roadmap Progress</h3>
+                            <span class="progress-pct" id="overall-progress-text">0%</span>
+                        </div>
+                        <div class="progress-bar-container" style="height: 10px;">
+                            <div class="progress-bar" id="overall-progress-bar" style="width: 0%; background: linear-gradient(90deg, var(--primary), var(--cyan));"></div>
+                        </div>
+                    </div>
+
+                    <div class="roadmap-wrapper">
+                        <div class="accordion-container" id="roadmap-accordion">
+                            <!-- Accordion groups populated dynamically by roadmap.js -->
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Right Column: AI Insights & Career Predictions -->
+                <div class="roadmap-insights-sidepanel" style="display:flex; flex-direction:column; gap:1.5rem;">
+                    
+                    <!-- AI Insight Console -->
+                    <div class="card-box ai-insights-card">
+                        <div class="panel-header" style="display:flex; align-items:center; gap: 0.6rem; margin-bottom: 1.2rem;">
+                            <div class="panel-icon" style="color: var(--primary); filter: drop-shadow(0 0 6px rgba(37, 99, 235, 0.2));">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                </svg>
+                            </div>
+                            <h3>A.I. Pathway Diagnostics</h3>
+                        </div>
+                        
+                        <div class="diag-status" style="background:rgba(37, 99, 235, 0.05); padding: 0.8rem 1rem; border-radius: var(--radius-md); border:1px solid rgba(37, 99, 235, 0.1); margin-bottom: 1.2rem;">
+                            <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--primary); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.2rem;">Diagnostic Engine Status</span>
+                            <p style="font-size: 0.78rem; color: var(--text-dark); line-height: 1.4;">Active target profile: <strong style="color: var(--primary);" id="side-target-path">Web Developer</strong>. Resume gaps parsed successfully.</p>
+                        </div>
+
+                        <div class="diagnostic-list" style="display:flex; flex-direction:column; gap: 0.9rem;">
+                            <div class="diag-item">
+                                <div class="diag-meta" style="display:flex; justify-content:space-between; font-size:0.75rem; font-weight:600; margin-bottom:0.25rem;">
+                                    <span style="color: var(--text-dark);">Role Match Affinity</span>
+                                    <span style="color: var(--primary);">78% Score</span>
+                                </div>
+                                <div class="progress-bar-container"><div class="progress-bar" style="width: 78%;"></div></div>
+                            </div>
+                            
+                            <div class="diag-item">
+                                <div class="diag-meta" style="display:flex; justify-content:space-between; font-size:0.75rem; font-weight:600; margin-bottom:0.25rem;">
+                                    <span style="color: var(--text-dark);">Structural Skill Gap</span>
+                                    <span style="color: #059669;">Low Risk</span>
+                                </div>
+                                <div class="progress-bar-container"><div class="progress-bar" style="width: 22%; background: linear-gradient(90deg, #10B981, #059669);"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Career Predictions Bento Widget -->
+                    <div class="card-box career-prediction-card">
+                        <div class="panel-header" style="display:flex; align-items:center; gap: 0.6rem; margin-bottom: 1.2rem;">
+                            <div class="panel-icon" style="color: var(--primary); filter: drop-shadow(0 0 6px rgba(37, 99, 235, 0.2));">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                                    <polyline points="17 6 23 6 23 12"/>
+                                </svg>
+                            </div>
+                            <h3>Velocity Projection</h3>
+                        </div>
+
+                        <!-- Mini Custom SVG Projection Line Graph -->
+                        <div class="side-graph-canvas" style="height: 100px; position:relative; margin-bottom: 1.2rem; background: var(--bg-surface-solid); border-radius: var(--radius-md); border:1px solid var(--border); overflow:hidden;">
+                            <svg viewBox="0 0 100 50" fill="none" style="width: 100%; height:100%;">
+                                <defs>
+                                    <linearGradient id="sideGrad" x1="0" y1="50" x2="0" y2="0">
+                                        <stop offset="0%" stop-color="#2563EB" stop-opacity="0"/>
+                                        <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.2"/>
+                                    </linearGradient>
+                                </defs>
+                                <path d="M0 45 Q20 42, 35 30 T70 18 T100 8 L100 50 L0 50 Z" fill="url(#sideGrad)" />
+                                <path d="M0 45 Q20 42, 35 30 T70 18 T100 8" stroke="var(--primary)" stroke-width="2.2" stroke-linecap="round" />
+                                <circle cx="100" cy="8" r="2.5" fill="var(--primary)" />
+                            </svg>
+                            <span style="position:absolute; bottom: 8px; right: 8px; font-family:var(--font-mono); font-size:0.6rem; color:var(--text-body);">12 Month Target</span>
+                        </div>
+
+                        <div class="prediction-list" style="display:flex; flex-direction:column; gap: 0.8rem;">
+                            <div class="pred-item" style="display:flex; align-items:center; gap: 0.8rem; padding: 0.6rem 0.8rem; background:rgba(248, 250, 252, 0.8); border:1px solid var(--border); border-radius:var(--radius-md);">
+                                <span style="font-size: 1.1rem;">📈</span>
+                                <div class="pred-text" style="display:flex; flex-direction:column;">
+                                    <span style="font-size: 0.76rem; font-weight:700; color:var(--text-dark);">Market Value Projection</span>
+                                    <span style="font-size: 0.65rem; color:var(--text-body);">Estimated demand growth of <strong style="color:var(--primary);">+45% skill value</strong>.</span>
+                                </div>
+                            </div>
+
+                            <div class="pred-item" style="display:flex; align-items:center; gap: 0.8rem; padding: 0.6rem 0.8rem; background:rgba(248, 250, 252, 0.8); border:1px solid var(--border); border-radius:var(--radius-md);">
+                                <span style="font-size: 1.1rem;">⏱️</span>
+                                <div class="pred-text" style="display:flex; flex-direction:column;">
+                                    <span style="font-size: 0.76rem; font-weight:700; color:var(--text-dark);">Competency Runway</span>
+                                    <span style="font-size: 0.65rem; color:var(--text-body);">Target match readiness achieved in <strong style="color: var(--primary);">14 Weeks</strong>.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
         </main>
     </div>
 
-    <script src="app-data.js"></script> <script src="global-sidebar.js"></script>
+    <script src="toast.js"></script>
+    <script src="app-data.js"></script> 
+    <script src="global-sidebar.js"></script>
+    <script src="quiz-data.js"></script>
+    <script src="localstorage-state-management.js"></script>
+    <script src="quiz-lock-manager.js"></script>
     <script src="roadmap.js"></script>
     <script src="ai-recommendation.js"></script>
 </body>
 </html>
-

@@ -1,169 +1,328 @@
-/* =====================================================
-   LEVEL SELECTION PAGE — Xyverra
-   ===================================================== */
+/* ==========================================================================
+   PATH BLUEPRINT - LEVEL SELECTION STYLE
+   ========================================================================== */
+@import url('global.css');
 
+.large-card {
+    width: 100%;
+    max-width: 800px;
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.2rem;
+    box-shadow: var(--shadow-premium);
+    border-radius: var(--radius-xl);
+    animation: cardEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
 
-/* Wider card */
-.large-card { max-width: 640px; width: 100%; }
-
-/* ── Progress Steps ── */
+/* Onboarding horizontal steps bar */
 .onboarding-steps {
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+    background: #F8FAFC;
+    padding: 0.9rem 1.6rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
 }
 
 .step {
-    font-size: 0.8125rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
     font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
     color: var(--text-muted);
-    padding: 6px 16px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    white-space: nowrap;
-    transition: all 0.3s;
+    transition: all 0.3s var(--ease);
+}
+
+.step-num {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    color: var(--text-muted);
+    font-size: 0.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    border: 1px solid var(--border);
+    transition: all 0.3s var(--ease);
+}
+
+.step-check {
+    width: 14px;
+    height: 14px;
+    color: var(--primary);
+    transition: all 0.3s var(--ease);
+}
+
+.step-divider {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    margin: 0 1.2rem;
+    transition: all 0.3s var(--ease);
+}
+
+/* Active & Done Step States */
+.step.done {
+    color: var(--text-dark);
+}
+
+.step-divider.done {
+    background: var(--primary);
 }
 
 .step.active {
     color: var(--primary);
-    background: rgba(99, 102, 241, 0.1);
-    border-color: rgba(99, 102, 241, 0.3);
-    box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
 }
 
-.step.done {
-    color: var(--success);
-    background: rgba(16, 185, 129, 0.1);
-    border-color: rgba(16, 185, 129, 0.3);
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+.step.active .step-num {
+    background: var(--primary);
+    color: #FFFFFF;
+    border-color: var(--primary);
 }
 
-.step.done i { margin-right: 4px; font-size: 0.7rem; }
-
-.step-divider {
-    flex: 1;
-    min-width: 16px;
-    height: 1.5px;
-    background: var(--border);
-}
-
-/* ── Context bar (shows selected path) ── */
+/* Selection Context pill */
 .selection-context {
     display: flex;
     align-items: center;
-    gap: 0.85rem;
-    padding: 0.9rem 1.1rem;
-    background: rgba(96, 165, 250, 0.07);
-    border: 1.5px solid rgba(96, 165, 250, 0.2);
-    border-radius: 14px;
-    margin-bottom: 1.75rem;
+    gap: 1rem;
+    background: #DBEAFE;
+    border: 1px solid rgba(37, 99, 235, 0.15);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.4rem;
 }
 
-.context-text { display: flex; flex-direction: column; gap: 2px; }
+.context-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-md);
+    background: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    flex-shrink: 0;
+    border: 1px solid rgba(37, 99, 235, 0.12);
+}
 
-#selected-path-label { font-size: 0.9375rem; font-weight: 700; color: var(--text-dark); }
+.context-icon svg {
+    width: 20px;
+    height: 20px;
+}
 
-.context-sub { font-size: 0.8125rem; color: var(--text-muted); }
+.context-text {
+    display: flex;
+    flex-direction: column;
+}
 
-/* ── Level option cards ── */
+.context-path-name {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--text-dark);
+}
+
+.context-sub {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+/* Vertical stack cards */
 .level-options {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    margin-bottom: 2rem;
 }
 
 .level-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.3rem 1.6rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
-    padding: 1.5rem 1.75rem;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    box-shadow: var(--shadow-premium);
+    transition: all 0.25s var(--ease);
 }
 
-.level-card::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 100%);
-    pointer-events: none;
-    z-index: 0;
+.card-glow-element {
+    display: none;
 }
 
-.level-card>* { position: relative; z-index: 1; }
-
+/* Hover & Active Card Glow Borders */
 .level-card:hover {
-    border-color: rgba(255, 255, 255, 0.9);
-    background: rgba(255, 255, 255, 0.9);
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.06), var(--shadow-glow);
+    border-color: var(--border-strong);
+    background: #F8FAFC;
+    transform: translateY(-2px);
 }
 
-.level-card.active { border-color: rgba(99, 102, 241, 0.4); background: rgba(255, 255, 255, 0.95); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15), 0 10px 25px rgba(99, 102, 241, 0.1); }
-
-.level-card.active::after {
-    content: '\f058';
-    font-family: 'Font Awesome 6 Free';
-    font-weight: 900;
-    position: absolute;
-    top: 14px;
-    right: 14px;
-    color: var(--primary);
-    font-size: 1rem;
+.level-card.active {
+    background: #FFFFFF;
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 4px #DBEAFE;
 }
 
-.level-card-left { display: flex; align-items: flex-start; gap: 1rem; }
-
-.level-emoji { font-size: 2rem; line-height: 1; flex-shrink: 0; }
-
-.level-card h4 {
-    font-size: 0.9375rem;
-    font-weight: 700;
-    color: var(--text-dark);
-    margin-bottom: 3px;
+/* Card interior structure */
+.level-card-left {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    flex: 1;
 }
 
-.level-card p { font-size: 0.8125rem; color: var(--text-muted); line-height: 1.45; }
-
-.score-badge {
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--primary);
-    background: rgba(99, 102, 241, 0.08);
-    border: 1px solid rgba(99, 102, 241, 0.2);
-    padding: 4px 10px;
-    border-radius: 999px;
-    white-space: nowrap;
+.level-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ── Bottom navigation ── */
-.bottom-actions { display: flex; gap: 0.85rem; align-items: center; }
+.level-card:hover .level-icon {
+    transform: scale(1.03);
+}
 
-.back-btn { flex: 0 0 auto; width: auto; padding: 12px 22px; }
+.level-icon svg {
+    width: 22px;
+    height: 22px;
+}
 
-@media (max-width: 560px) {
-    .level-card { flex-direction: column; align-items: flex-start; }
+.icon-green { background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; }
+.icon-blue { background: #DBEAFE; color: var(--primary); border: 1px solid rgba(37, 99, 235, 0.15); }
+.icon-purple { background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; }
 
-    .score-badge { align-self: flex-start; }
+.level-card-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    max-width: 440px;
+}
 
-    .level-card.active::after { top: 12px; right: 12px; }
+.level-card-text h4 {
+    font-size: 0.98rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    transition: var(--transition-sm);
+}
+
+.level-card.active h4 {
+    color: var(--primary);
+}
+
+.level-card-text p {
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+    transition: var(--transition-sm);
+}
+
+.level-card.active p {
+    color: var(--text-body);
+}
+
+/* Selected state check circles */
+.level-check {
+    position: absolute;
+    top: 50%;
+    right: 1.5rem;
+    transform: translateY(-50%) scale(0.6);
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #E2E8F0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.25s var(--ease);
+    color: var(--primary);
+}
+
+.level-card.active .level-check {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+    border-color: var(--primary);
+    background: var(--primary);
+    color: white;
+}
+
+.level-check svg {
+    width: 12px;
+    height: 12px;
+}
+
+/* Translucent badges */
+.score-badge {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    white-space: nowrap;
+    margin-right: 2.2rem;
+}
+
+.badge-green { background: #F1F5F9; border: 1px solid #E2E8F0; color: #475569; }
+.badge-blue { background: #DBEAFE; border: 1px solid rgba(37, 99, 235, 0.15); color: var(--primary); }
+.badge-purple { background: #F1F5F9; border: 1px solid #E2E8F0; color: #475569; }
+
+/* Action Footer layout */
+.bottom-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .large-card {
+        padding: 1.8rem 1.2rem;
+        gap: 1.8rem;
+    }
+
+    .onboarding-steps {
+        padding: 0.6rem 0.8rem;
+    }
+
+    .step span {
+        display: none; /* Hide labels on mobile */
+    }
+
+    .level-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.2rem;
+    }
+
+    .score-badge {
+        margin-right: 0;
+        align-self: flex-start;
+    }
+
+    .level-check {
+        top: 1.2rem;
+        transform: translateY(0) scale(0.8);
+    }
+    
+    .level-card.active .level-check {
+        transform: translateY(0) scale(1);
+    }
 }
