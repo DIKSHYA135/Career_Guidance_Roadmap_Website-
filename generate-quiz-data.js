@@ -20,8 +20,8 @@ categories.forEach(cat => {
     data[cat] = {};
     levels.forEach(lvl => {
         data[cat][lvl] = [];
-        // Generate 15 questions per category/level
-        for (let i = 1; i <= 15; i++) {
+        // Generate 100 questions per category/level
+        for (let i = 1; i <= 100; i++) {
             data[cat][lvl].push({
                 q: `[${lvl}] Question ${i} about ${cat}. What is the primary purpose or concept here?`,
                 opts: [

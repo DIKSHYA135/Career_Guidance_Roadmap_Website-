@@ -29,7 +29,7 @@
         <!-- Sidebar Overlay -->
         <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-        <!-- Glassmorphic Sidebar -->
+        <!-- Sidebar -->
         <aside class="sidebar" id="sidebar-menu">
             <div class="sidebar-brand">
                 <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" class="sidebar-logo">
@@ -48,7 +48,7 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg>
                     Skill Gap Analysis
                 </a>
-                <a href="skill-input.html" class="nav-item nav-skill-input">
+                <a href="skill-input.html" class="nav-item active nav-skill-input">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     Create Roadmap
                 </a>
@@ -60,13 +60,12 @@
             
             <div style="flex: 1;"></div>
             
-            <!-- User Status Console inside Sidebar -->
             <div class="user-profile">
                 <div class="profile-click-area" title="View Profile">
                     <div class="avatar" id="user-avatar"></div>
                     <div class="profile-text">
-                        <h4 id="user-display-name">Loading...</h4>
-                        <p>Principal Candidate</p>
+                        <h4 id="user-display-name">Loading Candidate...</h4>
+                        <p>Platform Architect</p>
                     </div>
                 </div>
                 <button class="signout-btn" title="Sign Out" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">
@@ -87,7 +86,7 @@
                     <button class="btn btn-outline ai-exit-trigger" style="width:auto; padding: 10px 20px;">
                         <i class="fas fa-pause"></i> Pause Learning
                     </button>
-                    <a href="quiz.html" id="top-quiz-btn" class="btn btn-primary" style="width:auto; padding: 10px 20px; display: none;">
+                    <a href="quiz.html" id="top-quiz-btn" class="btn btn-primary" style="width:auto; padding: 10px 20px; display: inline-flex;">
                         Take Skill Assessment <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
@@ -220,6 +219,7 @@
         </main>
     </div>
 
+    <script src="toast.js"></script>
     <script src="app-data.js"></script> 
     <script src="global-sidebar.js"></script>
     <script src="quiz-data.js"></script>

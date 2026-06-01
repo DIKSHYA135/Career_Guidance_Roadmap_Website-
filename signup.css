@@ -5,7 +5,7 @@
 
 /* Background */
 body {
-    background: #F8FAFC !important;
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%) !important;
 }
 
 /* Auth-specific card sizing */

@@ -92,59 +92,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('profile-email').innerHTML = `<i class="fas fa-envelope"></i> ${currentEmail}`;
         document.getElementById('profile-bio').textContent = userData.profile.bio || "No bio added yet.";
         document.getElementById('profile-goal').textContent = userData.profile.learningGoal || "No specific goal set.";
-
-        // Learning Overview
-        document.getElementById('profile-category').textContent = userData.path || "Not Selected";
-        document.getElementById('profile-level').textContent = userData.level || "Beginner";
-        document.getElementById('profile-module').textContent = "Introduction" // Placeholder
-
-        // Stats
-        document.getElementById('stat-modules').textContent = userData.progress.modulesCompleted;
-        document.getElementById('stat-streak').textContent = userData.streak || userData.progress.learningStreak || 0;
-        document.getElementById('stat-certs').textContent = userData.progress.certificatesEarned;
-        document.getElementById('stat-roadmaps').textContent = userData.roadmapHistory.length;
-
-        // Dynamic Skills
-        document.getElementById('skills-badge').textContent = userData.level || "Beginner";
-        document.getElementById('skills-category-text').textContent = userData.path || "Category";
-        document.getElementById('skills-level-text').textContent = userData.level || "Beginner";
-
-        const skillsContainer = document.getElementById('profile-skills-container');
-        skillsContainer.innerHTML = '';
-        
-        if (userData.path && SKILLS_MAP[userData.path] && SKILLS_MAP[userData.path][userData.level]) {
-            const skills = SKILLS_MAP[userData.path][userData.level];
-            skills.forEach(skill => {
-                const pill = document.createElement('div');
-                pill.className = 'skill-pill';
-                pill.textContent = skill;
-                skillsContainer.appendChild(pill);
-            });
-        } else {
-            skillsContainer.innerHTML = '<p class="text-muted" style="width: 100%;">Select a category and level to see skills.</p>';
-        }
-
-        // Roadmap History
-        const historyList = document.getElementById('roadmap-history-list');
-        if (userData.roadmapHistory.length > 0) {
-            historyList.innerHTML = '';
-            userData.roadmapHistory.forEach(rm => {
-                const item = document.createElement('div');
-                item.className = 'history-card-item';
-                
-                const dateString = new Date(rm.date).toLocaleDateString();
-                const statusClass = rm.status === 'Completed' ? 'status-completed' : 'status-progress';
-                
-                item.innerHTML = `
-                    <div class="history-info">
-                        <h4>${rm.name}</h4>
-                        <div class="history-meta">${rm.category} • ${rm.level} • Generated: ${dateString}</div>
-                    </div>
-                    <div class="history-status ${statusClass}">${rm.status}</div>
-                `;
-                historyList.appendChild(item);
-            });
-        }
     };
 
     renderProfile();
@@ -183,31 +130,5 @@ document.addEventListener("DOMContentLoaded", () => {
         saveUserData();
         renderProfile();
         editProfileModal.classList.remove('active');
-    });
-
-    const editLearningBtn = document.getElementById('edit-learning-btn');
-    const editLearningModal = document.getElementById('edit-learning-modal');
-    const closeLearningModal = document.getElementById('close-learning-modal');
-    const saveLearningBtn = document.getElementById('save-learning-btn');
-
-    editLearningBtn.addEventListener('click', () => {
-        const catSelect = document.getElementById('edit-category');
-        const lvlSelect = document.getElementById('edit-level');
-        
-        if (userData.path) catSelect.value = userData.path;
-        if (userData.level) lvlSelect.value = userData.level;
-        
-        editLearningModal.classList.add('active');
-    });
-
-    closeLearningModal.addEventListener('click', () => editLearningModal.classList.remove('active'));
-
-    saveLearningBtn.addEventListener('click', () => {
-        userData.path = document.getElementById('edit-category').value;
-        userData.level = document.getElementById('edit-level').value;
-        
-        saveUserData();
-        renderProfile();
-        editLearningModal.classList.remove('active');
     });
 });

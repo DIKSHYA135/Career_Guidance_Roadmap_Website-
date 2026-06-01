@@ -12,6 +12,60 @@
     <link rel="stylesheet" href="quiz.css">
     <link rel="stylesheet" href="ai-recommendation.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .modern-radio-container {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--glass-bg);
+        }
+        .modern-radio-container:hover {
+            border-color: var(--primary);
+            background: rgba(42, 101, 245, 0.05);
+        }
+        .modern-radio-container.selected {
+            border-color: var(--primary);
+            background: rgba(42, 101, 245, 0.1);
+        }
+        .modern-radio-container.correct {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .modern-radio-container.wrong {
+            border-color: var(--error);
+            background: rgba(239, 68, 68, 0.1);
+        }
+        .modern-radio-container input[type="radio"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+        .modern-radio-text {
+            font-size: 1rem;
+            color: var(--text-dark);
+            flex: 1;
+        }
+        .quiz-tab-warning {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
 </head>
 <body>
     <div class="app-layout">
@@ -33,39 +87,39 @@
         <aside class="sidebar" id="sidebar-menu">
             <div class="sidebar-brand">
                 <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" class="sidebar-logo">
-                Xyverra
+                <span>Xyverra</span>
             </div>
             <nav class="nav-menu">
                 <a href="dashboard.html" class="nav-item nav-dashboard">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                     Dashboard
                 </a>
                 <a href="skills.html" class="nav-item nav-skills">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                     Skills
                 </a>
                 <a href="skill-gap.html" class="nav-item nav-skill-gap">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg>
                     Skill Gap Analysis
                 </a>
-                <a href="skill-input.html" class="nav-item nav-skill-input">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                <a href="skill-input.html" class="nav-item active nav-skill-input">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     Create Roadmap
                 </a>
                 <a href="progress.html" class="nav-item nav-progress">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                    Progress
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                    Progress Tracker
                 </a>
             </nav>
-
-                        <div style="flex: 1;"></div>
+            
+            <div style="flex: 1;"></div>
             
             <div class="user-profile">
                 <div class="profile-click-area" title="View Profile">
                     <div class="avatar" id="user-avatar"></div>
                     <div class="profile-text">
-                        <h4 id="user-display-name">Loading...</h4>
-                        <p>User Role</p>
+                        <h4 id="user-display-name">Loading Candidate...</h4>
+                        <p>Platform Architect</p>
                     </div>
                 </div>
                 <button class="signout-btn" title="Sign Out" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">
@@ -84,29 +138,12 @@
                         <a href="roadmap.html" class="quiz-back-link" style="margin-bottom: 0;">
                             <i class="fas fa-arrow-left"></i> Back to Roadmap
                         </a>
-                        <button id="btn-ai-config" class="btn btn-outline" style="font-size: 0.8rem; padding: 6px 12px; min-width: auto; width: auto; gap: 6px; display: inline-flex; align-items: center; border-radius: 20px; box-shadow: none; height: 32px; background: rgba(255,255,255,0.85);">
-                            <i class="fas fa-robot text-primary"></i> <span id="ai-status-label">AI: Off</span>
-                        </button>
                     </div>
                     <h1 id="quiz-module-title">Module Assessment</h1>
                     <p>Answer correctly (70%+) to mark this module as completed on your roadmap.</p>
                 </div>
 
-                <!-- AI Loading Screen -->
-                <div id="ai-loading-screen" style="display: none; flex-direction: column; align-items: center; justify-content: center; padding: 3.5rem 2rem; background: var(--glass-bg); border-radius: 20px; box-shadow: var(--shadow-md); border: 1px solid var(--glass-border); text-align: center; margin-bottom: 1.5rem;">
-                    <div class="ai-avatar-icon" style="width: 56px; height: 56px; font-size: 24px; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-robot text-primary" style="animation: pulseGlow 2s infinite;"></i>
-                    </div>
-                    <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-dark); margin-bottom: 0.5rem;">Gemini AI is generating your Quiz...</h3>
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; max-width: 380px; line-height: 1.5;">
-                        Custom-tailoring 5 unique multiple-choice questions for your module topic and experience level.
-                    </p>
-                    <div class="ai-typing-dots" style="margin-bottom: 0;">
-                        <div class="ai-dot" style="background: var(--primary);"></div>
-                        <div class="ai-dot" style="background: var(--primary); animation-delay: 0.2s;"></div>
-                        <div class="ai-dot" style="background: var(--primary); animation-delay: 0.4s;"></div>
-                    </div>
-                </div>
+
 
                 <!-- Quiz Card -->
                 <div class="quiz-card" id="quiz-card">
@@ -127,9 +164,9 @@
 
                     <!-- Question & Options (quiz body) -->
                     <div id="quiz-body">
-                        <h3 class="question-text" id="quiz-question">Loading question...</h3>
+                        <h3 class="question-text" id="quiz-question"></h3>
 
-                        <div class="options-grid disabled" id="quiz-options-container">
+                        <div class="options-grid" id="quiz-options-container" style="display: flex; flex-direction: column;">
                             <!-- Populated dynamically by quiz.js -->
                         </div>
                     </div>
@@ -179,30 +216,11 @@
         </div>
     </div>
 
-    <!-- AI Quiz Config Overlay -->
-    <div class="ai-exit-overlay" id="aiConfigOverlay" style="display: none; align-items: center; justify-content: center; z-index: 99999;">
-        <div class="ai-exit-modal" style="max-width: 440px; width: 90%; background: #FFFFFF; border-radius: 24px; padding: 2.2rem; box-shadow: var(--shadow-lg); border: 1px solid var(--border);">
-            <div class="ai-modal-header" style="display: flex; gap: 15px; align-items: flex-start;">
-                <div class="ai-avatar-icon" style="background: linear-gradient(135deg, var(--primary), var(--accent)); width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">
-                    <i class="fas fa-robot"></i>
-                </div>
-                <div>
-                    <h3 class="ai-modal-title" style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text-dark);">AI Quiz Generation</h3>
-                    <p class="ai-modal-subtitle" style="margin: 3px 0 0 0; font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">Integrate Gemini LLM to generate completely dynamic and fresh questions every single time!</p>
-                </div>
-            </div>
-            <div style="margin: 1.5rem 0;">
-                <label for="gemini-api-key" style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.03em;">Google Gemini API Key</label>
-                <input type="password" id="gemini-api-key" placeholder="Paste your API key here..." style="width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border); font-size: 0.9rem; background: #F8FAFC; color: var(--text-dark); outline: none; transition: border-color 0.2s;">
-                <p style="font-size: 0.76rem; color: var(--text-muted); margin-top: 0.65rem; line-height: 1.45;">
-                    <i class="fas fa-info-circle" style="color: var(--primary); margin-right: 3px;"></i> Don't have a key? Get a free API key from <a href="https://aistudio.google.com/" target="_blank" style="color: var(--primary); font-weight: 600; text-decoration: underline;">Google AI Studio</a>. Leave empty to use pre-defined randomized fallback questions.
-                </p>
-            </div>
-            <div class="ai-modal-actions" style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--border); padding-top: 1.25rem; margin-top: 0.5rem;">
-                <button class="btn btn-outline" id="btn-cancel-ai" style="padding: 10px 16px; font-size: 0.85rem; width: auto; min-width: auto; height: 38px;">Cancel</button>
-                <button class="btn btn-primary" id="btn-save-ai" style="padding: 10px 16px; font-size: 0.85rem; width: auto; min-width: auto; height: 38px; background: var(--primary); color: white;">Save Config</button>
-            </div>
-        </div>
+    <div class="quiz-tab-warning" id="quiz-tab-warning">
+        <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: var(--warning); margin-bottom: 1rem;"></i>
+        <h2 style="margin-bottom: 1rem;">Tab Switching Detected!</h2>
+        <p style="max-width: 400px; font-size: 1.1rem; line-height: 1.5;">You navigated away from the assessment. This is a strict environment and tab switching is not allowed. Please stay focused.</p>
+        <button class="btn btn-primary" id="btn-dismiss-warning" style="margin-top: 1.5rem;">I Understand, Resume</button>
     </div>
 
     <!-- Assessment Decision Modal -->
