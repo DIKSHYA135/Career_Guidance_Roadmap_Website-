@@ -51,6 +51,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const name = nameInput.value.trim();
             const email = emailInput.value.trim();
             const password = passwordInput.value;
+            const skillsRaw = document.getElementById('signup-skills').value;
+            const skills = skillsRaw ? skillsRaw.split(',').map(s => s.trim()).filter(s => s !== "") : [];
 
             // 4. Client-side Validation
             let isValid = true;
@@ -90,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, password })
+                    body: JSON.stringify({ name, email, password, skills })
                 });
 
                 const data = await response.json();

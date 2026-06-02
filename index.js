@@ -103,8 +103,8 @@ signupForm.addEventListener('submit', (e) => {
     const email = document.getElementById('signup-email').value;
     const password = document.getElementById('signup-password').value;
 
-    if (password.length < 8) {
-        signupError.textContent = 'Password must be at least 8 characters long.';
+    if (password.length < 6) {
+        signupError.textContent = 'Password must be at least 6 characters long.';
         return;
     }
 

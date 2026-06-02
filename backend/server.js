@@ -73,7 +73,7 @@ app.post('/api/auth/register', async (req, res) => {
     console.log('Registration attempt for:', req.body.email);
 
     try {
-        const { email, password, name } = req.body;
+        const { email, password, name, skills } = req.body;
 
         if (!email || !password) {
             return res.status(400).json({
@@ -86,6 +86,14 @@ app.post('/api/auth/register', async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: 'Password must be at least 6 characters long'
+            });
+        }
+
+        // Validate skills if provided
+        if (skills && !Array.isArray(skills)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Skills must be an array of strings'
             });
         }
 
@@ -103,7 +111,8 @@ app.post('/api/auth/register', async (req, res) => {
         const newUser = new User({
             email,
             password: hashedPassword,
-            name: name || email.split('@')[0]
+            name: name || email.split('@')[0],
+            skills: skills || []
         });
 
         await newUser.save();
@@ -124,7 +133,8 @@ app.post('/api/auth/register', async (req, res) => {
             user: {
                 id: newUser._id,
                 email: newUser.email,
-                name: newUser.name
+                name: newUser.name,
+                skills: newUser.skills
             }
         });
 
