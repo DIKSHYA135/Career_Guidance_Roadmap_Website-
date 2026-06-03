@@ -399,11 +399,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // Helper: Build course ID
     const getCourseId = (moduleId, courseName) => `${moduleId}_${courseName.replace(/\s+/g, '')}`;
 
-    // Helper: Check if a module is considered passed (quiz >= 75% OR pre-completed)
+    // Helper: Check if a module is considered passed (quiz >= 70% OR pre-completed)
     const isModulePassed = (modId) => {
         if (completedModules.includes(modId)) return true;
         const scores = JSON.parse(localStorage.getItem('moduleQuizPassed') || '{}');
-        return (scores[modId] || 0) >= 75;
+        return (scores[modId] || 0) >= 70;
     };
 
     // Helper: Render a group
@@ -421,8 +421,13 @@ document.addEventListener("DOMContentLoaded", () => {
         modulesToRender.forEach((module, localIdx) => {
             const globalIdx = pathStartIndex + localIdx;
 
-            // Lock if previous module hasn't been quiz-passed or pre-completed
-            const isLocked = globalIdx > 0 && !isModulePassed(pathData[globalIdx - 1].id);
+            // Lock if previous module hasn't been quiz-passed. The first module (globalIdx 0) is never locked so the user can start.
+            let isLocked = false;
+            if (globalIdx === 0) {
+                isLocked = false;
+            } else {
+                isLocked = !isModulePassed(pathData[globalIdx - 1].id);
+            }
 
             // Check course completion status
             const totalCourses = module.courses && module.courses.length > 0 ? module.courses.length : 1;
@@ -609,7 +614,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const sideTargetPath = document.getElementById('side-target-path');
     if (sideTargetPath) sideTargetPath.textContent = matchedPathKey;
 
-    // ── Always render ALL 3 groups (with correct start indexes for locking) ──
+    // Render all groups (they will be locked automatically if prior modules aren't completed)
     renderGroup("🌱 Beginner",     beginnerModules,     0);
     renderGroup("⚡ Intermediate", intermediateModules, 2);
     renderGroup("🚀 Advanced",     advancedModules,     4);

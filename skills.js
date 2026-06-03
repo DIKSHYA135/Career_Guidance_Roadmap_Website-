@@ -1,256 +1,319 @@
 /* ==========================================================
-   skills.js — Redesigned Skill Inventory (Category Based)
-   All browser confirm()/prompt() replaced with XyConfirm/XyPrompt
+   skills.js — Skill Inventory
+   SKILLS_DATA format: { "Category": { beginner: [...], intermediate: [...], advanced: [...] } }
    ========================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Initialize Data
-    let localSkillsData = null;
+
+    // ── 1. Bootstrap Data ──────────────────────────────────
+    // Always start fresh from SKILLS_DATA (wipe stale localStorage cache)
+    if (typeof SKILLS_DATA === 'undefined') {
+        console.error('[skills.js] SKILLS_DATA not found. Make sure app-data.js is loaded first.');
+        return;
+    }
+
+    // Deep clone the source data
+    let skillsData = JSON.parse(JSON.stringify(SKILLS_DATA));
+
+    // Merge any saved additions (user-added skills) without overwriting defaults
     try {
-        const storedData = localStorage.getItem('xyverra_skills_data');
-        if (storedData) localSkillsData = JSON.parse(storedData);
-    } catch (e) {
-        console.error("Error reading from localStorage", e);
-    }
-
-    if (!localSkillsData) {
-        if (typeof SKILLS_DATA !== 'undefined') {
-            localSkillsData = JSON.parse(JSON.stringify(SKILLS_DATA));
-            saveData();
-        } else {
-            console.error("SKILLS_DATA not found in app-data.js");
-            return;
+        const saved = JSON.parse(localStorage.getItem('xyverra_skills_data') || 'null');
+        if (saved && typeof saved === 'object') {
+            // Only merge — don't replace; only pull keys that exist in SKILLS_DATA
+            Object.keys(SKILLS_DATA).forEach(cat => {
+                if (saved[cat]) {
+                    ['beginner', 'intermediate', 'advanced'].forEach(lvl => {
+                        if (Array.isArray(saved[cat][lvl])) {
+                            skillsData[cat][lvl] = saved[cat][lvl];
+                        }
+                    });
+                }
+            });
         }
+    } catch (e) { /* ignore bad localStorage */ }
+
+    function save() {
+        try { localStorage.setItem('xyverra_skills_data', JSON.stringify(skillsData)); } catch(e) {}
     }
 
-    function saveData() {
-        localStorage.setItem('xyverra_skills_data', JSON.stringify(localSkillsData));
-    }
+    // ── 2. DOM References ──────────────────────────────────
+    const elCategoryCards    = document.getElementById('category-cards');
+    const elSkillPanel       = document.getElementById('skill-panel');
+    const elPanelTitle       = document.getElementById('panel-category-title');
+    const elBtnClosePanel    = document.getElementById('btn-close-panel');
+    const elAnalytics        = document.getElementById('skills-analytics');
+    const elSearch           = document.getElementById('skill-search');
+    const elPathTitle        = document.getElementById('skills-path-title');
 
-    // 2. Elements
-    const categoryCardsContainer = document.getElementById('category-cards');
-    const skillPanel             = document.getElementById('skill-panel');
-    const panelCategoryTitle     = document.getElementById('panel-category-title');
-    const btnClosePanel          = document.getElementById('btn-close-panel');
-    const analyticsContainer     = document.getElementById('skills-analytics');
-    const skillSearchInput       = document.getElementById('skill-search');
-
-    const lists = {
+    const elLists = {
         beginner:     document.getElementById('list-beginner'),
         intermediate: document.getElementById('list-intermediate'),
         advanced:     document.getElementById('list-advanced')
     };
 
-    let selectedCategory = null;
+    if (!elCategoryCards) { console.error('[skills.js] #category-cards not found'); return; }
 
-    if (!categoryCardsContainer) return;
+    let activeCategory = localStorage.getItem('xyverra_selected_path') || Object.keys(skillsData)[0];
 
-    // 3. Render Analytics Summary
+    // ── 3. Analytics Strip ────────────────────────────────
     function renderAnalytics() {
-        if (!analyticsContainer) return;
-        let total = 0, bCount = 0, iCount = 0, aCount = 0;
-        Object.values(localSkillsData).forEach(cat => {
-            bCount += (cat.beginner     || []).length;
-            iCount += (cat.intermediate || []).length;
-            aCount += (cat.advanced     || []).length;
+        if (!elAnalytics) return;
+        let total = 0, b = 0, i = 0, a = 0;
+        Object.values(skillsData).forEach(cat => {
+            b += (cat.beginner || []).length;
+            i += (cat.intermediate || []).length;
+            a += (cat.advanced || []).length;
         });
-        total = bCount + iCount + aCount;
-
-        analyticsContainer.innerHTML = `
+        total = b + i + a;
+        elAnalytics.innerHTML = `
             <div class="skill-stat-card">
                 <div class="skill-stat-num">${total}</div>
                 <div class="skill-stat-label">Total Skills</div>
             </div>
             <div class="skill-stat-card skill-stat-green">
-                <div class="skill-stat-num">${bCount}</div>
+                <div class="skill-stat-num">${b}</div>
                 <div class="skill-stat-label">Beginner</div>
             </div>
             <div class="skill-stat-card skill-stat-amber">
-                <div class="skill-stat-num">${iCount}</div>
+                <div class="skill-stat-num">${i}</div>
                 <div class="skill-stat-label">Intermediate</div>
             </div>
             <div class="skill-stat-card skill-stat-purple">
-                <div class="skill-stat-num">${aCount}</div>
+                <div class="skill-stat-num">${a}</div>
                 <div class="skill-stat-label">Advanced</div>
             </div>
         `;
     }
 
-    // 4. Render Categories
-    function renderCategories() {
-        categoryCardsContainer.innerHTML = '';
-        const categories = Object.keys(localSkillsData);
-        const icons = {
-            'Web Development': '🌐', 'Full Stack Development': '⚡',
-            'Backend / APIs': '🔧', 'Data Science': '📊',
-            'NLP / AI': '🤖', 'Cloud / DevOps': '☁️',
-            'UI/UX Design': '🎨', 'Mobile Development': '📱',
-            'Cybersecurity': '🔒', 'Data Analytics': '📈'
-        };
+    // ── 4. Category Cards ─────────────────────────────────
+    const ICONS = {
+        'Web Development': '<i class="fas fa-globe" style="color: #3b82f6; filter: drop-shadow(0 2px 4px rgba(59,130,246,0.3));"></i>', 
+        'Full Stack Development': '<i class="fas fa-layer-group" style="color: #8b5cf6; filter: drop-shadow(0 2px 4px rgba(139,92,246,0.3));"></i>',
+        'Backend / APIs': '<i class="fas fa-server" style="color: #10b981; filter: drop-shadow(0 2px 4px rgba(16,185,129,0.3));"></i>', 
+        'Data Science': '<i class="fas fa-chart-line" style="color: #f59e0b; filter: drop-shadow(0 2px 4px rgba(245,158,11,0.3));"></i>',
+        'NLP / AI': '<i class="fas fa-brain" style="color: #ec4899; filter: drop-shadow(0 2px 4px rgba(236,72,153,0.3));"></i>', 
+        'Cloud / DevOps': '<i class="fas fa-cloud" style="color: #0ea5e9; filter: drop-shadow(0 2px 4px rgba(14,165,233,0.3));"></i>',
+        'UI/UX Design': '<i class="fas fa-palette" style="color: #f43f5e; filter: drop-shadow(0 2px 4px rgba(244,63,94,0.3));"></i>', 
+        'Mobile Development': '<i class="fas fa-mobile-alt" style="color: #14b8a6; filter: drop-shadow(0 2px 4px rgba(20,184,166,0.3));"></i>',
+        'Cybersecurity': '<i class="fas fa-shield-alt" style="color: #ef4444; filter: drop-shadow(0 2px 4px rgba(239,68,68,0.3));"></i>', 
+        'Data Analytics': '<i class="fas fa-chart-pie" style="color: #eab308; filter: drop-shadow(0 2px 4px rgba(234,179,8,0.3));"></i>'
+    };
 
-        categories.forEach(category => {
-            const cat = localSkillsData[category];
-            const skillCount = (cat.beginner || []).length + (cat.intermediate || []).length + (cat.advanced || []).length;
+    function renderCategories() {
+        elCategoryCards.innerHTML = '';
+        Object.keys(skillsData).forEach(cat => {
+            const d = skillsData[cat];
+            const count = (d.beginner||[]).length + (d.intermediate||[]).length + (d.advanced||[]).length;
             const card = document.createElement('div');
-            card.className = 'category-card';
+            card.className = 'category-card' + (cat === activeCategory ? ' active' : '');
             card.innerHTML = `
-                <span class="cat-icon">${icons[category] || '📁'}</span>
-                <span class="cat-name">${category}</span>
-                <span class="cat-count">${skillCount} skills</span>
+                <span class="cat-icon">${ICONS[cat] || '<i class="fas fa-folder"></i>'}</span>
+                <span class="cat-name">${cat}</span>
+                <span class="cat-count">${count} skills</span>
             `;
             card.addEventListener('click', () => {
                 document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
                 card.classList.add('active');
-                selectedCategory = category;
+                activeCategory = cat;
+                localStorage.setItem('xyverra_selected_path', cat);
+                if (elPathTitle) elPathTitle.textContent = cat;
                 openPanel();
             });
-            categoryCardsContainer.appendChild(card);
+            elCategoryCards.appendChild(card);
         });
-
         renderAnalytics();
     }
 
-    // 5. Panel Logic
+    // ── 5. Panel ──────────────────────────────────────────
     function openPanel() {
-        if (!selectedCategory) return;
-        panelCategoryTitle.textContent = selectedCategory + " Skills";
+        if (!activeCategory || !elSkillPanel || !elPanelTitle) return;
+        elPanelTitle.innerHTML = `<i class="fas fa-layer-group"></i> ${activeCategory}`;
         renderSkills();
-        skillPanel.style.display = 'block';
-        skillPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        elSkillPanel.style.display = 'block';
+        elSkillPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     function closePanel() {
-        skillPanel.style.display = 'none';
+        if (elSkillPanel) elSkillPanel.style.display = 'none';
         document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
-        selectedCategory = null;
+        activeCategory = null;
     }
 
-    if (btnClosePanel) btnClosePanel.addEventListener('click', closePanel);
+    if (elBtnClosePanel) elBtnClosePanel.addEventListener('click', closePanel);
+    if (elSearch) elSearch.addEventListener('input', () => { if (activeCategory) renderSkills(elSearch.value.toLowerCase()); });
 
-    // Search filter
-    if (skillSearchInput) {
-        skillSearchInput.addEventListener('input', () => {
-            if (selectedCategory) renderSkills(skillSearchInput.value.toLowerCase());
-        });
-    }
-
-    function renderSkills(filterText = '') {
-        if (!selectedCategory || !localSkillsData[selectedCategory]) return;
-        const categoryData = localSkillsData[selectedCategory];
+    // ── 6. Render Skills ──────────────────────────────────
+    function renderSkills(filter = '') {
+        if (!activeCategory || !skillsData[activeCategory]) return;
+        const catData = skillsData[activeCategory];
 
         ['beginner', 'intermediate', 'advanced'].forEach(level => {
-            const listEl = lists[level];
-            if (!listEl) return;
-            listEl.innerHTML = '';
+            const ul = elLists[level];
+            if (!ul) return;
+            ul.innerHTML = '';
 
-            const skills = categoryData[level] || [];
-            const filtered = filterText ? skills.filter(s => s.toLowerCase().includes(filterText)) : skills;
+            const all      = catData[level] || [];
+            const shown    = filter ? all.filter(s => s.toLowerCase().includes(filter)) : all;
 
-            if (filtered.length === 0) {
-                listEl.innerHTML = `<li class="skill-empty-state">No skills yet. Add one using the + button.</li>`;
+            if (shown.length === 0) {
+                ul.innerHTML = `<li class="skill-empty-state">No ${level} skills yet. Click + to add one.</li>`;
                 return;
             }
 
-            filtered.forEach((skill, index) => {
-                const realIndex = skills.indexOf(skill);
+            shown.forEach(skillName => {
+                const realIdx = all.indexOf(skillName);
                 const li = document.createElement('li');
                 li.className = 'skill-item';
                 li.dataset.level = level;
-                li.dataset.index = realIndex;
+                li.dataset.index = realIdx;
+
+                const hintText = level === 'advanced'
+                    ? 'Advanced — assessment coming soon'
+                    : 'Click to take assessment & unlock roadmap';
+                const hintIcon = level === 'advanced' ? 'fa-info-circle' : 'fa-play-circle';
+
                 li.innerHTML = `
-                    <span class="skill-name">${skill}</span>
+                    <div class="skill-item-body">
+                        <span class="skill-name">${skillName}</span>
+                        <span class="skill-hint"><i class="fas ${hintIcon}"></i> ${hintText}</span>
+                    </div>
                     <div class="skill-actions">
-                        <button class="action-btn-small edit-btn" data-level="${level}" data-index="${realIndex}" title="Edit skill">
+                        <button class="action-btn-small edit-btn" title="Edit" data-level="${level}" data-index="${realIdx}">
                             <i class="fas fa-pencil-alt"></i>
                         </button>
-                        <button class="action-btn-small delete-btn" data-level="${level}" data-index="${realIndex}" title="Delete skill">
+                        <button class="action-btn-small delete-btn" title="Delete" data-level="${level}" data-index="${realIdx}">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 `;
-                listEl.appendChild(li);
+
+                // Assessment click (not on action buttons)
+                li.addEventListener('click', e => {
+                    if (e.target.closest('.skill-actions')) return;
+                    launchAssessment(level, realIdx);
+                });
+
+                ul.appendChild(li);
             });
         });
     }
 
-    // 6. Add, Edit, Delete — using XyPrompt / XyConfirm
+    // ── 7. Launch Assessment ──────────────────────────────
+    function launchAssessment(level, skillIndex) {
+        const catModules = (typeof MODULES_DATA !== 'undefined') ? MODULES_DATA[activeCategory] : null;
+        const catEncoded = encodeURIComponent(activeCategory);
+
+        if (!catModules) {
+            notify('warning', 'No assessment modules are mapped for this category yet.');
+            return;
+        }
+
+        if (level === 'beginner') {
+            const mods = catModules['Beginner'] || [];
+            // Map skill index → module; fall back to first module
+            const mod = mods[skillIndex] || mods[0];
+            if (!mod) { notify('warning', 'No assessment found for this skill.'); return; }
+            go(`quiz.html?specificModules=${mod.id}&targetLevel=Beginner&category=${catEncoded}`);
+
+        } else if (level === 'intermediate') {
+            const begMods = catModules['Beginner'] || [];
+            if (begMods.length < 2) { notify('warning', 'Not enough beginner modules to assess.'); return; }
+            const ids = begMods.slice(0, 2).map(m => m.id).join(',');
+            go(`quiz.html?specificModules=${ids}&targetLevel=Intermediate&category=${catEncoded}`);
+
+        } else {
+            // Advanced — require beginner + intermediate
+            const begMods = catModules['Beginner'] || [];
+            const intMods = catModules['Intermediate'] || [];
+            const ids = [...begMods.slice(0,2), ...intMods.slice(0,1)].map(m => m.id).join(',');
+            if (!ids) { notify('warning', 'Assessment not available for this skill yet.'); return; }
+            go(`quiz.html?specificModules=${ids}&targetLevel=Advanced&category=${catEncoded}`);
+        }
+    }
+
+    function go(url) {
+        document.body.style.opacity = '0';
+        document.body.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => { window.location.href = url; }, 300);
+    }
+
+    // ── 8. Edit / Delete ──────────────────────────────────
     ['beginner', 'intermediate', 'advanced'].forEach(level => {
-        if (!lists[level]) return;
-        lists[level].addEventListener('click', async (e) => {
+        const ul = elLists[level];
+        if (!ul) return;
+        ul.addEventListener('click', async e => {
             const editBtn   = e.target.closest('.edit-btn');
             const deleteBtn = e.target.closest('.delete-btn');
+            if (!editBtn && !deleteBtn) return;
+            e.stopPropagation();
+
+            const idx       = parseInt((editBtn || deleteBtn).dataset.index);
+            const skillName = skillsData[activeCategory][level][idx];
 
             if (editBtn) {
-                const index        = parseInt(editBtn.dataset.index);
-                const currentSkill = localSkillsData[selectedCategory][level][index];
-
-                const newSkill = typeof XyPrompt !== 'undefined'
-                    ? await XyPrompt({ title: 'Edit Skill', placeholder: 'Skill name', defaultValue: currentSkill, confirmText: 'Save' })
-                    : prompt("Edit skill:", currentSkill);
-
-                if (newSkill && newSkill.trim() !== '') {
-                    localSkillsData[selectedCategory][level][index] = newSkill.trim();
-                    saveData();
-                    renderSkills(skillSearchInput ? skillSearchInput.value.toLowerCase() : '');
-                    renderAnalytics();
-                    if (typeof XySuccess !== 'undefined') XySuccess(`"${newSkill.trim()}" updated successfully.`);
+                const val = typeof XyPrompt !== 'undefined'
+                    ? await XyPrompt({ title: 'Edit Skill', placeholder: 'Skill name', defaultValue: skillName, confirmText: 'Save' })
+                    : prompt('Edit skill:', skillName);
+                if (val && val.trim()) {
+                    skillsData[activeCategory][level][idx] = val.trim();
+                    save(); renderSkills(elSearch ? elSearch.value.toLowerCase() : '');
+                    if (typeof XySuccess !== 'undefined') XySuccess(`"${val.trim()}" updated.`);
                 }
-            } else if (deleteBtn) {
-                const index = parseInt(deleteBtn.dataset.index);
-                const skillName = localSkillsData[selectedCategory][level][index];
-
-                const confirmed = typeof XyConfirm !== 'undefined'
-                    ? await XyConfirm({ title: 'Delete Skill?', message: `Remove "<strong>${skillName}</strong>" from ${level}?`, confirmText: 'Delete', type: 'danger' })
-                    : window.confirm(`Delete "${skillName}"?`);
-
-                if (confirmed) {
-                    localSkillsData[selectedCategory][level].splice(index, 1);
-                    saveData();
-                    renderSkills(skillSearchInput ? skillSearchInput.value.toLowerCase() : '');
-                    renderAnalytics();
+            } else {
+                const ok = typeof XyConfirm !== 'undefined'
+                    ? await XyConfirm({ title: 'Delete Skill?', message: `Remove "<strong>${skillName}</strong>"?`, confirmText: 'Delete', type: 'danger' })
+                    : confirm(`Delete "${skillName}"?`);
+                if (ok) {
+                    skillsData[activeCategory][level].splice(idx, 1);
+                    save(); renderSkills(elSearch ? elSearch.value.toLowerCase() : '');
+                    renderCategories();
                     if (typeof XyWarning !== 'undefined') XyWarning(`"${skillName}" removed.`);
                 }
             }
         });
     });
 
-    // Add skill buttons
+    // ── 9. Add Skill Buttons ──────────────────────────────
     document.querySelectorAll('.add-skill-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
-            if (!selectedCategory) return;
+            if (!activeCategory) return;
             const level = btn.dataset.level;
-
-            const newSkill = typeof XyPrompt !== 'undefined'
-                ? await XyPrompt({ title: `Add ${level.charAt(0).toUpperCase() + level.slice(1)} Skill`, message: `Adding to: <strong>${selectedCategory}</strong>`, placeholder: 'e.g. TypeScript, Docker, Figma...', confirmText: 'Add Skill' })
-                : prompt(`Add a new ${level} skill for ${selectedCategory}:`);
-
-            if (newSkill && newSkill.trim() !== '') {
-                if (!localSkillsData[selectedCategory][level]) localSkillsData[selectedCategory][level] = [];
-                localSkillsData[selectedCategory][level].push(newSkill.trim());
-                saveData();
-                renderSkills(skillSearchInput ? skillSearchInput.value.toLowerCase() : '');
+            const val = typeof XyPrompt !== 'undefined'
+                ? await XyPrompt({ title: `Add ${level.charAt(0).toUpperCase()+level.slice(1)} Skill`, message: `Category: <strong>${activeCategory}</strong>`, placeholder: 'e.g. TypeScript, Docker, Figma…', confirmText: 'Add Skill' })
+                : prompt(`Add ${level} skill to ${activeCategory}:`);
+            if (val && val.trim()) {
+                if (!skillsData[activeCategory][level]) skillsData[activeCategory][level] = [];
+                skillsData[activeCategory][level].push(val.trim());
+                save(); renderSkills(elSearch ? elSearch.value.toLowerCase() : '');
                 renderCategories();
-                if (typeof XySuccess !== 'undefined') XySuccess(`"${newSkill.trim()}" added to ${level}!`);
+                if (typeof XySuccess !== 'undefined') XySuccess(`"${val.trim()}" added!`);
             }
         });
     });
 
-    // Export functionality
+    // ── 10. Export ────────────────────────────────────────
     const exportBtn = document.getElementById('btn-export');
     if (exportBtn) {
         exportBtn.addEventListener('click', () => {
-            const data = JSON.stringify(localSkillsData, null, 2);
-            const blob = new Blob([data], { type: 'application/json' });
-            const url  = URL.createObjectURL(blob);
-            const a    = document.createElement('a');
-            a.href     = url;
-            a.download = 'xyverra-skills.json';
-            a.click();
-            URL.revokeObjectURL(url);
-            if (typeof XySuccess !== 'undefined') XySuccess('Skills exported successfully!');
+            const blob = new Blob([JSON.stringify(skillsData, null, 2)], { type: 'application/json' });
+            const a    = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'xyverra-skills.json' });
+            a.click(); URL.revokeObjectURL(a.href);
+            if (typeof XySuccess !== 'undefined') XySuccess('Skills exported!');
         });
     }
 
-    // Initial Render
+    // ── Helper ────────────────────────────────────────────
+    function notify(type, msg) {
+        if (type === 'warning' && typeof XyWarning !== 'undefined') { XyWarning(msg); return; }
+        alert(msg);
+    }
+
+    // ── 11. Boot ──────────────────────────────────────────
     renderCategories();
+
+    // Auto-open last active category
+    if (activeCategory && skillsData[activeCategory]) {
+        if (elPathTitle) elPathTitle.textContent = activeCategory;
+        openPanel();
+    }
 });

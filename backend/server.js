@@ -21,10 +21,22 @@ app.use((req, res, next) => {
 });
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGO_URI)
+if (!process.env.MONGO_URI) {
+    console.error('❌ Error: MONGO_URI is not defined in the .env file.');
+    process.exit(1);
+}
+
+mongoose.connect(process.env.MONGO_URI, {
+    serverSelectionTimeoutMS: 5000 // 5 seconds timeout
+})
     .then(() => console.log('✅ Connected to MongoDB Atlas'))
     .catch(err => {
         console.error('❌ MongoDB connection error:', err.message);
+        if (err.message.includes('IP not whitelisted') || err.message.includes('Could not connect to any servers')) {
+            console.error('👉 Tip: Ensure your IP address is whitelisted in MongoDB Atlas.');
+        } else if (err.message.includes('Authentication failed')) {
+            console.error('👉 Tip: Check your database username and password in the .env file.');
+        }
         process.exit(1);
     });
 
@@ -73,7 +85,7 @@ app.post('/api/auth/register', async (req, res) => {
     console.log('Registration attempt for:', req.body.email);
 
     try {
-        const { email, password, name } = req.body;
+        const { email, password, name, skills } = req.body;
 
         if (!email || !password) {
             return res.status(400).json({
@@ -86,6 +98,14 @@ app.post('/api/auth/register', async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: 'Password must be at least 6 characters long'
+            });
+        }
+
+        // Validate skills if provided
+        if (skills && !Array.isArray(skills)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Skills must be an array of strings'
             });
         }
 
@@ -103,7 +123,8 @@ app.post('/api/auth/register', async (req, res) => {
         const newUser = new User({
             email,
             password: hashedPassword,
-            name: name || email.split('@')[0]
+            name: name || email.split('@')[0],
+            skills: skills || []
         });
 
         await newUser.save();
@@ -124,7 +145,8 @@ app.post('/api/auth/register', async (req, res) => {
             user: {
                 id: newUser._id,
                 email: newUser.email,
-                name: newUser.name
+                name: newUser.name,
+                skills: newUser.skills
             }
         });
 

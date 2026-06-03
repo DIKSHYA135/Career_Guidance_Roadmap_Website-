@@ -78,42 +78,68 @@
             <div class="profile-container dashboard-container">
                 
                 <!-- Profile Header -->
-                <div class="profile-header-card content-card">
-                    <div class="profile-header-content">
-                        <div class="profile-avatar-large" id="profile-avatar">U</div>
-                        <div class="profile-info-primary">
-                            <h1 id="profile-name">User Name</h1>
-                            <p class="profile-email" id="profile-email"><i class="fas fa-envelope"></i> user@example.com</p>
+                <div class="profile-header-card content-card" style="display: flex; flex-direction: column; gap: 1.5rem; padding: 2rem;">
+                    <div class="profile-header-content" style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+                        <div style="display: flex; gap: 1.5rem; align-items: center;">
+                            <div class="profile-avatar-large" id="profile-avatar" style="width: 100px; height: 100px; font-size: 2.5rem; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; border-radius: 50%; box-shadow: 0 10px 20px rgba(37,99,235,0.2);">U</div>
+                            <div class="profile-info-primary">
+                                <h1 id="profile-name" style="font-size: 2rem; font-weight: 800; color: var(--text-dark); margin-bottom: 0.5rem;">User Name</h1>
+                                <p class="profile-email" id="profile-email" style="font-size: 1rem; color: var(--text-muted);"><i class="fas fa-envelope"></i> user@example.com</p>
+                            </div>
                         </div>
                         <div class="profile-actions">
-                            <button class="btn btn-primary" id="edit-profile-btn">
+                            <button class="btn btn-primary" id="edit-profile-btn" style="padding: 0.75rem 1.5rem; font-weight: 600;">
                                 <i class="fas fa-edit"></i> Edit Profile
                             </button>
                         </div>
                     </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+                        <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+                            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Contact Number</span>
+                            <span id="profile-phone" style="font-weight: 500; color: var(--text-dark); font-size: 1.05rem;"><i class="fas fa-phone-alt" style="color: var(--primary); margin-right: 6px;"></i> Not provided</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+                            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Birthdate</span>
+                            <span id="profile-dob" style="font-weight: 500; color: var(--text-dark); font-size: 1.05rem;"><i class="fas fa-birthday-cake" style="color: var(--primary); margin-right: 6px;"></i> Not provided</span>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Learning Path Section -->
-                <div class="content-card card-box" style="margin-top: 1.5rem;">
-                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <div class="card-icon blue-text">
-                                <i class="fas fa-route"></i>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
+                    <!-- Learning Path Section -->
+                    <div class="content-card card-box" style="height: 100%;">
+                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div class="card-icon" style="color: var(--primary); font-size: 1.25rem;">
+                                    <i class="fas fa-route"></i>
+                                </div>
+                                <h2 style="font-size: 1.25rem; font-weight: 700;">Learning Path</h2>
                             </div>
-                            <h2>Learning Path</h2>
                         </div>
-                        <button class="btn btn-outline" id="edit-learning-btn" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
-                            <i class="fas fa-pen"></i> Update Path
-                        </button>
+                        <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem;">
+                                <span style="color: var(--text-muted); font-weight: 500;">Current Pathway</span>
+                                <span id="display-category" style="font-weight: 700; color: var(--text-dark);">Web Development</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding-bottom: 0.5rem;">
+                                <span style="color: var(--text-muted); font-weight: 500;">Skill Level</span>
+                                <span id="display-level" style="font-weight: 700; color: var(--primary); background: rgba(37,99,235,0.1); padding: 4px 10px; border-radius: 6px;">Beginner</span>
+                            </div>
+                        </div>
                     </div>
-                    <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.8rem;">
-                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
-                            <span style="color: var(--text-body);">Current Pathway</span>
-                            <span id="display-category" style="font-weight: 700; color: var(--text-dark);">Web Development</span>
+
+                    <!-- Skills Section -->
+                    <div class="content-card card-box" style="height: 100%;">
+                        <div class="card-header" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+                            <div class="card-icon" style="color: var(--primary); font-size: 1.25rem;">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                            <h2 style="font-size: 1.25rem; font-weight: 700;">My Skills</h2>
                         </div>
-                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
-                            <span style="color: var(--text-body);">Skill Level</span>
-                            <span id="display-level" style="font-weight: 700; color: var(--text-dark);">Beginner</span>
+                        <div id="profile-skills-container" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                            <!-- Skills injected here -->
+                            <span style="color: var(--text-muted); font-style: italic; font-size: 0.95rem;">No skills added yet. Manage them on the Skills page.</span>
                         </div>
                     </div>
                 </div>
@@ -122,33 +148,32 @@
         </main>
     </div>
 
-    <!-- Edit Profile Modal -->
+    <!-- Unified Edit Profile Modal -->
     <div class="modal-overlay" id="edit-profile-modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 600px;">
             <div class="modal-header">
                 <h2>Edit Profile</h2>
                 <button class="close-modal-btn" id="close-profile-modal"><i class="fas fa-times"></i></button>
             </div>
-            <div class="modal-body">
-                <div class="form-group">
+            <div class="modal-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group" style="grid-column: span 2;">
                     <label>Full Name</label>
                     <input type="text" id="edit-name" class="form-control">
                 </div>
-                <button class="btn btn-primary btn-block" id="save-profile-btn">Save Changes</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Learning Path Modal -->
-    <div class="modal-overlay" id="edit-learning-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Update Learning Path</h2>
-                <button class="close-modal-btn" id="close-learning-modal"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body">
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Email Address</label>
+                    <input type="email" id="edit-email" class="form-control">
+                </div>
                 <div class="form-group">
-                    <label>Category</label>
+                    <label>Contact Number</label>
+                    <input type="tel" id="edit-phone" class="form-control" placeholder="+1 (555) 000-0000">
+                </div>
+                <div class="form-group">
+                    <label>Birthdate</label>
+                    <input type="date" id="edit-dob" class="form-control">
+                </div>
+                <div class="form-group" style="grid-column: span 2; margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1rem;">
+                    <label>Course Chosen (Pathway)</label>
                     <select id="edit-category" class="form-control">
                         <option value="Web Development">Web Development</option>
                         <option value="Full Stack Development">Full Stack Development</option>
@@ -162,7 +187,7 @@
                         <option value="Data Analytics">Data Analytics</option>
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="grid-column: span 2;">
                     <label>Level</label>
                     <select id="edit-level" class="form-control">
                         <option value="Beginner">Beginner</option>
@@ -170,7 +195,9 @@
                         <option value="Advanced">Advanced</option>
                     </select>
                 </div>
-                <button class="btn btn-primary btn-block" id="save-learning-btn">Update & Refresh Skills</button>
+                <div style="grid-column: span 2; margin-top: 0.5rem;">
+                    <button class="btn btn-primary btn-block" id="save-profile-btn" style="padding: 0.8rem;">Save Changes</button>
+                </div>
             </div>
         </div>
     </div>

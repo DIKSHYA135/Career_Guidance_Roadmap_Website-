@@ -417,11 +417,54 @@ function shuffleArray(array) {
 document.addEventListener("DOMContentLoaded", () => {
     // ── Read module from URL ──
     const urlParams = new URLSearchParams(window.location.search);
+    const specificModulesParam = urlParams.get('specificModules');
+    const targetLevel  = urlParams.get('targetLevel') || 'Beginner';
+    const categoryParam = urlParams.get('category') || localStorage.getItem('xyverra_selected_path') || 'Web Development';
     moduleId = urlParams.get('module') || 'html';
     const isVerify = urlParams.get('verify') === 'true';
 
-    // TODO: Replace with GET /api/quiz/:moduleId
-    const quizData = QUIZ_DATA[moduleId] || QUIZ_DATA['html'];
+    let quizData = { title: "Assessment", questions: [] };
+    let activeModuleIds = [];
+
+    if (specificModulesParam) {
+        activeModuleIds = specificModulesParam.split(',');
+
+        // 1. Try SCALABLE_QUIZ_DATA first (organized by Category → Level)
+        if (typeof SCALABLE_QUIZ_DATA !== 'undefined' && SCALABLE_QUIZ_DATA[categoryParam]) {
+            const catData = SCALABLE_QUIZ_DATA[categoryParam];
+            // Map targetLevel to which level of questions to pull
+            // Beginner → pull Beginner questions
+            // Intermediate → pull Beginner + partial Intermediate
+            // Advanced → pull Beginner + Intermediate
+            let levels = ['Beginner'];
+            if (targetLevel === 'Intermediate') levels = ['Beginner'];
+            if (targetLevel === 'Advanced') levels = ['Beginner', 'Intermediate'];
+
+            let allQ = [];
+            levels.forEach(lvl => {
+                if (catData[lvl]) allQ = allQ.concat(catData[lvl]);
+            });
+            quizData.questions = allQ;
+            quizData.title = `${categoryParam} — ${targetLevel} Assessment`;
+
+        } else {
+            // 2. Fallback: QUIZ_DATA by module ID
+            let titles = [];
+            activeModuleIds.forEach(id => {
+                const data = QUIZ_DATA[id];
+                if (data) {
+                    titles.push(data.title);
+                    quizData.questions = quizData.questions.concat(data.questions);
+                }
+            });
+            if (titles.length > 0) quizData.title = titles.join(' & ') + ' Assessment';
+        }
+        if (activeModuleIds.length > 0) moduleId = activeModuleIds[0];
+
+    } else {
+        quizData = QUIZ_DATA[moduleId] || QUIZ_DATA['html'];
+        activeModuleIds = [moduleId];
+    }
     
     window.generateNewQuiz = function() {
         // Fetch recent from session storage to avoid reuse across reloads
@@ -572,7 +615,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             // Generate a single replacement question avoiding recent uses
             let recentlyUsed = JSON.parse(sessionStorage.getItem('xyverra_recent_qs_' + moduleId) || '[]');
-            let validPool = (QUIZ_DATA[moduleId] || QUIZ_DATA['html']).questions.map(q => {
+            let validPool = (quizData.questions || []).map(q => {
                 if (!q.id) q.id = 'q_' + Math.random().toString(36).substr(2, 9);
                 if (q.q && q.opts && !q.question) {
                     return { id: q.id, question: q.q, options: q.opts.map(o => o.text), answer: (q.opts.find(o => o.correct) || {}).text || "" };
@@ -628,8 +671,14 @@ document.addEventListener("DOMContentLoaded", () => {
             questionMeta.textContent = `Question ${currentQuestionIndex + 1} of ${totalQuestions}`;
         }
 
-        // Set question text
-        quizQuestionTxt.textContent = currentQuestion.question;
+        // Set question text (remove leading metadata like '[Beginner] Question 75 about Cloud / DevOps.')
+        let cleanQuestion = currentQuestion.question
+            .replace(/^\[.*?\]\s*/i, '') // Remove [Beginner], [Intermediate], etc.
+            .replace(/^Question\s+\d+\s+about\s+.*?\.\s*/i, '') // Remove "Question 75 about Cloud / DevOps. "
+            .replace(/^Question\s+\d+[\.\:\-]?\s*/i, '') // Remove "Question 1. "
+            .replace(/^\d+[\.\)]\s*/, ''); // Remove "1. "
+            
+        quizQuestionTxt.textContent = cleanQuestion;
 
         // Clear and disable options during reading time
         quizOptionsCont.innerHTML = '';
@@ -811,12 +860,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Save if passed
         if (passed) {
+            const pendingStart = localStorage.getItem('pendingStartModule');
+            if (pendingStart) {
+                localStorage.setItem('selectedStartModule', pendingStart);
+                localStorage.removeItem('pendingStartModule');
+            }
+
             // TODO: POST /api/quiz/submit { moduleId, score, total: totalQuestions }
             let completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
-            if (!completedModules.includes(moduleId)) {
-                completedModules.push(moduleId);
-                localStorage.setItem('completedModules', JSON.stringify(completedModules));
-            }
+            
+            // Push all active modules
+            activeModuleIds.forEach(id => {
+                if (!completedModules.includes(id)) {
+                    completedModules.push(id);
+                }
+            });
+            localStorage.setItem('completedModules', JSON.stringify(completedModules));
 
             // TODO: Update user skill score via PATCH /api/user/score
             let currentScore = parseInt(localStorage.getItem('xyverra_skill_score') || '0');

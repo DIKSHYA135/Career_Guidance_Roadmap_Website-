@@ -146,19 +146,19 @@ const SKILLS_DATA = {
 const MODULES_DATA = {
   "Web Development": {
     "Beginner": [
-      { id: "wd-beg-1", title: "HTML Fundamentals", desc: "Learn the core structure of the web." },
-      { id: "wd-beg-2", title: "CSS Fundamentals", desc: "Style your websites with modern CSS." },
-      { id: "wd-beg-3", title: "JavaScript Basics", desc: "Add interactivity to your pages." }
+      { id: "html", title: "HTML Fundamentals", desc: "Learn the core structure of the web." },
+      { id: "css", title: "CSS Fundamentals", desc: "Style your websites with modern CSS." },
+      { id: "js", title: "JavaScript Basics", desc: "Add interactivity to your pages." }
     ],
     "Intermediate": [
-      { id: "wd-int-1", title: "React", desc: "Build component-based UIs." },
-      { id: "wd-int-2", title: "TypeScript", desc: "Type-safe JavaScript." },
-      { id: "wd-int-3", title: "Tailwind CSS", desc: "Utility-first CSS framework." }
+      { id: "react", title: "React", desc: "Build component-based UIs." },
+      { id: "ts", title: "TypeScript", desc: "Type-safe JavaScript." },
+      { id: "tailwind", title: "Tailwind CSS", desc: "Utility-first CSS framework." }
     ],
     "Advanced": [
-      { id: "wd-adv-1", title: "Next.js", desc: "React framework for production." },
-      { id: "wd-adv-2", title: "Performance Optimization", desc: "Make your apps blazing fast." },
-      { id: "wd-adv-3", title: "System Design", desc: "Architect scalable frontend systems." }
+      { id: "nextjs", title: "Next.js", desc: "React framework for production." },
+      { id: "performance", title: "Performance Optimization", desc: "Make your apps blazing fast." },
+      { id: "system-design", title: "System Design", desc: "Architect scalable frontend systems." }
     ]
   },
   "Data Science": {

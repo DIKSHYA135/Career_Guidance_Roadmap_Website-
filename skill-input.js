@@ -172,7 +172,8 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('xyverra_selected_path', currentCategory); // Sync it just in case
             localStorage.setItem('userLevel',           currentLevel);
             localStorage.setItem('userExperience',      experienceField ? experienceField.value : '');
-            localStorage.setItem('selectedStartModule', selectedModuleId);
+            localStorage.setItem('pendingStartModule', selectedModuleId);
+            localStorage.removeItem('selectedStartModule');
 
             // Clear previously completed/skipped modules if they are restarting/regenerating a roadmap
             localStorage.removeItem('completedModules');
@@ -187,12 +188,24 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.style.transition  = 'opacity 0.3s ease';
             
             setTimeout(() => { 
-                if (currentLevel === 'Beginner') {
+                const catData = typeof MODULES_DATA !== 'undefined' ? MODULES_DATA[currentCategory] : null;
+                if (!catData || !selectedModuleId) {
                     window.location.href = 'roadmap.html';
+                    return;
+                }
+
+                if (currentLevel === 'Beginner') {
+                    window.location.href = `quiz.html?mode=assessment&targetLevel=Beginner&phase=beginner&specificModules=${selectedModuleId}`;
                 } else if (currentLevel === 'Intermediate') {
-                    window.location.href = 'quiz.html?mode=assessment&targetLevel=Intermediate&phase=beginner';
+                    const begMods = catData['Beginner'] || [];
+                    const testIds = begMods.slice(0, 2).map(m => m.id).join(',');
+                    window.location.href = `quiz.html?mode=assessment&targetLevel=Intermediate&phase=beginner&specificModules=${testIds}`;
                 } else if (currentLevel === 'Advanced') {
-                    window.location.href = 'quiz.html?mode=assessment&targetLevel=Advanced&phase=beginner';
+                    const begMods = catData['Beginner'] || [];
+                    const intMods = catData['Intermediate'] || [];
+                    // Combine to test foundational knowledge before reading advanced modules
+                    const testIds = [...begMods.slice(0, 2), ...intMods.slice(0, 1)].map(m => m.id).join(',');
+                    window.location.href = `quiz.html?mode=assessment&targetLevel=Advanced&phase=beginner&specificModules=${testIds}`;
                 }
             }, 300);
         });

@@ -329,13 +329,12 @@ textarea#experience-field:focus {
     font-size: 0.8rem;
     color: var(--text-muted);
     line-height: 1.45;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    -webkit-box-orient: vertical;
     font-weight: 500;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+     overflow: hidden;
+     text-overflow: ellipsis;
 }
 
 .module-preview-badge {
