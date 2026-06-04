@@ -29,30 +29,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Helper: Show error
     const showError = (element, message, input) => {
-        element.textContent = message;
-        if (input) input.classList.add('input-error');
+        if (element) {
+            element.textContent = message;
+        }
+        if (input) {
+            input.classList.add('input-error');
+        }
     };
 
     // Helper: Clear errors
     const clearErrors = () => {
-        [nameError, emailError, passwordError].forEach(el => el.textContent = '');
-        [nameInput, emailInput, passwordInput].forEach(el => el.classList.remove('input-error'));
+        [nameError, emailError, passwordError].forEach(el => {
+            if (el) el.textContent = '';
+        });
+        [nameInput, emailInput, passwordInput].forEach(el => {
+            if (el) el.classList.remove('input-error');
+        });
     };
 
     if (signupForm) {
         signupForm.addEventListener('submit', async (e) => {
             // 1. Prevent Default Behavior (STOPS PAGE REFRESH)
             e.preventDefault();
+            console.log("Signup form submission started...");
             
             // 2. Clear previous errors
             clearErrors();
 
             // 3. Gather Values
-            const name = nameInput.value.trim();
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-            const skillsRaw = document.getElementById('signup-skills').value;
+            const name = nameInput ? nameInput.value.trim() : "";
+            const email = emailInput ? emailInput.value.trim() : "";
+            const password = passwordInput ? passwordInput.value : "";
+            
+            // Fix: Safely handle the optional skills field
+            const skillsElement = document.getElementById('signup-skills');
+            const skillsRaw = skillsElement ? skillsElement.value : "";
             const skills = skillsRaw ? skillsRaw.split(',').map(s => s.trim()).filter(s => s !== "") : [];
+
+            console.log("Form values gathered:", { name, email, skills: skills.length });
 
             // 4. Client-side Validation
             let isValid = true;
@@ -78,17 +92,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 isValid = false;
             }
 
-            if (!isValid) return;
+            if (!isValid) {
+                console.warn("Validation failed");
+                return;
+            }
 
             // 5. Show Loading State
             const submitBtn = signupForm.querySelector('button[type="submit"]');
-            const originalBtnHTML = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+            let originalBtnHTML = "";
+            if (submitBtn) {
+                originalBtnHTML = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+            }
 
             try {
                 // 6. API Request
                 const apiUrl = 'http://localhost:5000/api/auth/register';
+                console.log("Sending registration request to:", apiUrl);
+                
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -96,6 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 const data = await response.json();
+                console.log("Server response received:", response.status);
 
                 if (response.ok) {
                     // Success!
@@ -109,7 +132,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     // Show success popup and redirect
                     if (window.showSuccessPopup) {
                         await window.showSuccessPopup("Account Created Successfully ✅");
+                    } else {
+                        console.log("showSuccessPopup not found, skipping popup.");
                     }
+                    
                     window.location.href = 'path-selection.html';
                 } else {
                     // Backend returned an error
@@ -123,21 +149,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
             } catch (error) {
-                console.error("Signup error:", error);
-                
-                // Fallback for demo/offline purposes if required by user
-                // But the user asked for API issues fix, so we should prioritize real backend.
-                // However, I'll keep a more robust error message.
+                console.error("Signup error details:", error);
                 alert("Unable to connect to the server. Please ensure the backend is running at http://localhost:5000");
             } finally {
                 // 7. Restore Button State (Only if not redirected)
-                if (window.location.pathname.indexOf('path-selection.html') === -1) {
+                // We check if we are still on the signup page
+                if (submitBtn && window.location.pathname.indexOf('path-selection.html') === -1) {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalBtnHTML;
                 }
             }
         });
     } else {
-        console.error("Signup form element not found!");
+        console.error("Signup form element (#signup-form) not found!");
     }
 });
