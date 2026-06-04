@@ -160,6 +160,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.getElementById('edit-dob').value = userData.dob || "";
             document.getElementById('edit-category').value = userData.selectedPath || "Web Development";
             document.getElementById('edit-level').value = userData.selectedLevel || "Beginner";
+            document.getElementById('edit-password').value = "";
             
             editProfileModal.classList.add('active');
         });
@@ -175,13 +176,17 @@ document.addEventListener("DOMContentLoaded", async () => {
             const email = document.getElementById('edit-email').value.trim();
             const phone = document.getElementById('edit-phone').value.trim();
             const dob = document.getElementById('edit-dob').value;
+            const password = document.getElementById('edit-password').value;
             const selectedPath = document.getElementById('edit-category').value;
             const selectedLevel = document.getElementById('edit-level').value;
             
             saveProfileBtn.disabled = true;
             saveProfileBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
-            const success = await saveToServer({ name, email, phone, dob, selectedPath, selectedLevel });
+            const updates = { name, email, phone, dob, selectedPath, selectedLevel };
+            if (password) updates.password = password;
+
+            const success = await saveToServer(updates);
             
             if (success) {
                 editProfileModal.classList.remove('active');
