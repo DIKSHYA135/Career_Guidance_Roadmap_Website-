@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile - Xyverra</title>
+    <meta name="description" content="View and manage your Xyverra profile, learning path, and skills.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -27,7 +28,6 @@
         <!-- Sidebar Overlay -->
         <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-        <!-- Sidebar Navigation -->
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar-menu">
             <div class="sidebar-brand">
@@ -63,7 +63,7 @@
                 <div class="profile-click-area" title="View Profile">
                     <div class="avatar" id="user-avatar"></div>
                     <div class="profile-text">
-                        <h4 id="user-display-name">Loading Candidate...</h4>
+                        <h4 id="user-display-name">Loading...</h4>
                         <p>Platform Architect</p>
                     </div>
                 </div>
@@ -76,70 +76,73 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="profile-container dashboard-container">
-                
-                <!-- Profile Header -->
-                <div class="profile-header-card content-card" style="display: flex; flex-direction: column; gap: 1.5rem; padding: 2rem;">
-                    <div class="profile-header-content" style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
-                        <div style="display: flex; gap: 1.5rem; align-items: center;">
-                            <div class="profile-avatar-large" id="profile-avatar" style="width: 100px; height: 100px; font-size: 2.5rem; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; border-radius: 50%; box-shadow: 0 10px 20px rgba(37,99,235,0.2);">U</div>
+
+                <!-- Profile Header Card -->
+                <div class="profile-header-card content-card">
+                    <!-- Gradient accent strip -->
+                    <div class="profile-banner"></div>
+                    <!-- Avatar + Info + Actions -->
+                    <div class="profile-top-row">
+                        <div class="profile-left">
+                            <div class="profile-avatar-ring">
+                                <div class="profile-avatar-large" id="profile-avatar">U</div>
+                            </div>
                             <div class="profile-info-primary">
-                                <h1 id="profile-name" style="font-size: 2rem; font-weight: 800; color: var(--text-dark); margin-bottom: 0.5rem;">User Name</h1>
-                                <p class="profile-email" id="profile-email" style="font-size: 1rem; color: var(--text-muted);"><i class="fas fa-envelope"></i> user@example.com</p>
+                                <h1 id="profile-name">User Name</h1>
+                                <p id="profile-email"><i class="fas fa-envelope"></i> user@example.com</p>
+                                <p id="profile-dob-display" style="display:none;"><i class="fas fa-birthday-cake"></i> <span id="profile-dob-text"></span></p>
+                                <div class="profile-meta-chips">
+                                    <span class="meta-chip"><i class="fas fa-circle-check"></i> Active Member</span>
+                                    <span class="meta-chip" id="member-since-chip" style="display:none;"><i class="fas fa-calendar-alt"></i> <span id="member-since-text"></span></span>
+                                </div>
                             </div>
                         </div>
                         <div class="profile-actions">
-                            <button class="btn btn-primary" id="edit-profile-btn" style="padding: 0.75rem 1.5rem; font-weight: 600;">
+                            <button class="btn btn-primary btn-sm" id="edit-profile-btn">
                                 <i class="fas fa-edit"></i> Edit Profile
                             </button>
-                        </div>
-                    </div>
-                    
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
-                        <div style="display: flex; flex-direction: column; gap: 0.3rem;">
-                            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Contact Number</span>
-                            <span id="profile-phone" style="font-weight: 500; color: var(--text-dark); font-size: 1.05rem;"><i class="fas fa-phone-alt" style="color: var(--primary); margin-right: 6px;"></i> Not provided</span>
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 0.3rem;">
-                            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Birthdate</span>
-                            <span id="profile-dob" style="font-weight: 500; color: var(--text-dark); font-size: 1.05rem;"><i class="fas fa-birthday-cake" style="color: var(--primary); margin-right: 6px;"></i> Not provided</span>
+                            <button class="btn-ghost-lock" id="change-password-btn">
+                                <i class="fas fa-lock"></i> Security
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
-                    <!-- Learning Path Section -->
-                    <div class="content-card card-box" style="height: 100%;">
-                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <div class="card-icon" style="color: var(--primary); font-size: 1.25rem;">
-                                    <i class="fas fa-route"></i>
-                                </div>
-                                <h2 style="font-size: 1.25rem; font-weight: 700;">Learning Path</h2>
+                <!-- Info Cards Row -->
+                <div class="profile-cards-row">
+                    <!-- Learning Path Card -->
+                    <div class="content-card card-box profile-info-card">
+                        <div class="pcard-header">
+                            <div class="pcard-icon-wrap">
+                                <i class="fas fa-route"></i>
                             </div>
+                            <span class="pcard-title">Learning Path</span>
                         </div>
-                        <div style="display: flex; flex-direction: column; gap: 1.2rem;">
-                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem;">
-                                <span style="color: var(--text-muted); font-weight: 500;">Current Pathway</span>
-                                <span id="display-category" style="font-weight: 700; color: var(--text-dark);">Web Development</span>
+                        <div class="pcard-body">
+                            <div class="pcard-row">
+                                <span class="pcard-label">Pathway</span>
+                                <span id="display-category" class="pcard-value">Web Development</span>
                             </div>
-                            <div style="display: flex; justify-content: space-between; padding-bottom: 0.5rem;">
-                                <span style="color: var(--text-muted); font-weight: 500;">Skill Level</span>
-                                <span id="display-level" style="font-weight: 700; color: var(--primary); background: rgba(37,99,235,0.1); padding: 4px 10px; border-radius: 6px;">Beginner</span>
+                            <div class="pcard-row">
+                                <span class="pcard-label">Skill Level</span>
+                                <span id="display-level" class="pcard-badge">Beginner</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Skills Section -->
-                    <div class="content-card card-box" style="height: 100%;">
-                        <div class="card-header" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
-                            <div class="card-icon" style="color: var(--primary); font-size: 1.25rem;">
+                    <!-- Skills Card -->
+                    <div class="content-card card-box profile-info-card">
+                        <div class="pcard-header">
+                            <div class="pcard-icon-wrap">
                                 <i class="fas fa-tools"></i>
                             </div>
-                            <h2 style="font-size: 1.25rem; font-weight: 700;">My Skills</h2>
+                            <span class="pcard-title">My Skills</span>
                         </div>
-                        <div id="profile-skills-container" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                            <!-- Skills injected here -->
-                            <span style="color: var(--text-muted); font-style: italic; font-size: 0.95rem;">No skills added yet. Manage them on the Skills page.</span>
+                        <div id="profile-skills-container" class="skills-pills-wrap">
+                            <div class="no-skills-state">
+                                <i class="fas fa-layer-group"></i>
+                                <span>No skills added yet. Visit the Skills page.</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -148,36 +151,28 @@
         </main>
     </div>
 
-    <!-- Unified Edit Profile Modal -->
+    <!-- Edit Profile Modal -->
     <div class="modal-overlay" id="edit-profile-modal">
-        <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-content modal-sm">
             <div class="modal-header">
-                <h2>Edit Profile</h2>
+                <h2><i class="fas fa-user-edit" style="color:var(--primary);margin-right:6px;"></i>Edit Profile</h2>
                 <button class="close-modal-btn" id="close-profile-modal"><i class="fas fa-times"></i></button>
             </div>
-            <div class="modal-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <div class="form-group" style="grid-column: span 2;">
+            <div class="modal-body modal-grid">
+                <div class="form-group span-2">
                     <label>Full Name</label>
-                    <input type="text" id="edit-name" class="form-control">
+                    <input type="text" id="edit-name" class="form-control" placeholder="Your full name">
                 </div>
-                <div class="form-group" style="grid-column: span 2;">
+                <div class="form-group span-2">
                     <label>Email Address</label>
-                    <input type="email" id="edit-email" class="form-control">
+                    <input type="email" id="edit-email" class="form-control" placeholder="your@email.com">
                 </div>
-                <div class="form-group">
-                    <label>Contact Number</label>
-                    <input type="tel" id="edit-phone" class="form-control" placeholder="+1 (555) 000-0000">
-                </div>
-                <div class="form-group">
-                    <label>Birthdate</label>
+                <div class="form-group span-2">
+                    <label>Date of Birth</label>
                     <input type="date" id="edit-dob" class="form-control">
                 </div>
-                <div class="form-group" style="grid-column: span 2;">
-                    <label>Change Password</label>
-                    <input type="password" id="edit-password" class="form-control" placeholder="New Password (leave blank to keep current)">
-                </div>
-                <div class="form-group" style="grid-column: span 2; margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1rem;">
-                    <label>Course Chosen (Pathway)</label>
+                <div class="form-group span-2 section-divider">
+                    <label>Career Pathway</label>
                     <select id="edit-category" class="form-control">
                         <option value="Web Development">Web Development</option>
                         <option value="Full Stack Development">Full Stack Development</option>
@@ -191,17 +186,44 @@
                         <option value="Data Analytics">Data Analytics</option>
                     </select>
                 </div>
-                <div class="form-group" style="grid-column: span 2;">
-                    <label>Level</label>
+                <div class="form-group span-2">
+                    <label>Skill Level</label>
                     <select id="edit-level" class="form-control">
                         <option value="Beginner">Beginner</option>
                         <option value="Intermediate">Intermediate</option>
                         <option value="Advanced">Advanced</option>
                     </select>
                 </div>
-                <div style="grid-column: span 2; margin-top: 0.5rem;">
-                    <button class="btn btn-primary btn-block" id="save-profile-btn" style="padding: 0.8rem;">Save Changes</button>
+                <div class="span-2">
+                    <button class="btn btn-primary btn-block" id="save-profile-btn">Save Changes</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="modal-overlay" id="change-password-modal">
+        <div class="modal-content modal-sm">
+            <div class="modal-header">
+                <h2><i class="fas fa-lock" style="color:var(--primary);margin-right:6px;"></i>Security Settings</h2>
+                <button class="close-modal-btn" id="close-password-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" style="display:flex;flex-direction:column;gap:0.9rem;">
+                <p style="color:var(--text-muted);font-size:0.85rem;line-height:1.5;margin:0;">Update your password. Minimum 6 characters.</p>
+                <div id="password-alert" style="display:none;padding:0.6rem 0.85rem;border-radius:var(--radius-md);font-size:0.84rem;font-weight:500;"></div>
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" id="current-password" class="form-control" placeholder="Enter current password">
+                </div>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" id="new-password" class="form-control" placeholder="Enter new password">
+                </div>
+                <div class="form-group">
+                    <label>Confirm New Password</label>
+                    <input type="password" id="confirm-password" class="form-control" placeholder="Confirm new password">
+                </div>
+                <button class="btn btn-primary btn-block" id="save-password-btn" style="margin-top:0.25rem;">Update Password</button>
             </div>
         </div>
     </div>

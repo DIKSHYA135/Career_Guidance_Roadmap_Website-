@@ -121,6 +121,9 @@
     align-items: center;
     gap: 8px;
     flex-shrink: 0;
+    overflow: hidden;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .profile-click-area {

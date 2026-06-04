@@ -339,7 +339,7 @@ app.get('/api/user/profile', authMiddleware, async (req, res) => {
 app.put('/api/user/profile', authMiddleware, async (req, res) => {
     try {
         // Only allow updating specific fields
-        const allowedUpdates = ['name', 'selectedPath', 'selectedLevel', 'skills'];
+        const allowedUpdates = ['name', 'selectedPath', 'selectedLevel', 'skills', 'dob'];
         const updates = {};
         for (const key of Object.keys(req.body)) {
             if (allowedUpdates.includes(key)) {
@@ -362,6 +362,42 @@ app.put('/api/user/profile', authMiddleware, async (req, res) => {
     }
 });
 
+// ==========================
+// CHANGE PASSWORD ROUTE
+// ==========================
+app.put('/api/user/change-password', authMiddleware, async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ message: 'Current password and new password are required' });
+        }
+
+        if (newPassword.length < 6) {
+            return res.status(400).json({ message: 'New password must be at least 6 characters long' });
+        }
+
+        const user = await User.findById(req.user.userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Incorrect current password' });
+        }
+
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        
+        user.password = hashedNewPassword;
+        await user.save();
+
+        res.json({ success: true, message: 'Password updated successfully' });
+    } catch (error) {
+        console.error('Change Password Error:', error);
+        res.status(500).json({ message: 'Server error while changing password', error: error.message });
+    }
+});
 
 // ==========================
 // SAVE SKILLS ROUTE
