@@ -60,12 +60,12 @@ document.addEventListener("DOMContentLoaded", () => {
         continueBtn.addEventListener('click', async (e) => {
             e.preventDefault();
 
-            const email = localStorage.getItem('xyverra_user_email');
+            const token = localStorage.getItem('token');
             const level = localStorage.getItem('userLevel');
 
-            // If no email, we might be in a local-only session or not logged in
-            if (!email) {
-                console.warn("No user email found, proceeding with local storage only.");
+            // If not logged in, we might be in a local-only session
+            if (!token) {
+                console.warn("No auth token found, proceeding with local storage only.");
                 window.location.href = 'skill-input.html';
                 return;
             }
@@ -80,8 +80,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 // API Request to save level
                 const response = await fetch('http://localhost:5000/api/user/save-level', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, selectedLevel: level })
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ selectedLevel: level })
                 });
 
                 const data = await response.json();

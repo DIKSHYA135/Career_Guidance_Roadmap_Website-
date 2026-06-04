@@ -240,10 +240,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (generateBtn.disabled) return;
 
-        // Get user email from localStorage
-        const email = localStorage.getItem('xyverra_user_email');
-        if (!email) {
-            alert("User email not found. Please log in again.");
+        // Get auth token from localStorage
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert("User session not found. Please log in again.");
             window.location.href = 'login.html';
             return;
         }
@@ -256,15 +256,21 @@ document.addEventListener('DOMContentLoaded', () => {
             // 1. Save Level to MongoDB
             const levelResponse = await fetch('http://localhost:5000/api/user/save-level', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, selectedLevel: currentLevel })
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ selectedLevel: currentLevel })
             });
 
             // 2. Save Skills to MongoDB
             const skillsResponse = await fetch('http://localhost:5000/api/user/save-skills', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, skills: userSkills })
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ skills: userSkills })
             });
 
             const skillsData = await skillsResponse.json();

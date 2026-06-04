@@ -58,14 +58,14 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault(); // Prevent immediate navigation
 
             const selectedPath = localStorage.getItem('xyverra_selected_path');
-            const email = localStorage.getItem('xyverra_user_email');
+            const token = localStorage.getItem('token');
 
             if (!selectedPath) {
                 alert("Please select a learning path to continue.");
                 return;
             }
 
-            if (!email) {
+            if (!token) {
                 alert("User session not found. Please login again.");
                 window.location.href = 'login.html';
                 return;
@@ -76,16 +76,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 continueBtn.innerHTML = 'Saving... <i class="fas fa-spinner fa-spin"></i>';
                 continueBtn.style.pointerEvents = 'none';
 
-                console.log("Attempting to save path:", selectedPath, "for email:", email);
+                console.log("Attempting to save path:", selectedPath);
 
-                // Send POST request to backend - Using localhost consistently
+                // Send POST request to backend - the user is identified by their token
                 const response = await fetch('http://localhost:5000/api/user/save-path', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({
-                        email: email,
                         selectedPath: selectedPath
                     })
                 });
