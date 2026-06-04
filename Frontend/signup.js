@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const skillsRaw = skillsElement ? skillsElement.value : "";
             const skills = skillsRaw ? skillsRaw.split(',').map(s => s.trim()).filter(s => s !== "") : [];
 
-            console.log("Form values gathered:", { name, email, skills: skills.length });
+            console.log("Form values gathered:", { name, email, password: '***', skills: skills.length });
 
             // 4. Client-side Validation
             let isValid = true;
@@ -107,6 +107,9 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             try {
+                const payload = { name, email, password, skills };
+                console.log("Sending Payload to Backend:", JSON.stringify({ ...payload, password: '***' }, null, 2));
+
                 // 6. API Request
                 const apiUrl = 'http://localhost:5000/api/auth/register';
                 console.log("Sending registration request to:", apiUrl);
@@ -114,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, password, skills })
+                    body: JSON.stringify(payload)
                 });
 
                 const data = await response.json();

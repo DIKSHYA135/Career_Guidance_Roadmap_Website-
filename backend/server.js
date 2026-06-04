@@ -13,10 +13,14 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Request Logger
+// Request Logger - Improved for debugging
 app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    if (req.method !== 'GET') {
+        console.log('Request Body:', JSON.stringify(req.body, null, 2));
+    }
     next();
 });
 
@@ -29,7 +33,11 @@ if (!process.env.MONGO_URI) {
 mongoose.connect(process.env.MONGO_URI, {
     serverSelectionTimeoutMS: 5000 // 5 seconds timeout
 })
-    .then(() => console.log('✅ Connected to MongoDB Atlas'))
+    .then(() => {
+        console.log('✅ Connected to MongoDB Atlas');
+        console.log('Using Database:', mongoose.connection.name);
+        console.log('Using Collection for Users:', User.collection.name);
+    })
     .catch(err => {
         console.error('❌ MongoDB connection error:', err.message);
         if (err.message.includes('IP not whitelisted') || err.message.includes('Could not connect to any servers')) {
@@ -42,7 +50,7 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Home Route
 app.get('/', (req, res) => {
-    res.json({ message: "Works" });
+    res.json({ message: "Xyverra API is running" });
 });
 
 // Health Check
@@ -50,7 +58,8 @@ app.get('/health', (req, res) => {
     res.status(200).json({
         status: 'UP',
         db: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
-        time: new Date().toISOString()
+        time: new Date().toISOString(),
+        dbName: mongoose.connection.name
     });
 });
 // Auth Middleware
@@ -69,25 +78,18 @@ const authMiddleware = (req, res, next) => {
     }
 };
 
-app.get('/', async(req, res) => {
-    try{
-        res.status(200).json({message: "Works"});
-    }
-    catch (error) {
-        console.log("Error in server while creating user");
-        res.status(500).json({ message: 'Server error', error: error.message });
-}});
-
 // ==========================
 // REGISTER ROUTE
 // ==========================
 app.post('/api/auth/register', async (req, res) => {
-    console.log('Registration attempt for:', req.body.email);
+    console.log('--- Registration Process Started ---');
+    console.log('Received Body:', req.body);
 
     try {
         const { email, password, name, skills } = req.body;
 
         if (!email || !password) {
+            console.warn('Missing email or password in request body');
             return res.status(400).json({
                 success: false,
                 message: 'Email and password are required'
@@ -101,17 +103,10 @@ app.post('/api/auth/register', async (req, res) => {
             });
         }
 
-        // Validate skills if provided
-        if (skills && !Array.isArray(skills)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Skills must be an array of strings'
-            });
-        }
-
-        const existingUser = await User.findOne({ email });
+        const existingUser = await User.findOne({ email: email.toLowerCase() });
 
         if (existingUser) {
+            console.warn(`User with email ${email} already exists`);
             return res.status(400).json({
                 success: false,
                 message: 'User already exists'
@@ -121,18 +116,25 @@ app.post('/api/auth/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = new User({
-            email,
+            email: email.toLowerCase(),
             password: hashedPassword,
             name: name || email.split('@')[0],
             skills: skills || []
         });
 
-        await newUser.save();
+        console.log('Attempting to save user:', { 
+            email: newUser.email, 
+            name: newUser.name,
+            skillsCount: newUser.skills.length 
+        });
+
+        const savedUser = await newUser.save();
+        console.log('✅ User saved successfully with ID:', savedUser._id);
 
         const token = jwt.sign(
             {
-                userId: newUser._id,
-                email: newUser.email
+                userId: savedUser._id,
+                email: savedUser.email
             },
             process.env.JWT_SECRET || 'secretkey',
             { expiresIn: '24h' }
@@ -143,19 +145,19 @@ app.post('/api/auth/register', async (req, res) => {
             message: 'User registered successfully',
             token,
             user: {
-                id: newUser._id,
-                email: newUser.email,
-                name: newUser.name,
-                skills: newUser.skills
+                id: savedUser._id,
+                email: savedUser.email,
+                name: savedUser.name,
+                skills: savedUser.skills
             }
         });
 
     } catch (error) {
-        console.error('Registration Error:', error);
+        console.error('❌ Registration Error:', error);
 
         res.status(500).json({
             success: false,
-            message: 'Server error',
+            message: 'Server error during registration',
             error: error.message
         });
     }
