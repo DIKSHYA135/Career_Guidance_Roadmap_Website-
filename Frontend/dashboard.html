@@ -11,7 +11,9 @@
     <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
-    <div class="app-layout">
+
+
+    <div class="app-layout" style="position: relative; z-index: 10; background: transparent;">
         
         <!-- Mobile Header Toggle -->
         <div class="mobile-nav-toggle">
@@ -237,25 +239,30 @@
                         </div>
                     </div>
 
-                    <!-- Bento Card 3: AI Mentor Diagnostic Logs -->
+                    <!-- Bento Card 3: Skill Gap Analysis -->
                     <div class="content-card card-box" style="display:flex; flex-direction:column; justify-content:space-between;">
                         <div class="card-header">
                             <div class="card-icon purple-text">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg>
                             </div>
-                            <h2>AI Mentor Console</h2>
+                            <h2>Skill Gap Analysis</h2>
                         </div>
                         
-                        <!-- Simulated Command Terminal Console -->
-                        <div class="terminal-log">
-                            <div style="color:var(--primary); font-weight:700;">[SYSTEM DIAGNOSTIC INITIALIZED]</div>
-                            <div style="color:var(--text-muted);">[08:45:10] Scanning resume variables...</div>
-                            <div style="color:var(--text-body);">[08:45:11] Target match compiled. HTML Gaps detected.</div>
-                            <div style="color:#059669;">[08:45:12] Pathway generated: principal frontend skills unlocked.</div>
-                            <div style="color:#D97706; animation: pulseText 2s infinite;">&gt;&gt; Recommended: resume step 1 to acquire DOM competency indexes.</div>
+                        <div class="skill-gap-info">
+                            <p style="font-size:0.9rem; color:var(--text-body); margin-bottom: 1rem;">Based on your target role, we've identified missing competencies.</p>
+                            <div class="stats-list" style="display:flex; flex-direction:column; gap:0.6rem;">
+                                <div class="stat-item" style="display:flex; justify-content:space-between; font-size:0.8rem; border-bottom:1px solid var(--border); padding-bottom:0.4rem;">
+                                    <span style="color:var(--text-body);">Skills Validated</span>
+                                    <span style="color:var(--success); font-weight:700;" id="skills-validated-display">0</span>
+                                </div>
+                                <div class="stat-item" style="display:flex; justify-content:space-between; font-size:0.8rem; padding-bottom:0.4rem;">
+                                    <span style="color:var(--text-body);">Gaps Detected</span>
+                                    <span style="color:var(--danger, #EF4444); font-weight:700;" id="skills-gap-display">0</span>
+                                </div>
+                            </div>
                         </div>
                         
-                        <button class="btn btn-outline" style="width: 100%;" onclick="window.location.href='skill-gap.html'">
+                        <button class="btn btn-outline" style="width: 100%; margin-top: 1rem;" onclick="window.location.href='skill-gap.html'">
                             Inspect Gap Diagnostics &rarr;
                         </button>
                     </div>

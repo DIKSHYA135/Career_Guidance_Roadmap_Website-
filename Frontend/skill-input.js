@@ -165,144 +165,72 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ========================= Generate Button =========================
+    // ========================= Generate Button (Redirects to Roadmap) =========================
     if (generateBtn) {
-        generateBtn.addEventListener('click', () => {
-            // Save all data
-            localStorage.setItem('xyverra_selected_path', currentCategory); // Sync it just in case
-            localStorage.setItem('userLevel',           currentLevel);
-            localStorage.setItem('userExperience',      experienceField ? experienceField.value : '');
+        generateBtn.addEventListener('click', async () => {
+            if (generateBtn.disabled) return;
+
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert("User session not found. Please log in again.");
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Show loading state
+            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            generateBtn.disabled = true;
+
+            // Prepare local storage
+            localStorage.setItem('xyverra_selected_path', currentCategory);
+            localStorage.setItem('userLevel', currentLevel);
+            localStorage.setItem('userExperience', experienceField ? experienceField.value : '');
             localStorage.setItem('pendingStartModule', selectedModuleId);
             localStorage.removeItem('selectedStartModule');
-
-            // Clear previously completed/skipped modules if they are restarting/regenerating a roadmap
             localStorage.removeItem('completedModules');
-
-            // Save the *selected* target level for the assessment logic
             localStorage.setItem('xyverra_target_level', currentLevel);
-            // Clear old scores
             localStorage.removeItem('xyverra_assessment_scores');
-
-            // Smooth page transition
-            document.body.style.opacity     = '0';
-            document.body.style.transition  = 'opacity 0.3s ease';
             
-            setTimeout(() => { 
-                const catData = typeof MODULES_DATA !== 'undefined' ? MODULES_DATA[currentCategory] : null;
-                if (!catData || !selectedModuleId) {
-                    window.location.href = 'roadmap.html';
-                    return;
-                }
+            // Skill to be tested is the selected category
+            localStorage.setItem('currentQuizSkill', currentCategory);
 
-                if (currentLevel === 'Beginner') {
-                    window.location.href = `quiz.html?mode=assessment&targetLevel=Beginner&phase=beginner&specificModules=${selectedModuleId}`;
-                } else if (currentLevel === 'Intermediate') {
-                    const begMods = catData['Beginner'] || [];
-                    const testIds = begMods.slice(0, 2).map(m => m.id).join(',');
-                    window.location.href = `quiz.html?mode=assessment&targetLevel=Intermediate&phase=beginner&specificModules=${testIds}`;
-                } else if (currentLevel === 'Advanced') {
-                    const begMods = catData['Beginner'] || [];
-                    const intMods = catData['Intermediate'] || [];
-                    // Combine to test foundational knowledge before reading advanced modules
-                    const testIds = [...begMods.slice(0, 2), ...intMods.slice(0, 1)].map(m => m.id).join(',');
-                    window.location.href = `quiz.html?mode=assessment&targetLevel=Advanced&phase=beginner&specificModules=${testIds}`;
-                }
-            }, 300);
-        });
-    }
+            try {
+                // Save Level to MongoDB
+                await fetch('http://localhost:5000/api/user/save-level', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ selectedLevel: currentLevel })
+                });
 
-    // =========================
-    // Validation
-    // =========================
-
-    function validateForm() {
-
-        const isValid = userSkills.length > 0;
-
-        errorMessage.style.display =
-            isValid ? 'none' : 'flex';
-
-        generateBtn.disabled = !isValid;
-
-        generateBtn.classList.toggle(
-            'disabled',
-            !isValid
-        );
-    }
-
-    // =========================
-    // Generate Button (Now connects to Backend)
-    // =========================
-
-    generateBtn.addEventListener('click', async () => {
-
-        validateForm();
-
-        if (generateBtn.disabled) return;
-
-        // Get auth token from localStorage
-        const token = localStorage.getItem('token');
-        if (!token) {
-            alert("User session not found. Please log in again.");
-            window.location.href = 'login.html';
-            return;
-        }
-
-        // Show loading state
-        generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-        generateBtn.disabled = true;
-
-        try {
-            // 1. Save Level to MongoDB
-            const levelResponse = await fetch('http://localhost:5000/api/user/save-level', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ selectedLevel: currentLevel })
-            });
-
-            // 2. Save Skills to MongoDB
-            const skillsResponse = await fetch('http://localhost:5000/api/user/save-skills', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ skills: userSkills })
-            });
-
-            const skillsData = await skillsResponse.json();
-
-            if (skillsResponse.ok) {
-                console.log("Skills saved to MongoDB:", skillsData.skills);
-                
-                // Also save to localStorage for fallback/immediate use
-                localStorage.setItem('userLevel', currentLevel);
-                localStorage.setItem('userSkills', JSON.stringify(userSkills));
-                localStorage.setItem('userExperience', experienceField.value);
+                // Update last active page
+                await fetch('http://localhost:5000/api/user/save-page', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ lastActivePage: 'roadmap.html' })
+                });
 
                 // Page transition
                 document.body.style.opacity = '0';
                 document.body.style.transition = 'opacity 0.3s ease';
 
                 setTimeout(() => {
-                    window.location.href = 'skill-verification.html';
+                    window.location.href = 'roadmap.html';
                 }, 300);
-            } else {
-                alert(skillsData.message || "Failed to save skills.");
-                generateBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> Generate Roadmap';
+
+            } catch (error) {
+                console.error("Error saving to backend:", error);
+                alert("Connection error. Please ensure the backend is running.");
+                generateBtn.innerHTML = '<i class="fas fa-arrow-right"></i> Continue';
                 generateBtn.disabled = false;
             }
-
-        } catch (error) {
-            console.error("Error saving to backend:", error);
-            alert("Connection error. Please ensure the backend is running.");
-            generateBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> Generate Roadmap';
-            generateBtn.disabled = false;
-        }
-    });
+        });
+    }
 
     // =========================
     // Initialize UI

@@ -13,7 +13,9 @@
     <link rel="stylesheet" href="skill-input.css">
 </head>
 <body>
-    <div class="app-layout">
+
+
+    <div class="app-layout" style="position: relative; z-index: 10;">
         <!-- Mobile Header Toggle -->
         <div class="mobile-nav-toggle">
             <div class="sidebar-brand" style="margin-bottom: 0; padding: 0;">
@@ -114,33 +116,7 @@
                         </div>
                     </div>
 
-                    <!-- Module Selector (grouped by level) -->
-                    <div class="form-group" id="module-selector-group">
-                        <label>
-                            <i class="fas fa-layer-group" style="margin-right: 6px; color: var(--primary);"></i>
-                            Start from Module
-                            <span class="field-hint-inline" id="module-level-hint" style="margin-left: 8px; font-size: 0.78rem; color: var(--text-muted); font-weight: 500;">(Beginner modules)</span>
-                        </label>
-                        <p class="field-hint">Choose the module you want to begin from based on your level</p>
-                        <div class="module-select-wrapper">
-                            <select id="module-select" class="module-select">
-                                <!-- Options injected by JS -->
-                            </select>
-                            <i class="fas fa-chevron-down module-select-icon"></i>
-                        </div>
 
-                        <!-- Module preview card -->
-                        <div class="module-preview" id="module-preview" style="display: none;">
-                            <div class="module-preview-icon">
-                                <i class="fas fa-book-open"></i>
-                            </div>
-                            <div class="module-preview-text">
-                                <span class="module-preview-title" id="module-preview-title"></span>
-                                <span class="module-preview-desc" id="module-preview-desc"></span>
-                            </div>
-                            <span class="module-preview-badge" id="module-preview-badge"></span>
-                        </div>
-                    </div>
 
                     <!-- Experience Description -->
                     <div class="form-group">
@@ -150,8 +126,8 @@
 
                     <div class="form-actions">
                         <button type="button" id="generate-btn" class="btn btn-primary generate-btn">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                            Generate Roadmap
+                            <i class="fas fa-arrow-right"></i>
+                            Continue
                         </button>
                     </div>
                 </div>

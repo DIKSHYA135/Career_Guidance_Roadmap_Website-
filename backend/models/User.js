@@ -40,6 +40,42 @@ const userSchema = new mongoose.Schema({
         default: null
     },
 
+    competencyScore: {
+        type: Number,
+        default: 0
+    },
+
+    experienceRank: {
+        type: Number,
+        default: 0
+    },
+
+    dailyStreak: {
+        type: Number,
+        default: 0
+    },
+
+    lastActivePage: {
+        type: String,
+        default: 'login.html'
+    },
+
+    lastLoginDate: {
+        type: Date,
+        default: null
+    },
+
+    completedModules: {
+        type: [String],
+        default: []
+    },
+
+    quizScores: {
+        type: Map,
+        of: Number,
+        default: {}
+    },
+
     createdAt: {
         type: Date,
         default: Date.now

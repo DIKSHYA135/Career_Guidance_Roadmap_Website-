@@ -8,7 +8,6 @@
     justify-content: flex-start;
     padding-top: 4.5rem;
     padding-bottom: 3rem;
-    background: #F8FAFC;
 }
 
 /* ── Page Header ── */
@@ -39,9 +38,9 @@
 .grid-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
+    gap: 1.5rem;
     width: 100%;
-    max-width: 840px;
+    max-width: 900px;
     margin: 0 auto 2.5rem;
     animation: fadeInUp 0.55s var(--ease) both;
 }
@@ -54,29 +53,30 @@
     padding: 1.125rem 1.25rem;
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
-    background: #FFFFFF;
+    background: var(--bg-surface);
     cursor: pointer;
-    transition: var(--transition-sm);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     position: relative;
     overflow: hidden;
-    box-shadow: var(--shadow-premium);
+    box-shadow: var(--shadow-sm);
 }
 
 .grid-card > * { position: relative; z-index: 1; }
 
 /* ── Hover State ── */
 .grid-card:hover {
-    border-color: var(--border-strong);
-    background: #FFFFFF;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.08);
+    border-color: var(--primary);
+    background: var(--bg-surface-hover);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
 }
 
 /* ── Active / Selected State ── */
 .grid-card.active {
-    border-color: var(--primary);
-    background: #FFFFFF;
-    box-shadow: 0 0 0 4px #DBEAFE;
+    border-color: #3B82F6;
+    background: #EFF6FF;
+    transform: translateY(-4px);
+    box-shadow: 0 0 0 2px #3B82F6, var(--shadow-md);
 }
 
 /* Check mark on active */

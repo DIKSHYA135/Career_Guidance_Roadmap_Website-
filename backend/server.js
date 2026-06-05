@@ -9,6 +9,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const User = require('./models/User');
+const authMiddleware = require('./middleware/authMiddleware');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -164,22 +165,7 @@ function handleValidation(req, res, next) {
     next();
 }
 
-// ==========================
-// AUTH MIDDLEWARE
-// ==========================
-const authMiddleware = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ success: false, message: 'No token provided' });
-    }
-    const token = authHeader.split(' ')[1];
-    try {
-        req.user = jwt.verify(token, JWT_SECRET);
-        next();
-    } catch (err) {
-        return res.status(401).json({ success: false, message: 'Invalid or expired token' });
-    }
-};
+// (Auth middleware logic moved to middleware/authMiddleware.js)
 
 // ==========================
 // PUBLIC ROUTES
@@ -206,7 +192,10 @@ app.post(
     [
         body('email').isEmail().withMessage('A valid email is required')
             .bail().customSanitizer(v => v.trim().toLowerCase()),
-        body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
+        body('password')
+            .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long')
+            .matches(/\d/).withMessage('Password must contain at least one number')
+            .matches(/[a-zA-Z]/).withMessage('Password must contain at least one letter'),
         body('name').optional().trim().isLength({ max: 100 }),
         body('skills').optional().isArray().withMessage('Skills must be an array')
     ],
@@ -217,10 +206,53 @@ app.post(
 
             const existingUser = await User.findOne({ email });
             if (existingUser) {
-                return res.status(409).json({
-                    success: false,
-                    message: 'User already exists'
-                });
+                const isMatch = await bcrypt.compare(password, existingUser.password);
+                if (isMatch) {
+                    const now = new Date();
+                    let newStreak = existingUser.dailyStreak || 1;
+                    if (existingUser.lastLoginDate) {
+                        const lastDate = new Date(existingUser.lastLoginDate).setHours(0,0,0,0);
+                        const todayDate = now.setHours(0,0,0,0);
+                        const diffCalendarDays = Math.round((todayDate - lastDate) / 86400000);
+                        
+                        if (diffCalendarDays === 1) {
+                            newStreak += 1;
+                        } else if (diffCalendarDays > 1) {
+                            newStreak = 1;
+                        }
+                    } else {
+                        newStreak = 1;
+                    }
+                    existingUser.dailyStreak = newStreak;
+                    existingUser.lastLoginDate = now;
+                    await existingUser.save();
+
+                    const token = signToken(existingUser);
+                    return res.json({
+                        success: true,
+                        message: 'User already exists. Logged in successfully.',
+                        token,
+                        user: {
+                            id: existingUser._id,
+                            email: existingUser.email,
+                            name: existingUser.name,
+                            selectedPath: existingUser.selectedPath,
+                            selectedLevel: existingUser.selectedLevel,
+                            skills: existingUser.skills,
+                            competencyScore: existingUser.competencyScore,
+                            experienceRank: existingUser.experienceRank,
+                            dailyStreak: existingUser.dailyStreak,
+                            lastActivePage: existingUser.lastActivePage,
+                            quizScores: existingUser.quizScores,
+                            completedModules: existingUser.completedModules
+                        }
+                    });
+                } else {
+                    return res.status(409).json({
+                        success: false,
+                        message: 'User already exists (incorrect password)'
+                    });
+                }
             }
 
             const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
@@ -229,7 +261,9 @@ app.post(
                 email,
                 password: hashedPassword,
                 name: name || email.split('@')[0],
-                skills: Array.isArray(skills) ? skills : []
+                skills: Array.isArray(skills) ? skills : [],
+                dailyStreak: 1,
+                lastLoginDate: new Date()
             });
 
             console.log('✅ User saved successfully with ID:', newUser._id);
@@ -289,6 +323,25 @@ app.post(
                 });
             }
 
+            const now = new Date();
+            let newStreak = user.dailyStreak || 1;
+            if (user.lastLoginDate) {
+                const lastDate = new Date(user.lastLoginDate).setHours(0,0,0,0);
+                const todayDate = now.setHours(0,0,0,0);
+                const diffCalendarDays = Math.round((todayDate - lastDate) / 86400000);
+                
+                if (diffCalendarDays === 1) {
+                    newStreak += 1;
+                } else if (diffCalendarDays > 1) {
+                    newStreak = 1;
+                }
+            } else {
+                newStreak = 1;
+            }
+            user.dailyStreak = newStreak;
+            user.lastLoginDate = now;
+            await user.save();
+
             const token = signToken(user);
 
             res.json({
@@ -299,7 +352,15 @@ app.post(
                     id: user._id,
                     email: user.email,
                     name: user.name,
-                    selectedPath: user.selectedPath
+                    selectedPath: user.selectedPath,
+                    selectedLevel: user.selectedLevel,
+                    skills: user.skills,
+                    competencyScore: user.competencyScore,
+                    experienceRank: user.experienceRank,
+                    dailyStreak: user.dailyStreak,
+                    lastActivePage: user.lastActivePage,
+                    quizScores: user.quizScores,
+                    completedModules: user.completedModules
                 }
             });
         } catch (error) {
@@ -324,7 +385,7 @@ app.post('/api/user/save-path', authMiddleware, async (req, res) => {
         const updatedUser = await User.findByIdAndUpdate(
             req.user.userId,
             { selectedPath: selectedPath.trim() },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!updatedUser) {
@@ -357,7 +418,7 @@ app.post('/api/user/save-level', authMiddleware, async (req, res) => {
         const updatedUser = await User.findByIdAndUpdate(
             req.user.userId,
             { selectedLevel: selectedLevel.trim() },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!updatedUser) {
@@ -395,7 +456,7 @@ app.post('/api/user/save-skills', authMiddleware, async (req, res) => {
         const updatedUser = await User.findByIdAndUpdate(
             req.user.userId,
             { skills: cleanSkills },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!updatedUser) {
@@ -432,7 +493,7 @@ app.get('/api/user/profile', authMiddleware, async (req, res) => {
 // ==========================
 app.put('/api/user/profile', authMiddleware, async (req, res) => {
     try {
-        const allowedUpdates = ['name', 'selectedPath', 'selectedLevel', 'skills', 'dob'];
+        const allowedUpdates = ['name', 'selectedPath', 'selectedLevel', 'skills', 'dob', 'lastActivePage', 'competencyScore', 'experienceRank', 'dailyStreak', 'quizScores'];
         const updates = {};
         for (const key of Object.keys(req.body)) {
             if (allowedUpdates.includes(key)) {
@@ -443,7 +504,7 @@ app.put('/api/user/profile', authMiddleware, async (req, res) => {
         const user = await User.findByIdAndUpdate(
             req.user.userId,
             { $set: updates },
-            { new: true, runValidators: true }
+            { returnDocument: 'after', runValidators: true }
         ).select('-password');
 
         if (!user) {
@@ -452,6 +513,125 @@ app.put('/api/user/profile', authMiddleware, async (req, res) => {
         res.json(user);
     } catch (error) {
         return serverError(res, 'Update Profile Error', error);
+    }
+});
+
+// ==========================
+// SAVE QUIZ SCORE ROUTE (auth required)
+// ==========================
+app.post('/api/user/save-quiz', authMiddleware, async (req, res) => {
+    try {
+        const { skill, score } = req.body;
+        if (!skill || typeof score !== 'number') {
+            return res.status(400).json({ success: false, message: 'Skill and score required' });
+        }
+        
+        const user = await User.findById(req.user.userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        
+        user.quizScores.set(skill, score);
+        
+        // Add 50 XP for completing a quiz, plus XP based on score
+        user.experienceRank += 50 + Math.floor(score / 2);
+        
+        // Re-calculate competency score (average of all quizzes passed > 80%)
+        let totalScore = 0;
+        let count = 0;
+        user.quizScores.forEach((val) => {
+            if (val >= 80) {
+                totalScore += val;
+                count++;
+            }
+        });
+        
+        user.competencyScore = count > 0 ? Math.floor(totalScore / count) : user.competencyScore;
+        
+        // Update streak if needed (very simplified logic for now: just add 1 if they pass)
+        if (score >= 80) {
+            user.dailyStreak += 1;
+        }
+
+        // Also save the completed module IDs
+        const skillIds = skill.split(',');
+        skillIds.forEach(id => {
+            if (!user.completedModules.includes(id)) {
+                user.completedModules.push(id);
+            }
+        });
+
+        await user.save();
+        
+        return res.json({
+            success: true,
+            message: 'Quiz saved successfully',
+            experienceRank: user.experienceRank,
+            competencyScore: user.competencyScore,
+            dailyStreak: user.dailyStreak,
+            completedModules: user.completedModules
+        });
+    } catch (error) {
+        return serverError(res, 'Save Quiz Error', error);
+    }
+});
+
+// ==========================
+// SAVE COMPLETED MODULES ROUTE (auth required)
+// ==========================
+app.post('/api/user/save-completed-modules', authMiddleware, async (req, res) => {
+    try {
+        const { completedModules } = req.body;
+        if (!Array.isArray(completedModules)) {
+            return res.status(400).json({ success: false, message: 'completedModules must be an array' });
+        }
+
+        const user = await User.findById(req.user.userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Merge: add any new IDs not already present
+        completedModules.forEach(id => {
+            if (typeof id === 'string' && !user.completedModules.includes(id)) {
+                user.completedModules.push(id);
+            }
+        });
+
+        await user.save();
+
+        return res.json({
+            success: true,
+            message: 'Completed modules saved',
+            completedModules: user.completedModules
+        });
+    } catch (error) {
+        return serverError(res, 'Save Completed Modules Error', error);
+    }
+});
+
+// ==========================
+// SAVE PAGE ROUTE (auth required)
+// ==========================
+app.post('/api/user/save-page', authMiddleware, async (req, res) => {
+    try {
+        const { lastActivePage } = req.body;
+        if (!lastActivePage) {
+            return res.status(400).json({ success: false, message: 'Page is required' });
+        }
+        
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user.userId,
+            { lastActivePage },
+            { returnDocument: 'after' }
+        );
+        
+        return res.json({
+            success: true,
+            lastActivePage: updatedUser.lastActivePage
+        });
+    } catch (error) {
+        return serverError(res, 'Save Page Error', error);
     }
 });
 

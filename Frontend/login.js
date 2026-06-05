@@ -98,10 +98,26 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem("xyverra_user_email", data.user.email);
 
             if (data.user.selectedPath) {
-                localStorage.setItem(
-                    "xyverra_selected_path",
-                    data.user.selectedPath
-                );
+                localStorage.setItem("xyverra_selected_path", data.user.selectedPath);
+            }
+            if (data.user.selectedLevel) {
+                localStorage.setItem("userLevel", data.user.selectedLevel);
+                localStorage.setItem("xyverra_selected_level", data.user.selectedLevel);
+            }
+            if (data.user.skills && data.user.skills.length > 0) {
+                localStorage.setItem("userSkills", JSON.stringify(data.user.skills));
+            }
+            if (data.user.completedModules && data.user.completedModules.length > 0) {
+                localStorage.setItem("completedModules", JSON.stringify(data.user.completedModules));
+            }
+            if (data.user.competencyScore !== undefined) {
+                localStorage.setItem("xyverra_skill_score", data.user.competencyScore);
+            }
+            if (data.user.dailyStreak !== undefined) {
+                localStorage.setItem("xyverra_user_streak", data.user.dailyStreak);
+            }
+            if (data.user.experienceRank !== undefined) {
+                localStorage.setItem("xyverra_xp", data.user.experienceRank);
             }
 
             // Hide loader

@@ -32,9 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch { /* ignore */ }
 
     // ── 3. Categorize gaps ────────────────────────────────
-    const criticalGaps   = [];   // Skills not at all in user profile
+    const criticalGaps = [];   // Skills not at all in user profile
     const needsImprovement = []; // Skills user has but at beginner / low proficiency
-    const validated      = [];   // Skills user has at intermediate+ / verified
+    const validated = [];   // Skills user has at intermediate+ / verified
 
     requiredSkills.forEach(skill => {
         const owned = userSkillNames.includes(skill.name.toLowerCase());
@@ -49,17 +49,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const totalRequired  = requiredSkills.length;
-    const matchedCount   = validated.length + needsImprovement.length;
-    const readinessPct   = Math.round((matchedCount / totalRequired) * 100);
+    const totalRequired = requiredSkills.length;
+    const matchedCount = validated.length + needsImprovement.length;
+    const readinessPct = Math.round((matchedCount / totalRequired) * 100);
 
     // ── 4. Update Readiness Card ───────────────────────────
-    const scoreEl    = document.getElementById('readiness-score');
-    const textEl     = document.getElementById('readiness-text');
+    const scoreEl = document.getElementById('readiness-score');
+    const textEl = document.getElementById('readiness-text');
     const progressEl = document.getElementById('readiness-progress');
 
-    if (scoreEl)  scoreEl.textContent  = `${readinessPct}%`;
-    if (textEl)   textEl.textContent   = `${matchedCount} / ${totalRequired} Skills Acquired`;
+    if (scoreEl) scoreEl.textContent = `${readinessPct}%`;
+    if (textEl) textEl.textContent = `${matchedCount} / ${totalRequired} Skills Acquired`;
     if (progressEl) {
         setTimeout(() => { progressEl.style.width = `${readinessPct}%`; }, 150);
     }
@@ -76,9 +76,9 @@ document.addEventListener('DOMContentLoaded', () => {
     drawDonutChart('distribution-chart', matchedCount, criticalGaps.length);
 
     // ── 6. Render skill lists with course links ─────────────
-    renderList('critical-gaps-list',    criticalGaps,      'badge-critical',    'Missing',    true);
-    renderList('other-missing-list',    needsImprovement,  'badge-improvement', 'Improve',    true);
-    renderList('validated-skills-list', validated,         'badge-validated',   'Validated',  false);
+    renderList('critical-gaps-list', criticalGaps, 'badge-critical', 'Missing', true);
+    renderList('other-missing-list', needsImprovement, 'badge-improvement', 'Improve', true);
+    renderList('validated-skills-list', validated, 'badge-validated', 'Validated', false);
 });
 
 // ── Render a list of skills with optional course link ─────
@@ -113,18 +113,18 @@ function drawDonutChart(canvasId, owned, missing) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const dpr  = window.devicePixelRatio || 1;
+    const dpr = window.devicePixelRatio || 1;
     const size = 130;
-    canvas.width  = size * dpr;
+    canvas.width = size * dpr;
     canvas.height = size * dpr;
-    canvas.style.width  = `${size}px`;
+    canvas.style.width = `${size}px`;
     canvas.style.height = `${size}px`;
     ctx.scale(dpr, dpr);
 
     const cx = size / 2, cy = size / 2;
     const radius = size / 2 - 6;
-    const holeR  = radius * 0.65;
-    const total  = owned + missing || 1;
+    const holeR = radius * 0.65;
+    const total = owned + missing || 1;
     const startA = -Math.PI / 2;
     const ownedA = startA + (Math.PI * 2 * (owned / total));
 

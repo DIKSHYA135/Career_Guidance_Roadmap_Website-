@@ -33,22 +33,22 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) { /* ignore bad localStorage */ }
 
     function save() {
-        try { localStorage.setItem('xyverra_skills_data', JSON.stringify(skillsData)); } catch(e) {}
+        try { localStorage.setItem('xyverra_skills_data', JSON.stringify(skillsData)); } catch (e) { }
     }
 
     // ── 2. DOM References ──────────────────────────────────
-    const elCategoryCards    = document.getElementById('category-cards');
-    const elSkillPanel       = document.getElementById('skill-panel');
-    const elPanelTitle       = document.getElementById('panel-category-title');
-    const elBtnClosePanel    = document.getElementById('btn-close-panel');
-    const elAnalytics        = document.getElementById('skills-analytics');
-    const elSearch           = document.getElementById('skill-search');
-    const elPathTitle        = document.getElementById('skills-path-title');
+    const elCategoryCards = document.getElementById('category-cards');
+    const elSkillPanel = document.getElementById('skill-panel');
+    const elPanelTitle = document.getElementById('panel-category-title');
+    const elBtnClosePanel = document.getElementById('btn-close-panel');
+    const elAnalytics = document.getElementById('skills-analytics');
+    const elSearch = document.getElementById('skill-search');
+    const elPathTitle = document.getElementById('skills-path-title');
 
     const elLists = {
-        beginner:     document.getElementById('list-beginner'),
+        beginner: document.getElementById('list-beginner'),
         intermediate: document.getElementById('list-intermediate'),
-        advanced:     document.getElementById('list-advanced')
+        advanced: document.getElementById('list-advanced')
     };
 
     if (!elCategoryCards) { console.error('[skills.js] #category-cards not found'); return; }
@@ -87,15 +87,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── 4. Category Cards ─────────────────────────────────
     const ICONS = {
-        'Web Development': '<i class="fas fa-globe" style="color: #3b82f6; filter: drop-shadow(0 2px 4px rgba(59,130,246,0.3));"></i>', 
+        'Web Development': '<i class="fas fa-globe" style="color: #3b82f6; filter: drop-shadow(0 2px 4px rgba(59,130,246,0.3));"></i>',
         'Full Stack Development': '<i class="fas fa-layer-group" style="color: #8b5cf6; filter: drop-shadow(0 2px 4px rgba(139,92,246,0.3));"></i>',
-        'Backend / APIs': '<i class="fas fa-server" style="color: #10b981; filter: drop-shadow(0 2px 4px rgba(16,185,129,0.3));"></i>', 
+        'Backend / APIs': '<i class="fas fa-server" style="color: #10b981; filter: drop-shadow(0 2px 4px rgba(16,185,129,0.3));"></i>',
         'Data Science': '<i class="fas fa-chart-line" style="color: #f59e0b; filter: drop-shadow(0 2px 4px rgba(245,158,11,0.3));"></i>',
-        'NLP / AI': '<i class="fas fa-brain" style="color: #ec4899; filter: drop-shadow(0 2px 4px rgba(236,72,153,0.3));"></i>', 
+        'NLP / AI': '<i class="fas fa-brain" style="color: #ec4899; filter: drop-shadow(0 2px 4px rgba(236,72,153,0.3));"></i>',
         'Cloud / DevOps': '<i class="fas fa-cloud" style="color: #0ea5e9; filter: drop-shadow(0 2px 4px rgba(14,165,233,0.3));"></i>',
-        'UI/UX Design': '<i class="fas fa-palette" style="color: #f43f5e; filter: drop-shadow(0 2px 4px rgba(244,63,94,0.3));"></i>', 
+        'UI/UX Design': '<i class="fas fa-palette" style="color: #f43f5e; filter: drop-shadow(0 2px 4px rgba(244,63,94,0.3));"></i>',
         'Mobile Development': '<i class="fas fa-mobile-alt" style="color: #14b8a6; filter: drop-shadow(0 2px 4px rgba(20,184,166,0.3));"></i>',
-        'Cybersecurity': '<i class="fas fa-shield-alt" style="color: #ef4444; filter: drop-shadow(0 2px 4px rgba(239,68,68,0.3));"></i>', 
+        'Cybersecurity': '<i class="fas fa-shield-alt" style="color: #ef4444; filter: drop-shadow(0 2px 4px rgba(239,68,68,0.3));"></i>',
         'Data Analytics': '<i class="fas fa-chart-pie" style="color: #eab308; filter: drop-shadow(0 2px 4px rgba(234,179,8,0.3));"></i>'
     };
 
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elCategoryCards.innerHTML = '';
         Object.keys(skillsData).forEach(cat => {
             const d = skillsData[cat];
-            const count = (d.beginner||[]).length + (d.intermediate||[]).length + (d.advanced||[]).length;
+            const count = (d.beginner || []).length + (d.intermediate || []).length + (d.advanced || []).length;
             const card = document.createElement('div');
             card.className = 'category-card' + (cat === activeCategory ? ' active' : '');
             card.innerHTML = `
@@ -152,8 +152,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!ul) return;
             ul.innerHTML = '';
 
-            const all      = catData[level] || [];
-            const shown    = filter ? all.filter(s => s.toLowerCase().includes(filter)) : all;
+            const all = catData[level] || [];
+            const shown = filter ? all.filter(s => s.toLowerCase().includes(filter)) : all;
 
             if (shown.length === 0) {
                 ul.innerHTML = `<li class="skill-empty-state">No ${level} skills yet. Click + to add one.</li>`;
@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Advanced — require beginner + intermediate
             const begMods = catModules['Beginner'] || [];
             const intMods = catModules['Intermediate'] || [];
-            const ids = [...begMods.slice(0,2), ...intMods.slice(0,1)].map(m => m.id).join(',');
+            const ids = [...begMods.slice(0, 2), ...intMods.slice(0, 1)].map(m => m.id).join(',');
             if (!ids) { notify('warning', 'Assessment not available for this skill yet.'); return; }
             go(`quiz.html?specificModules=${ids}&targetLevel=Advanced&category=${catEncoded}`);
         }
@@ -242,12 +242,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const ul = elLists[level];
         if (!ul) return;
         ul.addEventListener('click', async e => {
-            const editBtn   = e.target.closest('.edit-btn');
+            const editBtn = e.target.closest('.edit-btn');
             const deleteBtn = e.target.closest('.delete-btn');
             if (!editBtn && !deleteBtn) return;
             e.stopPropagation();
 
-            const idx       = parseInt((editBtn || deleteBtn).dataset.index);
+            const idx = parseInt((editBtn || deleteBtn).dataset.index);
             const skillName = skillsData[activeCategory][level][idx];
 
             if (editBtn) {
@@ -279,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!activeCategory) return;
             const level = btn.dataset.level;
             const val = typeof XyPrompt !== 'undefined'
-                ? await XyPrompt({ title: `Add ${level.charAt(0).toUpperCase()+level.slice(1)} Skill`, message: `Category: <strong>${activeCategory}</strong>`, placeholder: 'e.g. TypeScript, Docker, Figma…', confirmText: 'Add Skill' })
+                ? await XyPrompt({ title: `Add ${level.charAt(0).toUpperCase() + level.slice(1)} Skill`, message: `Category: <strong>${activeCategory}</strong>`, placeholder: 'e.g. TypeScript, Docker, Figma…', confirmText: 'Add Skill' })
                 : prompt(`Add ${level} skill to ${activeCategory}:`);
             if (val && val.trim()) {
                 if (!skillsData[activeCategory][level]) skillsData[activeCategory][level] = [];
@@ -296,7 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (exportBtn) {
         exportBtn.addEventListener('click', () => {
             const blob = new Blob([JSON.stringify(skillsData, null, 2)], { type: 'application/json' });
-            const a    = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'xyverra-skills.json' });
+            const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'xyverra-skills.json' });
             a.click(); URL.revokeObjectURL(a.href);
             if (typeof XySuccess !== 'undefined') XySuccess('Skills exported!');
         });

@@ -6,7 +6,7 @@
 .large-card {
     width: 100%;
     max-width: 800px;
-    background: #FFFFFF;
+    background: var(--bg-surface);
     border: 1px solid var(--border);
     padding: 2.5rem;
     display: flex;
@@ -23,7 +23,7 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    background: #F8FAFC;
+    background: var(--bg-surface-solid);
     padding: 0.9rem 1.6rem;
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
@@ -45,7 +45,7 @@
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #FFFFFF;
+    background: var(--bg-surface-hover);
     color: var(--text-muted);
     font-size: 0.65rem;
     display: flex;
@@ -95,8 +95,8 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    background: #DBEAFE;
-    border: 1px solid rgba(37, 99, 235, 0.15);
+    background: var(--bg-surface-hover);
+    border: 1px solid rgba(59, 130, 246, 0.3);
     border-radius: var(--radius-lg);
     padding: 1rem 1.4rem;
 }
@@ -105,13 +105,13 @@
     width: 38px;
     height: 38px;
     border-radius: var(--radius-md);
-    background: #FFFFFF;
+    background: var(--bg-surface);
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--primary);
     flex-shrink: 0;
-    border: 1px solid rgba(37, 99, 235, 0.12);
+    border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
 .context-icon svg {
@@ -144,7 +144,7 @@
 }
 
 .level-card {
-    background: #FFFFFF;
+    background: var(--bg-surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     padding: 1.3rem 1.6rem;
@@ -154,9 +154,11 @@
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    box-shadow: var(--shadow-premium);
-    transition: all 0.25s var(--ease);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
+
+.level-card > * { position: relative; z-index: 1; }
 
 .card-glow-element {
     display: none;
@@ -164,16 +166,17 @@
 
 /* Hover & Active Card Glow Borders */
 .level-card:hover {
-    border-color: var(--border-strong);
-    background: #F8FAFC;
+    border-color: var(--primary);
+    background: var(--bg-surface-hover);
     transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .level-card.active {
-    background: #FFFFFF;
+    background: var(--bg-surface-hover);
     border-color: var(--primary);
-    transform: translateY(-2px);
-    box-shadow: 0 0 0 4px #DBEAFE;
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2), 0 0 0 2px var(--primary);
 }
 
 /* Card interior structure */
@@ -204,9 +207,9 @@
     height: 22px;
 }
 
-.icon-green { background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; }
-.icon-blue { background: #DBEAFE; color: var(--primary); border: 1px solid rgba(37, 99, 235, 0.15); }
-.icon-purple { background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; }
+.icon-green { background: rgba(16, 185, 129, 0.1); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); }
+.icon-blue { background: rgba(59, 130, 246, 0.1); color: #3B82F6; border: 1px solid rgba(59, 130, 246, 0.3); }
+.icon-purple { background: rgba(139, 92, 246, 0.1); color: #8B5CF6; border: 1px solid rgba(139, 92, 246, 0.3); }
 
 .level-card-text {
     display: flex;
@@ -234,7 +237,7 @@
 }
 
 .level-card.active p {
-    color: var(--text-body);
+    color: var(--text-dark);
 }
 
 /* Selected state check circles */
@@ -258,8 +261,8 @@
 .level-card.active .level-check {
     opacity: 1;
     transform: translateY(-50%) scale(1);
-    border-color: var(--primary);
-    background: var(--primary);
+    border-color: #3B82F6;
+    background: #3B82F6;
     color: white;
 }
 
@@ -279,9 +282,9 @@
     margin-right: 2.2rem;
 }
 
-.badge-green { background: #F1F5F9; border: 1px solid #E2E8F0; color: #475569; }
-.badge-blue { background: #DBEAFE; border: 1px solid rgba(37, 99, 235, 0.15); color: var(--primary); }
-.badge-purple { background: #F1F5F9; border: 1px solid #E2E8F0; color: #475569; }
+.badge-green { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #10B981; }
+.badge-blue { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: #3B82F6; }
+.badge-purple { background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); color: #8B5CF6; }
 
 /* Action Footer layout */
 .bottom-actions {

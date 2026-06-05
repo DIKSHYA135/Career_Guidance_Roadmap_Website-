@@ -88,26 +88,41 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 const data = await response.json();
+                
+                let nextUrl = level === 'Beginner' ? 'dashboard.html' : 'skill-input.html';
 
                 if (response.ok) {
                     console.log('Level saved to backend successfully');
-                    window.location.href = 'skill-input.html';
+                    
+                    // Save last active page
+                    try {
+                        await fetch('http://localhost:5000/api/user/save-page', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ lastActivePage: nextUrl })
+                        });
+                    } catch (err) {
+                        console.error("Failed to save page state", err);
+                    }
+
+                    window.location.href = nextUrl;
                 } else {
                     console.error('Failed to save level:', data.message);
-                    // Even if backend fails, we might want to let them proceed if we have local state
-                    // But usually, we should alert
                     alert('Error saving level: ' + (data.message || 'Unknown error'));
                     
-                    // Reset button
                     continueBtn.innerHTML = originalHTML;
                     continueBtn.classList.remove('btn-disabled');
                     continueBtn.style.pointerEvents = 'auto';
                 }
             } catch (error) {
                 console.error('Network error while saving level:', error);
-                // Fallback: Proceed anyway if it's a connection issue (better UX for demo)
-                console.log("Proceeding to skill selection despite server error (Fallback)");
-                window.location.href = 'skill-input.html';
+                
+                let nextUrl = level === 'Beginner' ? 'dashboard.html' : 'skill-input.html';
+                console.log("Proceeding to next page despite server error (Fallback)");
+                window.location.href = nextUrl;
             }
         });
     }

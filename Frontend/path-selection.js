@@ -20,6 +20,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
         });
+    } else {
+        // If no path is saved, use the default active one
+        const activeCard = document.querySelector('.grid-card.active');
+        if (activeCard) {
+            const title = activeCard.querySelector('h4').innerText;
+            localStorage.setItem('xyverra_selected_path', title);
+        }
     }
 
     // Card click event
@@ -96,6 +103,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (response.ok) {
                     console.log("Path saved to MongoDB:", data.selectedPath);
+                    
+                    // Save last active page
+                    try {
+                        await fetch('http://localhost:5000/api/user/save-page', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ lastActivePage: 'level-selection.html' })
+                        });
+                    } catch (err) {
+                        console.error("Failed to save page state", err);
+                    }
+
                     // Navigate to next page after successful save
                     window.location.href = 'level-selection.html';
                 } else {
