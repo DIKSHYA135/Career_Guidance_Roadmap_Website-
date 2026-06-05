@@ -25,7 +25,7 @@
 /* Gradient banner at top of header card */
 .profile-banner {
     height: 80px;
-    background: linear-gradient(135deg, #2563EB 0%, #60A5FA 50%, #818CF8 100%);
+    background: var(--primary);
     border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
 }
 
@@ -48,7 +48,7 @@
 /* Avatar ring / border effect */
 .profile-avatar-ring {
     padding: 3px;
-    background: linear-gradient(135deg, #2563EB, #818CF8);
+    background: var(--primary);
     border-radius: 50%;
     flex-shrink: 0;
 }
@@ -57,7 +57,7 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #1e40af, #2563EB);
+    background: var(--primary);
     color: white;
     display: flex;
     align-items: center;

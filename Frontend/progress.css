@@ -3,6 +3,17 @@
    ========================================================= */
 @import url('global.css');
 
+/* ── Progress Content Grid ── */
+.progress-content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+    .progress-content-grid { grid-template-columns: 1fr; }
+}
+
 /* ── Shared content card ── */
 .content-card {
     background: var(--bg-surface);
@@ -18,18 +29,20 @@
 .card-header {
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--border);
     flex-wrap: wrap;
+    gap: 10px;
 }
 
 .card-header h2 {
     font-size: 1.125rem;
-    font-weight: 700;
+    font-weight: 800;
     color: var(--text-dark);
     letter-spacing: -0.02em;
+    margin: 0;
 }
 
 .text-primary { color: var(--accent); }
@@ -41,7 +54,7 @@
     padding: 4px 12px;
     border-radius: var(--radius-full);
     font-size: 0.72rem;
-    font-weight: 700;
+    font-weight: 800;
     background: rgba(37, 99, 235, 0.1);
     color: var(--accent);
     border: 1px solid rgba(37, 99, 235, 0.2);
@@ -51,6 +64,25 @@
 }
 
 /* ── Progress Bar ── */
+.pg-bar-wrap {
+    margin-bottom: 2rem;
+}
+.pg-bar-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+.pg-bar-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+.pg-bar-pct {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
 .progress-bar-container {
     height: 6px;
     background: var(--bg-surface-hover);
@@ -61,7 +93,7 @@
 
 .progress-bar {
     height: 100%;
-    background: linear-gradient(90deg, var(--accent), var(--cyan));
+    background: linear-gradient(90deg, var(--primary), var(--cyan));
     border-radius: var(--radius-full);
     box-shadow: var(--shadow-sm);
     transition: width 1.2s var(--ease);
@@ -344,10 +376,6 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     flex-shrink: 0;
-}
-
-.summary-info .summary-value {
-    color: black;
 }
 
 .item-badge.completed { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }

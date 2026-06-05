@@ -1,22 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Sign in to Xyverra — your AI-powered career roadmap platform." />
   <title>Login — Xyverra</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="login.css" />
 </head>
+
 <body>
 
   <!-- Premium Loading Overlay -->
   <div id="premium-loader" class="premium-loader-overlay">
     <div class="loader-content">
       <div class="loader-logo-wrapper">
-        <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" style="width:100%; height:100%; border-radius:18px; object-fit:cover;">
+        <img src="xyverra_logo.jpeg" alt="Xyverra Logo"
+          style="width:100%; height:100%; border-radius:18px; object-fit:cover;">
       </div>
       <div class="loader-status">Initializing Career Intelligence...</div>
       <div class="loader-progress-track">
@@ -31,7 +36,7 @@
 
       <!-- Brand Header -->
       <div class="login-brand">
-        <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" class="brand-logo-img">
+        <img src="xyverra_logo.jpeg" alt="Xyverra Logo" class="brand-logo-img">
         <span class="brand-name">Xyverra</span>
       </div>
 
@@ -46,30 +51,19 @@
           <label for="login-email">Email address</label>
           <div class="input-wrapper">
             <i class="far fa-envelope input-icon"></i>
-            <input
-              type="email"
-              id="login-email"
-              placeholder="name@company.com"
-              autocomplete="email"
-              required
-            />
+            <input type="email" id="login-email" placeholder="name@company.com" autocomplete="email" required />
           </div>
         </div>
 
         <div class="form-group">
           <div class="label-row">
             <label for="login-password">Password</label>
-            <a href="#" class="forgot-link">Forgot password?</a>
+            <a href="javascript:void(0)" onclick="alert('Password recovery is not enabled in this demo.')" class="forgot-link">Forgot password?</a>
           </div>
           <div class="input-wrapper">
             <i class="fas fa-lock input-icon"></i>
-            <input
-              type="password"
-              id="login-password"
-              placeholder="Min. 8 characters"
-              autocomplete="current-password"
-              required
-            />
+            <input type="password" id="login-password" placeholder="Min. 8 characters" autocomplete="current-password"
+              required />
             <i class="far fa-eye eye-icon" id="toggle-password" title="Show password"></i>
           </div>
         </div>
@@ -99,10 +93,11 @@
 
     <!-- Footer -->
     <p class="login-footer">
-      By signing in, you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>
+      By signing in, you agree to our <a href="javascript:void(0)" onclick="alert('Terms page coming soon.')">Terms</a> and <a href="javascript:void(0)" onclick="alert('Privacy Policy coming soon.')">Privacy Policy</a>
     </p>
   </div>
 
   <script src="login.js"></script>
 </body>
+
 </html>

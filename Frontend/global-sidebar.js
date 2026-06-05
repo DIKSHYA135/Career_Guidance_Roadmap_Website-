@@ -6,7 +6,7 @@
 
 // Early-execution hook: if mandatory quiz is active, restrict navigation and redirect
 (function() {
-    const currentFile = window.location.pathname.split('/').pop() || 'dashboard.html';
+    const currentFile = window.location.pathname.split('/').pop() || './dashboard.html';
     if (currentFile !== 'quiz.html' && currentFile !== 'roadmap.html') {
         const rawState = localStorage.getItem('xyverra_mandatory_quiz_state');
         if (rawState) {
@@ -296,11 +296,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.remove('active');
         const href = item.getAttribute('href') || '';
-        if (href && currentFile === href) {
+        const hrefFile = href.split('/').pop();
+        if (hrefFile && currentFile === hrefFile) {
             item.classList.add('active');
         }
         // Root path → dashboard
-        if ((currentFile === '' || currentFile === 'index.html') && href === 'dashboard.html') {
+        if ((currentFile === '' || currentFile === 'index.html') && hrefFile === 'dashboard.html') {
             item.classList.add('active');
         }
     });
@@ -343,6 +344,54 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('a[href="#"], a[href=""]').forEach(link => {
         link.addEventListener('click', e => e.preventDefault());
     });
+
+    // ── 9. Inject Floating Back Button ─────────────────────
+    // Skipped on dashboard (no page to go back to meaningfully)
+    const noBackPages = ['dashboard.html', 'login.html', 'signup.html', 'landing.html', 'onboarding.html'];
+    if (!noBackPages.includes(currentFile)) {
+        const backBtn = document.createElement('button');
+        backBtn.id = 'global-back-btn';
+        backBtn.title = 'Go Back';
+        backBtn.innerHTML = '<i class="fas fa-arrow-left"></i>';
+        Object.assign(backBtn.style, {
+            position: 'fixed',
+            bottom: '28px',
+            right: '28px',
+            width: '46px',
+            height: '46px',
+            borderRadius: '50%',
+            background: 'var(--primary)',
+            color: 'white',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: '1rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 16px rgba(37,99,235,0.35)',
+            zIndex: '9000',
+            transition: 'all 0.2s ease',
+            fontFamily: 'inherit'
+        });
+        backBtn.addEventListener('mouseenter', () => {
+            backBtn.style.transform = 'translateY(-3px) scale(1.08)';
+            backBtn.style.boxShadow = '0 8px 24px rgba(37,99,235,0.45)';
+        });
+        backBtn.addEventListener('mouseleave', () => {
+            backBtn.style.transform = '';
+            backBtn.style.boxShadow = '0 4px 16px rgba(37,99,235,0.35)';
+        });
+        backBtn.addEventListener('click', () => {
+            if (window.history.length > 1) {
+                document.body.style.opacity = '0';
+                document.body.style.transition = 'opacity 0.22s ease';
+                setTimeout(() => window.history.back(), 230);
+            } else {
+                window.location.href = 'dashboard.html';
+            }
+        });
+        document.body.appendChild(backBtn);
+    }
 
     // ── 8. Fade in on page load ─────────────────────────────
     document.body.style.opacity = '0';

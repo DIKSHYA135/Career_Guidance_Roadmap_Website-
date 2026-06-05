@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const emailInput = document.getElementById('signup-email');
     const passwordInput = document.getElementById('signup-password');
     const togglePassword = document.getElementById('toggle-password');
-    
+
     // Error message containers
     const nameError = document.getElementById('name-error');
     const emailError = document.getElementById('email-error');
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // 1. Prevent Default Behavior (STOPS PAGE REFRESH)
             e.preventDefault();
             console.log("Signup form submission started...");
-            
+
             // 2. Clear previous errors
             clearErrors();
 
@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const name = nameInput ? nameInput.value.trim() : "";
             const email = emailInput ? emailInput.value.trim() : "";
             const password = passwordInput ? passwordInput.value : "";
-            
+
             // Fix: Safely handle the optional skills field
             const skillsElement = document.getElementById('signup-skills');
             const skillsRaw = skillsElement ? skillsElement.value : "";
@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 // 6. API Request
                 const apiUrl = 'http://localhost:5000/api/auth/register';
                 console.log("Sending registration request to:", apiUrl);
-                
+
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -125,25 +125,54 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (response.ok) {
                     // Success!
-                    console.log("Registration successful");
-                    
+                    console.log("Registration/Login successful");
+
                     // Save to localStorage
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('xyverra_user_name', data.user.name);
                     localStorage.setItem('xyverra_user_email', data.user.email);
-                    
+
+                    // Restore state if they already had an account
+                    if (data.user.selectedPath) {
+                        localStorage.setItem("xyverra_selected_path", data.user.selectedPath);
+                    }
+                    if (data.user.selectedLevel) {
+                        localStorage.setItem("userLevel", data.user.selectedLevel);
+                        localStorage.setItem("xyverra_selected_level", data.user.selectedLevel);
+                    }
+                    if (data.user.skills && data.user.skills.length > 0) {
+                        localStorage.setItem("userSkills", JSON.stringify(data.user.skills));
+                    }
+                    if (data.user.completedModules && data.user.completedModules.length > 0) {
+                        localStorage.setItem("completedModules", JSON.stringify(data.user.completedModules));
+                    }
+                    if (data.user.competencyScore !== undefined) {
+                        localStorage.setItem("xyverra_skill_score", data.user.competencyScore);
+                    }
+                    if (data.user.dailyStreak !== undefined) {
+                        localStorage.setItem("xyverra_user_streak", data.user.dailyStreak);
+                    }
+                    if (data.user.experienceRank !== undefined) {
+                        localStorage.setItem("xyverra_xp", data.user.experienceRank);
+                    }
+
                     // Show success popup and redirect
                     if (window.showSuccessPopup) {
-                        await window.showSuccessPopup("Account Created Successfully ✅");
+                        await window.showSuccessPopup(data.message.includes("exists") ? "Login Successful 🎉" : "Account Created Successfully ✅");
                     } else {
                         console.log("showSuccessPopup not found, skipping popup.");
                     }
-                    
-                    window.location.href = 'path-selection.html';
+
+                    // If existing user with a path, go to dashboard; otherwise path selection
+                    if (data.user.selectedPath) {
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        window.location.href = 'path-selection.html';
+                    }
                 } else {
                     // Backend returned an error
                     console.warn("Registration failed:", data.message);
-                    
+
                     // Specific handling for "user already exists"
                     if (data.message && data.message.toLowerCase().includes('exists')) {
                         showError(emailError, data.message, emailInput);

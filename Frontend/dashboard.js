@@ -1,123 +1,131 @@
 /* ==========================================================
-   dashboard.js — Xyverra Dashboard
-   All localStorage reads are marked with TODO comments
-   so they can be replaced with real API calls later.
+   dashboard.js — Xyverra Dashboard (LocalStorage mock logic)
    ========================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
+    
+    // Auth check
+    const email = localStorage.getItem('xyverra_user_email');
+    if (!email) {
+        window.location.href = 'login.html';
+        return;
+    }
 
-    // ── 1. Load state from localStorage ────────────────────
-    // TODO: Replace with GET /api/user/dashboard
-    const selectedPath    = localStorage.getItem("xyverra_selected_path") || "Web Development";
+    const userName = localStorage.getItem('xyverra_user_name') || 'Guest';
+    const selectedPath = localStorage.getItem('xyverra_selected_path');
+    const userRole = localStorage.getItem('xyverra_target_career');
+    const hasRoadmap = localStorage.getItem('xyverra_roadmap') !== null;
+    
+    // 1. Populate UI headers
+    const userNameEl = document.getElementById('user-welcome-name');
+    if (userNameEl) userNameEl.textContent = userName;
+    
+    const userDisplayName = document.getElementById('user-display-name');
+    if (userDisplayName) userDisplayName.textContent = userName;
+
+    const userAvatar = document.getElementById('user-avatar');
+    if (userAvatar) {
+        userAvatar.textContent = (userName).charAt(0).toUpperCase();
+    }
+
+    // 2. Empty State Check (No roadmap yet)
+    const dashboardGrid = document.querySelector('.metrics-grid');
+    const contentGrid = document.querySelector('.content-grid');
+    
+    if (!hasRoadmap || !selectedPath) {
+        // Show empty state
+        if (dashboardGrid) dashboardGrid.style.display = 'none';
+        if (contentGrid) contentGrid.innerHTML = `
+            <div class="card-box" style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🧭</div>
+                <h2>Welcome to Xyverra, ${userName}!</h2>
+                <p style="color: var(--text-muted); max-width: 500px; margin: 1rem auto 2rem;">Your learning journey hasn't started yet. Let's assess your skills, interests, and goals to recommend the perfect tech career path for you.</p>
+                <button class="btn btn-primary" onclick="window.location.href = 'career-discovery.html'" style="font-size: 1.1rem; padding: 12px 24px;">
+                    Start Career Discovery <i class="fas fa-arrow-right" style="margin-left:8px;"></i>
+                </button>
+            </div>
+        `;
+        return; // Stop further execution
+    }
+
+    // 3. Populate Dashboard Data for active roadmap
     const completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
-    const skillScore      = parseInt(localStorage.getItem('xyverra_skill_score') || '10');
+    const skillScore = localStorage.getItem('xyverra_skill_score') || 0;
+    const streak = localStorage.getItem('xyverra_user_streak') || 0;
+    
+    // Match roadmap path using ROADMAP_DATA if available (mocked stats)
+    let totalSteps = 12; // fallback
+    let currentModule = { title: "Introduction to " + selectedPath };
 
-    let userSkills = [];
-    try {
-        const raw = localStorage.getItem("userSkills");
-        if (raw) userSkills = JSON.parse(raw).map(s => s.toLowerCase().trim());
-    } catch { /* ignore */ }
-
-    // ── 2. Match roadmap path ───────────────────────────────
-    // ROADMAP_DATA is defined in roadmap.js (loaded before this script)
-    const pathData = (typeof ROADMAP_DATA !== 'undefined')
-        ? (ROADMAP_DATA[selectedPath] || ROADMAP_DATA[Object.keys(ROADMAP_DATA).find(k => selectedPath.includes(k))] || ROADMAP_DATA["Web Development"])
-        : [];
-
-    const totalSteps       = pathData.length;
-    let completedCount     = 0;
-    let currentModule      = null;
-
-    pathData.forEach(module => {
-        if (completedModules.includes(module.id)) {
-            completedCount++;
-        } else if (!currentModule && module.id !== 'capstone') {
-            currentModule = module;
-        }
-    });
-
+    if (typeof window.ROADMAP_DATA !== 'undefined' && window.ROADMAP_DATA[selectedPath]) {
+        const pathData = window.ROADMAP_DATA[selectedPath];
+        totalSteps = pathData.length;
+        const uncompleted = pathData.filter(m => !completedModules.includes(m.id) && m.id !== 'capstone');
+        if (uncompleted.length > 0) currentModule = uncompleted[0];
+    }
+    
+    const completedCount = completedModules.length;
     const progressPct = totalSteps > 0 ? Math.round((completedCount / totalSteps) * 100) : 0;
-    const jobReadiness = Math.min(100, Math.round(progressPct * 0.7 + (userSkills.length * 2)));
-    const trustScore  = Math.min(100, Math.round(completedCount * 12.5));
+    
+    // Bento Box 1: Competency Score
+    const scoreDisplay = document.getElementById('user-score-display');
+    if (scoreDisplay) scoreDisplay.textContent = skillScore;
+    const scoreBar = document.getElementById('score-progress-bar');
+    if (scoreBar) scoreBar.style.width = `${Math.min(100, skillScore)}%`;
 
-    // ── 3. Update Metric Cards ──────────────────────────────
-    _setText('.metric-card:nth-child(1) .metric-value', skillScore);
-    _setText('.metric-card:nth-child(1) .metric-subtitle', `out of 100`);
-    _setWidth('.metric-card:nth-child(1) .progress-bar', skillScore);
-
-    _setText('.metric-card:nth-child(2) .metric-value', `${progressPct}%`);
-    _setText('.metric-card:nth-child(2) .metric-subtitle', `${completedCount} of ${totalSteps} steps`);
-    _setWidth('.metric-card:nth-child(2) .progress-bar', progressPct);
-
-    _setText('.metric-card:nth-child(3) .metric-value', trustScore);
-    _setText('.metric-card:nth-child(3) .metric-subtitle', `Verification accuracy`);
-    _setWidth('.metric-card:nth-child(3) .progress-bar', trustScore);
-
-    _setText('.metric-card:nth-child(4) .metric-value', `${completedCount}/${totalSteps}`);
-
-    // ── 4. Update Progress Tracker Milestones (4th card) ───
-    const milestones = document.querySelectorAll('.pt-milestone');
-    milestones.forEach((el, i) => {
-        if (i < pathData.length && completedModules.includes(pathData[i].id)) {
+    // Bento Box 2: Roadmap Progress
+    const roadmapPct = document.getElementById('roadmap-pct-display');
+    if (roadmapPct) roadmapPct.textContent = `${progressPct}%`;
+    const roadmapSteps = document.getElementById('roadmap-steps-label');
+    if (roadmapSteps) roadmapSteps.textContent = `${completedCount} of ${totalSteps} steps completed`;
+    const roadmapBar = document.getElementById('roadmap-progress-bar');
+    if (roadmapBar) roadmapBar.style.width = `${progressPct}%`;
+    
+    // Bento Box 3: Experience Rank / Assigned Level
+    const xpDisplay = document.getElementById('xp-display-val');
+    if (xpDisplay) xpDisplay.textContent = (completedCount * 120).toLocaleString();
+    
+    const assignedLevel = localStorage.getItem('userLevel');
+    const rankTitle = document.getElementById('user-rank-title');
+    if (rankTitle) {
+        if (assignedLevel) {
+            rankTitle.textContent = assignedLevel;
+        } else {
+            if (progressPct < 30) rankTitle.textContent = "Beginner";
+            else if (progressPct < 70) rankTitle.textContent = "Intermediate";
+            else rankTitle.textContent = "Advanced";
+        }
+    }
+    
+    // Bento Box 4: Daily Tracker
+    const streakVal = document.getElementById('streak-val-display');
+    if (streakVal) streakVal.textContent = `${streak} Days`;
+    
+    const ptMilestones = document.querySelectorAll('.pt-milestone');
+    ptMilestones.forEach((el, i) => {
+        if (i < Math.min(streak, 5)) {
             el.classList.add('done');
         } else {
             el.classList.remove('done');
         }
     });
-
-    // ── 5. Next Milestone Section ───────────────────────────
-    const milestoneTitle = document.querySelector('.milestone-content h3');
-    const milestoneDesc  = document.querySelector('.milestone-content p');
-    if (currentModule) {
-        if (milestoneTitle) milestoneTitle.textContent = currentModule.title;
-        if (milestoneDesc) milestoneDesc.textContent = currentModule.desc;
-    } else {
-        if (milestoneTitle) milestoneTitle.textContent = '🎉 Roadmap Completed!';
-        if (milestoneDesc) milestoneDesc.textContent = 'You have finished all modules. Your profile is job-ready!';
+    
+    // Next Milestone Section
+    const activeMilestoneTitle = document.getElementById('active-milestone-title');
+    if (activeMilestoneTitle) {
+        activeMilestoneTitle.textContent = completedCount >= totalSteps ? '🎉 Roadmap Completed!' : currentModule.title;
     }
-
-    // ── 6. Knowledge Check Card ─────────────────────────────
-    const kcTitle = document.querySelector('.knowledge-content h3');
-    const kcBadge = document.querySelector('.knowledge-content .badge');
-    const kcDesc  = document.querySelector('.knowledge-content > p');
-    const kcBtn   = document.getElementById('take-quiz-btn') || document.querySelector('.knowledge-check-card .btn-primary');
-
-    if (currentModule) {
-        if (kcTitle) kcTitle.textContent = currentModule.title;
-        if (kcBadge) kcBadge.textContent = `Step ${completedCount + 1}`;
-        if (kcDesc) kcDesc.textContent = currentModule.desc;
-        if (kcBtn) {
-            kcBtn.onclick = e => {
-                e.preventDefault();
-                window.location.href = `quiz.html?module=${currentModule.id}`;
-            };
-        }
-    } else {
-        if (kcTitle) kcTitle.textContent = 'All Steps Complete!';
-        if (kcBadge) kcBadge.textContent = 'Done';
-        if (kcDesc) kcDesc.textContent = 'You have verified all modules in your roadmap.';
-        if (kcBtn) kcBtn.disabled = true;
-    }
-
-    // ── 7. Stats Panel ─────────────────────────────────────
-    _setText('.stat-item.job-readiness .stat-header span:last-child', `${jobReadiness}%`);
-    _setWidth('.stat-item.job-readiness .progress-bar', jobReadiness);
-
-    _setText('.stat-item:nth-child(3) .stat-value', userSkills.length);
-    _setText('.stat-item:nth-child(4) .stat-value', completedCount);
-    _setText('.stat-item:nth-child(5) .stat-value', `${completedCount}/${totalSteps}`);
-
-    // Update streak dynamically
-    const streak = localStorage.getItem('xyverra_user_streak') || '0';
-    _setText('.stat-item:nth-child(2) .badge', `${streak} Days`);
-
-    // ── Helper functions ────────────────────────────────────
-    function _setText(selector, text) {
-        const el = document.querySelector(selector);
-        if (el) el.textContent = text;
-    }
-    function _setWidth(selector, pct) {
-        const el = document.querySelector(selector);
-        if (el) el.style.width = `${Math.max(2, Math.min(100, pct))}%`;
-    }
+    
+    // Stats list
+    const readinessPct = document.getElementById('readiness-pct-display');
+    if (readinessPct) readinessPct.textContent = `${progressPct}%`;
+    
+    const userRoleDisplay = document.getElementById('user-role-display');
+    if (userRoleDisplay) userRoleDisplay.textContent = userRole || selectedPath;
+    
+    // Skill Gap Analysis
+    const validatedDisplay = document.getElementById('skills-validated-display');
+    const gapDisplay = document.getElementById('skills-gap-display');
+    if (validatedDisplay) validatedDisplay.textContent = completedCount;
+    if (gapDisplay) gapDisplay.textContent = Math.max(0, totalSteps - completedCount);
 });

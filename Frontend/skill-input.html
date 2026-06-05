@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Roadmap - Xyverra</title>
-    <meta name="description" content="Set your skills, level, and preferred modules to generate your personalised Xyverra learning roadmap.">
+    <title>Level Assignment - Xyverra</title>
+    <meta name="description" content="Your assigned level based on your assessment score.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="global.css">
     <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="skill-input.css">
 </head>
@@ -17,7 +18,7 @@
         <!-- Mobile Header Toggle -->
         <div class="mobile-nav-toggle">
             <div class="sidebar-brand" style="margin-bottom: 0; padding: 0;">
-                <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" class="sidebar-logo">
+                <img src="xyverra_logo.jpeg" alt="Xyverra Logo" class="sidebar-logo">
                 Xyverra
             </div>
             <button id="sidebar-toggle-btn" class="btn" style="padding: 5px; background: transparent;">
@@ -31,7 +32,7 @@
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar-menu">
             <div class="sidebar-brand">
-                <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" class="sidebar-logo">
+                <img src="xyverra_logo.jpeg" alt="Xyverra Logo" class="sidebar-logo">
                 Xyverra
             </div>
             <nav class="nav-menu">
@@ -39,17 +40,18 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                     Dashboard
                 </a>
-                <a href="skills.html" class="nav-item nav-skills">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                    Skills
+                <a href="career-discovery.html" class="nav-item nav-career-discovery">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+                    Career Discovery
                 </a>
+
                 <a href="skill-gap.html" class="nav-item nav-skill-gap">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg>
                     Skill Gap Analysis
                 </a>
                 <a href="skill-input.html" class="nav-item active nav-skill-input">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                    Create Roadmap
+                    My Roadmap
                 </a>
                 <a href="progress.html" class="nav-item nav-progress">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
@@ -78,80 +80,29 @@
             <div class="dashboard-container">
                 <!-- Page Header -->
                 <header class="dashboard-header" style="text-align: center; margin-bottom: 2.5rem;">
-                    <h1>Create Your Learning Roadmap</h1>
-                    <p>Tell us about your current experience to generate a personalized learning path.</p>
+                    <h1>Automatic Level Assignment</h1>
+                    <p>We've analyzed your Career Assessment to place you at the right starting point.</p>
                 </header>
 
                 <!-- Form Card -->
-                <div class="content-card form-card">
-                    <!-- Category Selector -->
-                    <div class="form-group">
-                        <label>Skill Category</label>
-                        <div class="module-select-wrapper">
-                            <select id="category-select" class="module-select">
-                                <option value="Web Development">Web Development</option>
-                                <option value="Full Stack Development">Full Stack Development</option>
-                                <option value="Backend / APIs">Backend / APIs</option>
-                                <option value="Data Science">Data Science</option>
-                                <option value="NLP / AI">NLP / AI</option>
-                                <option value="Cloud / DevOps">Cloud / DevOps</option>
-                                <option value="UI/UX Design">UI/UX Design</option>
-                                <option value="Mobile Development">Mobile Development</option>
-                                <option value="Cybersecurity">Cybersecurity</option>
-                                <option value="Data Analytics">Data Analytics</option>
-                            </select>
-                            <i class="fas fa-chevron-down module-select-icon"></i>
-                        </div>
+                <div class="content-card form-card" style="max-width: 600px; margin: 0 auto; text-align: center; padding: 3rem 2rem;">
+                    
+                    <div style="font-size: 3.5rem; margin-bottom: 1rem;" id="level-icon">🎓</div>
+                    <h2 style="font-size: 1.3rem; margin-bottom: 0.5rem; color: var(--text-dark);">Your Assessment Score: <strong id="assessment-score" style="color: var(--primary);">--</strong></h2>
+                    
+                    <p style="color: var(--text-body); margin-bottom: 2rem; line-height: 1.6; font-size: 1.1rem;">
+                        Based on your assessment, you have been placed in the:
+                    </p>
+                    
+                    <div style="background: rgba(37, 99, 235, 0.05); border: 2px solid var(--primary); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 2.5rem;">
+                        <h3 id="assigned-level-title" style="font-size: 2.2rem; color: var(--primary); margin: 0;">Loading Level...</h3>
+                        <p style="margin-top: 0.5rem; color: var(--text-dark); font-weight: 500;" id="assigned-level-desc"></p>
                     </div>
 
-                    <!-- Level Selector -->
-                    <div class="form-group">
-                        <label>Your Current Level</label>
-                        <div class="level-selector">
-                            <button type="button" class="level-btn active" data-level="Beginner">Beginner</button>
-                            <button type="button" class="level-btn" data-level="Intermediate">Intermediate</button>
-                            <button type="button" class="level-btn" data-level="Advanced">Advanced</button>
-                        </div>
-                    </div>
-
-                    <!-- Module Selector (grouped by level) -->
-                    <div class="form-group" id="module-selector-group">
-                        <label>
-                            <i class="fas fa-layer-group" style="margin-right: 6px; color: var(--primary);"></i>
-                            Start from Module
-                            <span class="field-hint-inline" id="module-level-hint" style="margin-left: 8px; font-size: 0.78rem; color: var(--text-muted); font-weight: 500;">(Beginner modules)</span>
-                        </label>
-                        <p class="field-hint">Choose the module you want to begin from based on your level</p>
-                        <div class="module-select-wrapper">
-                            <select id="module-select" class="module-select">
-                                <!-- Options injected by JS -->
-                            </select>
-                            <i class="fas fa-chevron-down module-select-icon"></i>
-                        </div>
-
-                        <!-- Module preview card -->
-                        <div class="module-preview" id="module-preview" style="display: none;">
-                            <div class="module-preview-icon">
-                                <i class="fas fa-book-open"></i>
-                            </div>
-                            <div class="module-preview-text">
-                                <span class="module-preview-title" id="module-preview-title"></span>
-                                <span class="module-preview-desc" id="module-preview-desc"></span>
-                            </div>
-                            <span class="module-preview-badge" id="module-preview-badge"></span>
-                        </div>
-                    </div>
-
-                    <!-- Experience Description -->
-                    <div class="form-group">
-                        <label for="experience-field">Experience Description <span style="font-weight: 400; color: var(--text-muted);">(Optional)</span></label>
-                        <textarea id="experience-field" rows="4" placeholder="Briefly describe what you've built or learned so far..."></textarea>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" id="generate-btn" class="btn btn-primary generate-btn">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                            Generate Roadmap
+                    <div class="form-actions" style="justify-content: center;">
+                        <button type="button" id="generate-btn" class="btn btn-primary generate-btn" style="padding: 14px 32px; font-size: 1.1rem;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                            Generate Personalized Roadmap
                         </button>
                     </div>
                 </div>
@@ -160,7 +111,6 @@
     </div>
 
     <script src="app-data.js"></script>
-    <script src="roadmap.js"></script>
     <script src="skill-input.js"></script>
     <script src="global-sidebar.js"></script>
 </body>

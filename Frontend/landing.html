@@ -4,423 +4,329 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xyverra — AI-Powered Career Guidance & Roadmaps</title>
-    <meta name="description" content="Accelerate your technical career. Get personalized, AI-generated career paths, skill gap analyses, and interactive tracking.">
+    <meta name="description" content="Accelerate your technical career. Get personalized, AI-generated career paths, skill gap analyses, and interactive roadmap tracking.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="global.css">
     <link rel="stylesheet" href="landing.css">
 </head>
 <body>
-    <!-- Ambient Background Lighting -->
+    <!-- Ambient Background -->
     <div class="mesh-bg"></div>
+    <div class="grid-overlay"></div>
 
-    <!-- Header / Navigation -->
-    <nav class="navbar">
+    <!-- Navigation -->
+    <nav class="navbar" id="main-navbar">
         <div class="nav-container">
-            <a href="#" class="nav-brand">
-                <div class="brand-icon">
-                    <img src="./image/xyverra_logo.jpeg" alt="Xyverra Logo" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; display: block;" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-rocket\'></i>';">
+            <a href="landing.html" class="nav-brand">
+                <div class="brand-logo-wrap">
+                    <img src="xyverra_logo.jpeg" alt="Xyverra" class="brand-logo-img">
                 </div>
                 <span>Xyverra</span>
             </a>
-            <div class="nav-links">
+            <div class="nav-links" id="nav-links">
                 <a href="#features" class="nav-link">Features</a>
-                <a href="#how-it-works" class="nav-link">How it Works</a>
-                <a href="#paths" class="nav-link">Paths</a>
-                <a href="#ai-matching" class="nav-link">AI Matching</a>
-                <a href="#stats" class="nav-link">Metrics</a>
-                <a href="#testimonials" class="nav-link">Testimonials</a>
+                <a href="#workflow" class="nav-link">How It Works</a>
+                <a href="#testimonials" class="nav-link">About</a>
             </div>
             <div class="nav-actions">
-                <a href="login.html" class="btn btn-outline nav-login">Login</a>
-                <a href="signup.html" class="btn btn-primary nav-signup">Get Started</a>
+                <a href="login.html" class="btn btn-outline">Sign In</a>
+                <a href="signup.html" class="btn btn-primary">Get Started Free</a>
             </div>
-            <button class="mobile-menu-btn" aria-label="Toggle menu"><i class="fas fa-bars"></i></button>
+            <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
-        <!-- Mobile Menu Overlay -->
-        <div class="mobile-menu">
-            <a href="#features" class="nav-link">Features</a>
-            <a href="#how-it-works" class="nav-link">How it Works</a>
-            <a href="#paths" class="nav-link">Paths</a>
-            <a href="#ai-matching" class="nav-link">AI Matching</a>
-            <a href="#stats" class="nav-link">Metrics</a>
-            <a href="#testimonials" class="nav-link">Testimonials</a>
-            <div class="mobile-nav-actions">
-                <a href="login.html" class="btn btn-outline">Login</a>
-                <a href="signup.html" class="btn btn-primary">Get Started</a>
-            </div>
+        <!-- Mobile drawer -->
+        <div class="mobile-nav-drawer" id="mobile-drawer">
+            <a href="#features" class="mobile-nav-link">Features</a>
+            <a href="#workflow" class="mobile-nav-link">How It Works</a>
+            <a href="login.html" class="mobile-nav-link">Sign In</a>
+            <a href="signup.html" class="btn btn-primary" style="margin-top:0.5rem; text-align:center;">Get Started Free</a>
         </div>
     </nav>
 
-    <!-- 1. Hero Section -->
-    <section class="hero" id="home">
-        <div class="hero-content fade-in-up">
-            <div class="hero-badge">⚡ AI-Powered Career Accelerator</div>
-            <h1 class="hero-title">Accelerate Your Tech Career With <span class="text-gradient">AI Roadmaps</span></h1>
-            <p class="hero-subtitle">Bridge your skill gaps, evaluate your competency, and execute a personalized learning journey designed for modern industry roles.</p>
-            <div class="hero-buttons">
-                <a href="signup.html" class="btn btn-primary btn-lg btn-glow">Start Learning <i class="fas fa-arrow-right"></i></a>
-                <a href="signup.html" class="btn btn-outline btn-lg">Generate Roadmap</a>
+    <!-- ═══════════════════════════ HERO ═══════════════════════════ -->
+    <section class="hero">
+        <div class="hero-inner">
+            <div class="hero-badge">
+                <span class="badge-dot"></span>
+                AI-Powered Career Intelligence Platform
+            </div>
+            <h1 class="hero-title">
+                Your <span class="text-gradient">Career Roadmap,</span><br>Built by AI
+            </h1>
+            <p class="hero-subtitle">
+                Stop guessing your next move. Xyverra assesses your skills, matches you to real career paths, pinpoints your gaps, and generates a personalized learning roadmap — all in minutes.
+            </p>
+            <div class="hero-cta-row">
+                <a href="signup.html" class="btn btn-primary btn-xl">
+                    <i class="fas fa-rocket"></i> Start for Free
+                </a>
+                <a href="login.html" class="btn btn-ghost btn-xl">
+                    Sign In <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="hero-trust-row">
+                <div class="trust-item"><i class="fas fa-shield-alt"></i> Free to use</div>
+                <div class="trust-divider"></div>
+                <div class="trust-item"><i class="fas fa-bolt"></i> AI-powered</div>
+                <div class="trust-divider"></div>
+                <div class="trust-item"><i class="fas fa-map"></i> Personalized roadmaps</div>
             </div>
         </div>
-        <div class="hero-visual fade-in-up delay-1">
-            <div class="glass-card mockup-card">
-                <div class="mockup-header">
-                    <span class="dot red"></span>
-                    <span class="dot yellow"></span>
-                    <span class="dot green"></span>
-                </div>
-                <div class="mockup-body">
-                    <div class="mockup-sidebar">
-                        <div class="mockup-item"></div>
-                        <div class="mockup-item"></div>
-                        <div class="mockup-item"></div>
+
+        <!-- Hero Dashboard Preview -->
+        <div class="hero-visual-wrap">
+            <div class="hero-dashboard-card">
+                <div class="hdc-header">
+                    <div class="hdc-dots">
+                        <span class="hdc-dot red"></span>
+                        <span class="hdc-dot yellow"></span>
+                        <span class="hdc-dot green"></span>
                     </div>
-                    <div class="mockup-content">
-                        <div class="mockup-title"></div>
-                        <div class="mockup-text line-1"></div>
-                        <div class="mockup-text line-2"></div>
-                        <div class="mockup-chart">
-                            <div class="bar bar-1"></div>
-                            <div class="bar bar-2"></div>
-                            <div class="bar bar-3"></div>
-                            <div class="bar bar-4"></div>
+                    <span class="hdc-title">Xyverra Dashboard</span>
+                </div>
+                <div class="hdc-body">
+                    <div class="hdc-stat-row">
+                        <div class="hdc-stat blue">
+                            <div class="hdc-stat-icon"><i class="fas fa-chart-line"></i></div>
+                            <div><div class="hdc-stat-val">74%</div><div class="hdc-stat-label">Job Readiness</div></div>
+                        </div>
+                        <div class="hdc-stat purple">
+                            <div class="hdc-stat-icon"><i class="fas fa-layer-group"></i></div>
+                            <div><div class="hdc-stat-val">Advanced</div><div class="hdc-stat-label">Current Level</div></div>
+                        </div>
+                        <div class="hdc-stat green">
+                            <div class="hdc-stat-icon"><i class="fas fa-fire"></i></div>
+                            <div><div class="hdc-stat-val">12 Days</div><div class="hdc-stat-label">Streak</div></div>
                         </div>
                     </div>
+                    <div class="hdc-path-label">Active Path: <strong>Full Stack Development</strong></div>
+                    <div class="hdc-progress-track">
+                        <div class="hdc-track-item done"><i class="fas fa-check"></i><span>HTML/CSS</span></div>
+                        <div class="hdc-track-arrow"><i class="fas fa-chevron-right"></i></div>
+                        <div class="hdc-track-item done"><i class="fas fa-check"></i><span>JavaScript</span></div>
+                        <div class="hdc-track-arrow"><i class="fas fa-chevron-right"></i></div>
+                        <div class="hdc-track-item active"><i class="fas fa-code"></i><span>React</span></div>
+                        <div class="hdc-track-arrow"><i class="fas fa-chevron-right"></i></div>
+                        <div class="hdc-track-item locked"><i class="fas fa-lock"></i><span>Node.js</span></div>
+                    </div>
+                    <div class="hdc-gap-row">
+                        <span class="hdc-gap-label">Skill Gaps Identified</span>
+                        <span class="hdc-gap-badge">3 Critical · 2 Minor</span>
+                    </div>
                 </div>
-                <!-- Floating elements with professional wording -->
-                <div class="float-badge float-1 glass-card"><i class="fas fa-map-marked-alt text-success"></i> Roadmap created</div>
-                <div class="float-badge float-2 glass-card"><i class="fas fa-chart-line text-accent"></i> +45% Skill Growth</div>
+            </div>
+            <div class="hero-floating-pill pill-left">
+                <i class="fas fa-brain" style="color:#8B5CF6"></i> AI Assessment Complete
+            </div>
+            <div class="hero-floating-pill pill-right">
+                <i class="fas fa-check-circle" style="color:#10B981"></i> Roadmap Generated
             </div>
         </div>
     </section>
 
-    <!-- 2. Features Section -->
-    <section class="features" id="features">
-        <div class="section-header fade-in-up">
-            <h2 class="section-title">Everything You Need to Succeed</h2>
-            <p class="section-subtitle">Xyverra combines intelligent matching algorithms with structured visual feedback to guide you toward job-readiness.</p>
+    <!-- ═══════════════════════════ FEATURES ═══════════════════════════ -->
+    <section id="features" class="section">
+        <div class="section-header">
+            <div class="section-badge">Platform Features</div>
+            <h2 class="section-title">Everything You Need to Land Your Dream Job</h2>
+            <p class="section-subtitle">From assessment to employment — Xyverra covers the full career development lifecycle.</p>
         </div>
-        <div class="features-grid">
-            <div class="feature-card glass-card fade-in-up">
-                <div class="feature-icon"><i class="fas fa-map-marked-alt"></i></div>
-                <h3>Personalized AI Roadmaps</h3>
-                <p>Discover structured, visual pathways custom-built to match your technical background and long-term career aspirations.</p>
+
+        <div class="features-bento">
+            <!-- Large card -->
+            <div class="bento-card bento-main">
+                <div class="bento-icon-lg" style="background: rgba(37,99,235,0.08); color:#2563EB">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <h3>AI-Generated Career Roadmaps</h3>
+                <p>Get a custom step-by-step roadmap based on your assessment score, current skill level, and chosen career path. Skip what you know, focus on what matters.</p>
+                <div class="bento-tags">
+                    <span class="btag">Personalized</span>
+                    <span class="btag">Interactive</span>
+                    <span class="btag">Visual</span>
+                </div>
             </div>
-            <div class="feature-card glass-card fade-in-up delay-1">
-                <div class="feature-icon"><i class="fas fa-search-plus"></i></div>
+
+            <!-- Skill Gap -->
+            <div class="bento-card">
+                <div class="bento-icon-sm" style="background: rgba(239,68,68,0.08); color:#EF4444">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
                 <h3>Skill Gap Analysis</h3>
-                <p>Instantly diagnose missing competencies and receive recommended study resources to bridge the gap efficiently.</p>
+                <p>Instantly see what you're missing vs. what employers need. Prioritized by urgency.</p>
             </div>
-            <div class="feature-card glass-card fade-in-up delay-2">
-                <div class="feature-icon"><i class="fas fa-tasks"></i></div>
-                <h3>Quiz-Based Tracking</h3>
-                <p>Validate your knowledge retention through interactive timed assessments to confirm module compliance.</p>
+
+            <!-- Quiz -->
+            <div class="bento-card">
+                <div class="bento-icon-sm" style="background: rgba(245,158,11,0.08); color:#F59E0B">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <h3>Knowledge Validation</h3>
+                <p>Timed quizzes after every module keep you sharp and track your verified competency score.</p>
             </div>
-            <div class="feature-card glass-card fade-in-up">
-                <div class="feature-icon"><i class="fas fa-compass"></i></div>
-                <h3>Smart Career Guidance</h3>
-                <p>Gain automated direction mapping your performance logs against real-time market demands and roles.</p>
+
+            <!-- Level -->
+            <div class="bento-card">
+                <div class="bento-icon-sm" style="background: rgba(139,92,246,0.08); color:#8B5CF6">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <h3>Auto Level Assignment</h3>
+                <p>Your assessment score auto-assigns Beginner, Intermediate, Advanced, or Capstone level.</p>
             </div>
-            <div class="feature-card glass-card fade-in-up delay-1">
-                <div class="feature-icon"><i class="fas fa-lightbulb"></i></div>
-                <h3>Smart Recommendations</h3>
-                <p>Get instant access to curated documentation links, coding exercises, and reference tools as you learn.</p>
+
+            <!-- Progress -->
+            <div class="bento-card">
+                <div class="bento-icon-sm" style="background: rgba(16,185,129,0.08); color:#10B981">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h3>Progress Tracking</h3>
+                <p>A real-time dashboard tracks your streak, roadmap completion, and job readiness score.</p>
             </div>
-            <div class="feature-card glass-card fade-in-up delay-2">
-                <div class="feature-icon"><i class="fas fa-columns"></i></div>
-                <h3>Interactive Dashboard</h3>
-                <p>Visualize your progress, streaks, score logs, and verification badge status from a unified command center.</p>
+
+            <!-- Wide card -->
+            <div class="bento-card bento-wide">
+                <div class="bento-icon-sm" style="background: rgba(6,182,212,0.08); color:#06B6D4">
+                    <i class="fas fa-compass"></i>
+                </div>
+                <h3>Smart Career Matching</h3>
+                <p>Our AI matches your interest profile against 10+ career domains including Web Development, Data Science, AI/ML, Cloud DevOps, Cybersecurity, and more — then suggests the best fit for you.</p>
             </div>
         </div>
     </section>
 
-    <!-- 3. How Xyverra Works -->
-    <section class="how-it-works" id="how-it-works">
-        <div class="section-header fade-in-up">
-            <h2 class="section-title">Your Path to Mastery</h2>
-            <p class="section-subtitle">Five structured phases designed to take you from a curious beginner to a job-ready expert.</p>
+    <!-- ═══════════════════════════ HOW IT WORKS ═══════════════════════════ -->
+    <section id="workflow" class="section section-alt">
+        <div class="section-header">
+            <div class="section-badge">The Process</div>
+            <h2 class="section-title">Your Path from Zero to Job-Ready</h2>
+            <p class="section-subtitle">A structured, 5-step AI workflow designed to get you hired.</p>
         </div>
-        <div class="steps-container">
-            <div class="step-line"></div>
-            
-            <div class="step fade-in-up">
-                <div class="step-number">1</div>
-                <div class="step-content glass-card">
-                    <h4>Account Creation</h4>
-                    <p>Register your secure profile in seconds. Unlock immediate platform features without any initial fees.</p>
+
+        <div class="workflow-container">
+            <div class="workflow-step-card">
+                <div class="ws-number">01</div>
+                <div class="ws-body">
+                    <div class="ws-icon" style="background:rgba(37,99,235,0.1);color:#2563EB"><i class="fas fa-clipboard-list"></i></div>
+                    <h4>Career Assessment</h4>
+                    <p>Answer targeted questions about your interests, experience, and goals. This forms the foundation of your personalized plan.</p>
                 </div>
             </div>
-            
-            <div class="step fade-in-up delay-1">
-                <div class="step-number">2</div>
-                <div class="step-content glass-card">
+            <div class="workflow-connector"><i class="fas fa-chevron-right"></i></div>
+
+            <div class="workflow-step-card">
+                <div class="ws-number">02</div>
+                <div class="ws-body">
+                    <div class="ws-icon" style="background:rgba(139,92,246,0.1);color:#8B5CF6"><i class="fas fa-brain"></i></div>
+                    <h4>AI Recommendations</h4>
+                    <p>Our system analyzes your profile and recommends the best-fit career paths based on your score and preferences.</p>
+                </div>
+            </div>
+            <div class="workflow-connector"><i class="fas fa-chevron-right"></i></div>
+
+            <div class="workflow-step-card">
+                <div class="ws-number">03</div>
+                <div class="ws-body">
+                    <div class="ws-icon" style="background:rgba(6,182,212,0.1);color:#06B6D4"><i class="fas fa-road"></i></div>
                     <h4>Path Selection</h4>
-                    <p>Choose your technical domain, specifying your high-demand business or engineering specialty.</p>
+                    <p>Choose your target career from the recommendations and review what skills and knowledge it requires.</p>
                 </div>
             </div>
-            
-            <div class="step fade-in-up delay-2">
-                <div class="step-number">3</div>
-                <div class="step-content glass-card">
-                    <h4>Skill Diagnosis</h4>
-                    <p>Input your current skillset. Our AI evaluates your baseline to avoid teaching topics you already know.</p>
+            <div class="workflow-connector"><i class="fas fa-chevron-right"></i></div>
+
+            <div class="workflow-step-card">
+                <div class="ws-number">04</div>
+                <div class="ws-body">
+                    <div class="ws-icon" style="background:rgba(245,158,11,0.1);color:#F59E0B"><i class="fas fa-layer-group"></i></div>
+                    <h4>Level Assignment</h4>
+                    <p>Your competency score automatically places you at the right starting level — no manual selection needed.</p>
                 </div>
             </div>
-            
-            <div class="step fade-in-up delay-1">
-                <div class="step-number">4</div>
-                <div class="step-content glass-card">
-                    <h4>Roadmap Generation</h4>
-                    <p>Access your Personalized Learning Journey immediately, mapping required tech topics in sequential order.</p>
-                </div>
-            </div>
-            
-            <div class="step fade-in-up">
-                <div class="step-number">5</div>
-                <div class="step-content glass-card">
-                    <h4>Verification & Assessment</h4>
-                    <p>Unlock achievements, complete quizzes, and verify individual skill nodes until you are interview-ready.</p>
+            <div class="workflow-connector"><i class="fas fa-chevron-right"></i></div>
+
+            <div class="workflow-step-card active-step">
+                <div class="ws-number">05</div>
+                <div class="ws-body">
+                    <div class="ws-icon" style="background:rgba(16,185,129,0.1);color:#10B981"><i class="fas fa-rocket"></i></div>
+                    <h4>Roadmap & Growth</h4>
+                    <p>Execute your personalized roadmap, track skill gaps, complete quizzes, and watch your job readiness climb.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 4. Learning Paths Section -->
-    <section class="learning-paths" id="paths">
-        <div class="section-header fade-in-up">
-            <h2 class="section-title">High-Demand Pathways</h2>
-            <p class="section-subtitle">Explore a selection of career specializations supported by Xyverra's intelligent curriculum generator.</p>
-        </div>
-        <div class="paths-grid">
-            <div class="path-card glass-card fade-in-up">
-                <div class="path-badge">Core Path</div>
-                <div class="path-icon"><i class="fas fa-code"></i></div>
-                <h3>Web Development</h3>
-                <p>Master HTML, CSS, JavaScript, and React to build rich client-side interfaces and single-page applications.</p>
-                <div class="path-footer">
-                    <span class="path-meta"><i class="fas fa-layer-group"></i> 5 Modules</span>
-                    <a href="signup.html" class="path-btn">Explore Path <i class="fas fa-chevron-right"></i></a>
-                </div>
-            </div>
-            <div class="path-card glass-card fade-in-up delay-1">
-                <div class="path-badge">Data Science</div>
-                <div class="path-icon"><i class="fas fa-brain"></i></div>
-                <h3>Data Science</h3>
-                <p>Dive deep into Python, data parsing with Pandas, chart visualization, and predictive machine learning models.</p>
-                <div class="path-footer">
-                    <span class="path-meta"><i class="fas fa-layer-group"></i> 5 Modules</span>
-                    <a href="signup.html" class="path-btn">Explore Path <i class="fas fa-chevron-right"></i></a>
-                </div>
-            </div>
-            <div class="path-card glass-card fade-in-up delay-2">
-                <div class="path-badge">Advanced</div>
-                <div class="path-icon"><i class="fas fa-server"></i></div>
-                <h3>Cloud & DevOps</h3>
-                <p>Automate workflows using containerized Docker apps, pipeline integrations, and AWS deployments.</p>
-                <div class="path-footer">
-                    <span class="path-meta"><i class="fas fa-layer-group"></i> 5 Modules</span>
-                    <a href="signup.html" class="path-btn">Explore Path <i class="fas fa-chevron-right"></i></a>
-                </div>
-            </div>
-            <div class="path-card glass-card fade-in-up">
-                <div class="path-badge">Critical</div>
-                <div class="path-icon"><i class="fas fa-shield-alt"></i></div>
-                <h3>Cybersecurity</h3>
-                <p>Master network protocols, cryptographical standards, penetration assessments, and system hardening.</p>
-                <div class="path-footer">
-                    <span class="path-meta"><i class="fas fa-layer-group"></i> 4 Modules</span>
-                    <a href="signup.html" class="path-btn">Explore Path <i class="fas fa-chevron-right"></i></a>
-                </div>
+    <!-- ═══════════════════════════ CTA ═══════════════════════════ -->
+    <section class="cta-section">
+        <div class="cta-inner">
+            <div class="cta-badge"><i class="fas fa-star"></i> Start Today — It's Free</div>
+            <h2>Accelerate Your Career With AI</h2>
+            <p>Join thousands of learners who've stopped guessing and started growing with Xyverra.</p>
+            <div class="cta-btns">
+                <a href="signup.html" class="btn btn-white btn-xl">
+                    Create Free Account <i class="fas fa-arrow-right"></i>
+                </a>
+                <a href="login.html" class="btn btn-outline-white btn-xl">Already have an account</a>
             </div>
         </div>
     </section>
 
-    <!-- 5. AI Recommendation Section -->
-    <section class="ai-recommendation" id="ai-matching">
-        <div class="ai-recommendation-container glass-card fade-in-up">
-            <div class="ai-rec-content">
-                <div class="hero-badge">🤖 Intelligence matching</div>
-                <h2 class="section-title text-left">Intelligent AI Recommendation Engine</h2>
-                <p>Xyverra's machine learning model scans active job boards and analyses the gaps in your profile to provide automated course matching and career fit indices.</p>
-                <div class="ai-feature-row">
-                    <div class="ai-feat-icon"><i class="fas fa-crosshairs"></i></div>
-                    <div class="ai-feat-text">
-                        <h4>Precision Skill Evaluation</h4>
-                        <p>Evaluates your quiz answers and completed modules to score your placement fit.</p>
-                    </div>
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand-col">
+                <div class="footer-brand">
+                    <img src="xyverra_logo.jpeg" alt="Xyverra" style="width:28px;height:28px;border-radius:8px;">
+                    <span>Xyverra</span>
                 </div>
-                <div class="ai-feature-row">
-                    <div class="ai-feat-icon"><i class="fas fa-briefcase"></i></div>
-                    <div class="ai-feat-text">
-                        <h4>Career Suitability Index</h4>
-                        <p>Provides a matching percentage against various role requirements based on your verified credentials.</p>
-                    </div>
-                </div>
+                <p>AI-powered career guidance for the modern tech professional.</p>
             </div>
-            <div class="ai-rec-visual">
-                <div class="ai-card glass-card">
-                    <div class="ai-card-header">
-                        <i class="fas fa-magic text-accent"></i>
-                        <span>AI Match Analysis</span>
-                    </div>
-                    <div class="ai-match-progress">
-                        <div class="progress-label">
-                           <span>Frontend Web Developer</span>
-                           <strong>92% Match</strong>
-                        </div>
-                        <div class="ai-progress-bar-container"><div class="ai-progress-bar" style="width: 92%;"></div></div>
-                    </div>
-                    <div class="ai-match-progress">
-                        <div class="progress-label">
-                           <span>Full Stack Engineer</span>
-                           <strong>76% Match</strong>
-                        </div>
-                        <div class="ai-progress-bar-container"><div class="ai-progress-bar" style="width: 76%;"></div></div>
-                    </div>
-                    <div class="ai-match-progress">
-                        <div class="progress-label">
-                           <span>DevOps Associate</span>
-                           <strong>45% Match</strong>
-                        </div>
-                        <div class="ai-progress-bar-container"><div class="ai-progress-bar" style="width: 45%;"></div></div>
-                    </div>
-                    <div class="ai-visual-overlay-badge"><i class="fas fa-spinner fa-spin"></i> Checking requirements...</div>
-                </div>
+            <div class="footer-links-col">
+                <h5>Platform</h5>
+                <a href="signup.html">Roadmaps</a>
+                <a href="signup.html">Assessments</a>
+                <a href="login.html">Dashboard</a>
             </div>
-        </div>
-    </section>
-
-    <!-- 6. Testimonials Section -->
-    <section class="testimonials" id="testimonials">
-        <div class="section-header fade-in-up">
-            <h2 class="section-title">Loved by Career Builders</h2>
-            <p class="section-subtitle">See how thousands of learners are stepping out of tutorial loops and achieving their targets.</p>
-        </div>
-        <div class="testimonials-grid">
-            <div class="testimonial-card glass-card fade-in-up">
-                <div class="stars">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                </div>
-                <p class="quote">"Before Xyverra, I was jumping from tutorial to tutorial without any clear direction. The AI roadmap gave me exactly what I needed to focus on, and the quizzes kept me accountable."</p>
-                <div class="user-info">
-                    <div class="avatar" style="background: linear-gradient(135deg, #6366F1, #8B5CF6);">JS</div>
-                    <div>
-                        <h4>Jharana Shrish</h4>
-                        <span>Frontend Developer</span>
-                    </div>
-                </div>
+            <div class="footer-links-col">
+                <h5>Company</h5>
+                <a href="javascript:void(0)" onclick="alert('Coming soon')">About</a>
+                <a href="javascript:void(0)" onclick="alert('Coming soon')">Careers</a>
+                <a href="javascript:void(0)" onclick="alert('Coming soon')">Contact</a>
             </div>
-            <div class="testimonial-card glass-card fade-in-up delay-1">
-                <div class="stars">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                </div>
-                <p class="quote">"The skill gap analysis is terrifyingly accurate. It pinpointed exactly why I was failing interviews and helped me bridge the gap in just 3 weeks."</p>
-                <div class="user-info">
-                    <div class="avatar" style="background: linear-gradient(135deg, #10B981, #34D399);">R</div>
-                    <div>
-                        <h4>Roshan</h4>
-                        <span>Data Analyst</span>
-                    </div>
-                </div>
-            </div>
-            <div class="testimonial-card glass-card fade-in-up delay-2">
-                <div class="stars">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                </div>
-                <p class="quote">"The dashboard analytics are incredibly motivating. Seeing my skill score rise every time I complete a module makes learning feel like a game."</p>
-                <div class="user-info">
-                    <div class="avatar" style="background: linear-gradient(135deg, #F59E0B, #FBBF24);">MS</div>
-                    <div>
-                        <h4>Mamta Shahu</h4>
-                        <span>UX Designer</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 7. Statistics / Success Metrics Section -->
-    <section class="statistics" id="stats">
-        <div class="stats-grid">
-            <div class="stat-card glass-card fade-in-up">
-                <div class="stat-num-container">
-                    <span class="stat-number" data-target="15000">0</span><span class="stat-suffix">+</span>
-                </div>
-                <p class="stat-label">AI Generated Career Paths</p>
-            </div>
-            <div class="stat-card glass-card fade-in-up delay-1">
-                <div class="stat-num-container">
-                    <span class="stat-number" data-target="94">0</span><span class="stat-suffix">%</span>
-                </div>
-                <p class="stat-label">Achievement Unlocked Rate</p>
-            </div>
-            <div class="stat-card glass-card fade-in-up delay-2">
-                <div class="stat-num-container">
-                    <span class="stat-number" data-target="40">0</span><span class="stat-suffix">+</span>
-                </div>
-                <p class="stat-label">Specialized Tech Specialties</p>
-            </div>
-            <div class="stat-card glass-card fade-in-up">
-                <div class="stat-num-container">
-                    <span class="stat-number" data-target="4.8">0</span><span class="stat-suffix">★</span>
-                </div>
-                <p class="stat-label">Average Satisfaction Rating</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta" id="cta">
-        <div class="cta-content glass-card fade-in-up">
-            <h2>Ready to accelerate your career?</h2>
-            <p>Join thousands of learners building their future with Xyverra.</p>
-            <a href="signup.html" class="btn btn-primary btn-xl btn-glow">Start Learning <i class="fas fa-arrow-right"></i></a>
-        </div>
-    </section>
-
-    <!-- 8. Footer -->
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-brand">
-                <div class="brand-icon-small">
-                    <i class="fas fa-rocket"></i>
-                </div>
-                <span>Xyverra</span>
-                <p>Your AI-powered mentor for a brighter career future.</p>
-            </div>
-            <div class="footer-links">
-                <div class="link-group">
-                    <h4>Platform</h4>
-                    <a href="signup.html">Roadmaps</a>
-                    <a href="signup.html">Assessments</a>
-                    <a href="login.html">Dashboard</a>
-                </div>
-                <div class="link-group">
-                    <h4>Company</h4>
-                    <a href="#home">About Us</a>
-                    <a href="#">Careers</a>
-                    <a href="#">Contact</a>
-                </div>
-                <div class="link-group">
-                    <h4>Legal</h4>
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
-                </div>
+            <div class="footer-links-col">
+                <h5>Legal</h5>
+                <a href="javascript:void(0)" onclick="alert('Coming soon')">Privacy Policy</a>
+                <a href="javascript:void(0)" onclick="alert('Coming soon')">Terms of Service</a>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 Xyverra. All rights reserved.</p>
-            <div class="social-icons">
-                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
-            </div>
+            <p>&copy; 2025 Xyverra. All rights reserved.</p>
         </div>
     </footer>
 
-    <script src="landing.js"></script>
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            document.getElementById('main-navbar').classList.toggle('scrolled', window.scrollY > 30);
+        });
+
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.getElementById('mobile-drawer').classList.toggle('open');
+        });
+
+        // Smooth-scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
+                e.preventDefault();
+                const target = document.querySelector(a.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('mobile-drawer').classList.remove('open');
+            });
+        });
+    </script>
 </body>
 </html>

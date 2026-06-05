@@ -8,105 +8,91 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="global.css">
+    <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="path-selection.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="centered-layout">
-
-
-            <div class="path-header">
-                <h2>Choose Your Learning Path</h2>
-                <p>Select the skill or domain you want to master</p>
+    <div class="app-layout">
+        <!-- Mobile Header Toggle -->
+        <div class="mobile-nav-toggle">
+            <div class="sidebar-brand" style="margin-bottom: 0; padding: 0;">
+                <img src="xyverra_logo.jpeg" alt="Xyverra Logo" class="sidebar-logo">
+                Xyverra
             </div>
-
-            <div class="grid-container">
-                <div class="grid-card active" onclick="document.querySelectorAll('.grid-card').forEach(c => c.classList.remove('active')); this.classList.add('active');">
-                    <div class="icon" style="color: #60A5FA;"><i class="fas fa-globe"></i></div>
-                    <div class="grid-card-content">
-                        <h4>Web Development</h4>
-                        <p>HTML, CSS, JavaScript, React</p>
-                    </div>
-                </div>
-
-                <div class="grid-card" onclick="document.querySelectorAll('.grid-card').forEach(c => c.classList.remove('active')); this.classList.add('active');">
-                    <div class="icon" style="color: #F87171;"><i class="fas fa-bolt"></i></div>
-                    <div class="grid-card-content">
-                        <h4>Full Stack Development</h4>
-                        <p>Frontend + Backend + Databases</p>
-                    </div>
-                </div>
-
-                <div class="grid-card" onclick="document.querySelectorAll('.grid-card').forEach(c => c.classList.remove('active')); this.classList.add('active');">
-                    <div class="icon" style="color: #9CA3AF;"><i class="fas fa-wrench"></i></div>
-                    <div class="grid-card-content">
-                        <h4>Backend / APIs</h4>
-                        <p>Node, Python, REST APIs, DBs</p>
-                    </div>
-                </div>
-
-                <div class="grid-card" onclick="document.querySelectorAll('.grid-card').forEach(c => c.classList.remove('active')); this.classList.add('active');">
-                    <div class="icon" style="color: #34D399;"><i class="fas fa-chart-bar"></i></div>
-                    <div class="grid-card-content">
-                        <h4>Data Science</h4>
-                        <p>Python, Pandas, ML, Statistics</p>
-                    </div>
-                </div>
-
-                <div class="grid-card" onclick="document.querySelectorAll('.grid-card').forEach(c => c.classList.remove('active')); this.classList.add('active');">
-                    <div class="icon" style="color: #A78BFA;"><i class="fas fa-robot"></i></div>
-                    <div class="grid-card-content">
-                        <h4>NLP / AI</h4>
-                        <p>LLMs, transformers, text processing</p>
-                    </div>
-                </div>
-
-                <div class="grid-card" onclick="document.querySelectorAll('.grid-card').forEach(c => c.classList.remove('active')); this.classList.add('active');">
-                    <div class="icon" style="color: #93C5FD;"><i class="fas fa-cloud"></i></div>
-                    <div class="grid-card-content">
-                        <h4>Cloud / DevOps</h4>
-                        <p>Docker, Kubernetes, CI/CD, AWS</p>
-                    </div>
-                </div>
-
-                <div class="grid-card" onclick="document.querySelectorAll('.grid-card').forEach(c => c.classList.remove('active')); this.classList.add('active');">
-                    <div class="icon" style="color: #F472B6;"><i class="fas fa-palette"></i></div>
-                    <div class="grid-card-content">
-                        <h4>UI/UX Design</h4>
-                        <p>Figma, user research, prototyping</p>
-                    </div>
-                </div>
-
-                <div class="grid-card" onclick="document.querySelectorAll('.grid-card').forEach(c => c.classList.remove('active')); this.classList.add('active');">
-                    <div class="icon" style="color: #4F46E5;"><i class="fas fa-mobile-alt"></i></div>
-                    <div class="grid-card-content">
-                        <h4>Mobile Development</h4>
-                        <p>React Native, Flutter, iOS/Android</p>
-                    </div>
-                </div>
-
-                <div class="grid-card" onclick="document.querySelectorAll('.grid-card').forEach(c => c.classList.remove('active')); this.classList.add('active');">
-                    <div class="icon" style="color: #F59E0B;"><i class="fas fa-lock"></i></div>
-                    <div class="grid-card-content">
-                        <h4>Cybersecurity</h4>
-                        <p>Penetration testing, networking</p>
-                    </div>
-                </div>
-
-                <div class="grid-card" onclick="document.querySelectorAll('.grid-card').forEach(c => c.classList.remove('active')); this.classList.add('active');">
-                    <div class="icon" style="color: #818CF8;"><i class="fas fa-chart-line"></i></div>
-                    <div class="grid-card-content">
-                        <h4>Data Analytics</h4>
-                        <p>SQL, Power BI, dashboards, ETL</p>
-                    </div>
-                </div>
-            </div>
-
-            <a href="level-selection.html" id="path-continue-btn" class="btn btn-primary">
-                Continue <i class="fas fa-arrow-right"></i>
-            </a>
-
+            <button id="sidebar-toggle-btn" class="btn" style="padding: 5px; background: transparent;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
         </div>
+
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar-menu">
+            <div class="sidebar-brand">
+                <img src="xyverra_logo.jpeg" alt="Xyverra Logo" class="sidebar-logo">
+                Xyverra
+            </div>
+            <nav class="nav-menu">
+                <a href="dashboard.html" class="nav-item nav-dashboard">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    Dashboard
+                </a>
+                <a href="career-discovery.html" class="nav-item active nav-career-discovery">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+                    Career Discovery
+                </a>
+
+                <a href="skill-gap.html" class="nav-item nav-skill-gap">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg>
+                    Skill Gap Analysis
+                </a>
+                <a href="skill-input.html" class="nav-item nav-skill-input">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    My Roadmap
+                </a>
+                <a href="progress.html" class="nav-item nav-progress">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                    Progress Tracker
+                </a>
+            </nav>
+
+            <div style="flex: 1;"></div>
+
+            <div class="user-profile">
+                <div class="profile-click-area" title="View Profile">
+                    <div class="avatar" id="user-avatar"></div>
+                    <div class="profile-text">
+                        <h4 id="user-display-name">Loading...</h4>
+                        <p>User Role</p>
+                    </div>
+                </div>
+                <button class="signout-btn" title="Sign Out" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="dashboard-container">
+                <div class="path-header" style="text-align: center; margin-bottom: 2.5rem;">
+                    <h1>Choose Your Learning Path</h1>
+                    <p style="color: var(--text-body);">Select one of your recommended careers to begin.</p>
+                </div>
+
+                <div class="grid-container" id="recommended-paths-grid">
+                    <!-- Dynamic rendering of recommended careers -->
+                </div>
+
+                <div style="text-align: center; margin-top: 3rem;">
+                    <button id="path-continue-btn" class="btn btn-primary" style="padding: 14px 32px; font-size: 1.1rem; display: inline-flex;" disabled>
+                        Continue to Career Details <i class="fas fa-arrow-right" style="margin-left:8px;"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
     </div>
     <script src="global-sidebar.js"></script>
     <script src="path-selection.js"></script>

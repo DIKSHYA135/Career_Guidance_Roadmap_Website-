@@ -351,14 +351,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const headerTitle = document.getElementById("roadmap-header-title");
     
     // Load state
+    const targetCareer = localStorage.getItem('xyverra_target_career') || localStorage.getItem('xyverra_selected_path') || 'Web Developer';
     const selectedPath = localStorage.getItem("xyverra_selected_path") || "Web Development";
+    
     let matchedPathKey = selectedPath;
     if (!ROADMAP_DATA[matchedPathKey]) {
-        matchedPathKey = Object.keys(ROADMAP_DATA).find(key => selectedPath.includes(key)) || "Web Development";
+        // Simple heuristic matching
+        matchedPathKey = Object.keys(ROADMAP_DATA).find(key => 
+            targetCareer.toLowerCase().includes(key.toLowerCase()) || 
+            key.toLowerCase().includes(selectedPath.toLowerCase().split(' ')[0])
+        ) || "Web Development";
     }
     
     if (headerTitle) {
-        headerTitle.innerText = `${matchedPathKey} Roadmap`;
+        headerTitle.innerText = `${targetCareer} Roadmap`;
     }
 
     const pathData = ROADMAP_DATA[matchedPathKey];
@@ -367,17 +373,30 @@ document.addEventListener("DOMContentLoaded", () => {
     let completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
     let completedCourses = JSON.parse(localStorage.getItem('completedCourses') || '[]');
 
-    // Respect "Start from Module"
-    const selectedStartModule = localStorage.getItem('selectedStartModule') || '';
-    if (selectedStartModule) {
-        const startIdx = pathData.findIndex(m => m.id === selectedStartModule);
-        if (startIdx > 0) {
-            for (let i = 0; i < startIdx; i++) {
-                const m = pathData[i];
-                if (m.id !== 'capstone' && !completedModules.includes(m.id)) {
-                    completedModules.push(m.id);
-                }
+    // Auto-unlock modules based on assigned userLevel
+    const userLevelStr = localStorage.getItem('userLevel') || "Beginner";
+    let startIdx = 0;
+    
+    // Most paths have 5 modules: 2 beginner, 2 intermediate, 1 capstone
+    // We map levels roughly to these indexes
+    if (userLevelStr === "Intermediate") {
+        startIdx = 2;
+    } else if (userLevelStr === "Advanced") {
+        startIdx = 4;
+    } else if (userLevelStr === "Capstone") {
+        startIdx = pathData.length - 1;
+    }
+
+    if (startIdx > 0 && startIdx < pathData.length) {
+        let changed = false;
+        for (let i = 0; i < startIdx; i++) {
+            const m = pathData[i];
+            if (m.id !== 'capstone' && !completedModules.includes(m.id)) {
+                completedModules.push(m.id);
+                changed = true;
             }
+        }
+        if (changed) {
             localStorage.setItem('completedModules', JSON.stringify(completedModules));
         }
     }
@@ -612,7 +631,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Update side panel target path
     const sideTargetPath = document.getElementById('side-target-path');
-    if (sideTargetPath) sideTargetPath.textContent = matchedPathKey;
+    if (sideTargetPath) sideTargetPath.textContent = targetCareer;
 
     // Render all groups (they will be locked automatically if prior modules aren't completed)
     renderGroup("🌱 Beginner",     beginnerModules,     0);
