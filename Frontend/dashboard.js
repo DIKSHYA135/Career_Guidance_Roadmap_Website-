@@ -67,11 +67,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const completedCount = completedModules.length;
     const progressPct = totalSteps > 0 ? Math.round((completedCount / totalSteps) * 100) : 0;
     
-    // Bento Box 1: Competency Score
+    // Compute Career Readiness Score (0-100)
+    // Formula: 60% Roadmap Progress, 20% Quiz Scores, 20% XP (Max 3000 XP)
+    const rawQuizScores = JSON.parse(localStorage.getItem('moduleQuizPassed') || '{}');
+    const quizCount = Object.keys(rawQuizScores).length;
+    const avgQuiz = quizCount > 0 ? Object.values(rawQuizScores).reduce((a,b) => a+b, 0) / quizCount : 0;
+    
+    const xp = (completedCount * 120) + (streak * 50);
+    const xpPct = Math.min(100, (xp / 3000) * 100);
+    
+    const careerReadinessScore = Math.round((progressPct * 0.6) + (avgQuiz * 0.2) + (xpPct * 0.2));
+    
+    // Bento Box 1: Career Readiness Score
     const scoreDisplay = document.getElementById('user-score-display');
-    if (scoreDisplay) scoreDisplay.textContent = skillScore;
+    if (scoreDisplay) scoreDisplay.textContent = `${careerReadinessScore}%`;
     const scoreBar = document.getElementById('score-progress-bar');
-    if (scoreBar) scoreBar.style.width = `${Math.min(100, skillScore)}%`;
+    if (scoreBar) scoreBar.style.width = `${careerReadinessScore}%`;
 
     // Bento Box 2: Roadmap Progress
     const roadmapPct = document.getElementById('roadmap-pct-display');
@@ -81,20 +92,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const roadmapBar = document.getElementById('roadmap-progress-bar');
     if (roadmapBar) roadmapBar.style.width = `${progressPct}%`;
     
-    // Bento Box 3: Experience Rank / Assigned Level
+    // Bento Box 3: Experience Rank / Job Ready Level
     const xpDisplay = document.getElementById('xp-display-val');
-    if (xpDisplay) xpDisplay.textContent = (completedCount * 120).toLocaleString();
+    if (xpDisplay) xpDisplay.textContent = `${xp.toLocaleString()} XP`;
     
-    const assignedLevel = localStorage.getItem('userLevel');
     const rankTitle = document.getElementById('user-rank-title');
     if (rankTitle) {
-        if (assignedLevel) {
-            rankTitle.textContent = assignedLevel;
-        } else {
-            if (progressPct < 30) rankTitle.textContent = "Beginner";
-            else if (progressPct < 70) rankTitle.textContent = "Intermediate";
-            else rankTitle.textContent = "Advanced";
-        }
+        if (careerReadinessScore < 30) rankTitle.textContent = "Beginner";
+        else if (careerReadinessScore < 60) rankTitle.textContent = "Intermediate";
+        else if (careerReadinessScore < 85) rankTitle.textContent = "Advanced";
+        else rankTitle.textContent = "Job Ready";
     }
     
     // Bento Box 4: Daily Tracker
@@ -117,8 +124,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
     // Stats list
-    const readinessPct = document.getElementById('readiness-pct-display');
-    if (readinessPct) readinessPct.textContent = `${progressPct}%`;
+    const readinessPctDisplay = document.getElementById('readiness-pct-display');
+    if (readinessPctDisplay) readinessPctDisplay.textContent = `${careerReadinessScore}%`;
     
     const userRoleDisplay = document.getElementById('user-role-display');
     if (userRoleDisplay) userRoleDisplay.textContent = userRole || selectedPath;

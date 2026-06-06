@@ -76,11 +76,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // 4. Donut Chart
     drawDonutChart('distribution-chart', validated.length, needsImprovement.length, criticalGaps.length);
 
-    // 5. Render lists
-    renderList('critical-gaps-list', criticalGaps, 'badge-critical', 'Missing', true);
-    renderList('other-missing-list', needsImprovement, 'badge-improvement', 'Improve', true);
-    renderList('needs-improvement-list', needsImprovement, 'badge-improvement', 'Improve', true);
-    renderList('validated-skills-list', validated, 'badge-validated', 'Validated', false);
+    // 5. Render lists with icons
+    renderList('critical-gaps-list', criticalGaps, 'badge-critical', 'Missing', '❌');
+    renderList('other-missing-list', needsImprovement, 'badge-improvement', 'Improve', '⚠');
+    renderList('needs-improvement-list', needsImprovement, 'badge-improvement', 'Improve', '⚠');
+    renderList('validated-skills-list', validated, 'badge-validated', 'Validated', '✓');
 
     // 6. Action Banner
     const banner = document.getElementById('sg-action-banner');
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Render list of skills
-function renderList(elementId, items, badgeClass, badgeText, showCourseLink) {
+function renderList(elementId, items, badgeClass, badgeText, icon) {
     const container = document.getElementById(elementId);
     if (!container) return;
 
@@ -107,21 +107,38 @@ function renderList(elementId, items, badgeClass, badgeText, showCourseLink) {
         return;
     }
 
-    container.innerHTML = items.map(item => `
-        <div class="skill-item">
-            <div class="skill-info">
-                <span class="skill-name">${item.name || item}</span>
-                <span class="skill-category-text">${item.category || ''}</span>
+    container.innerHTML = items.map(item => {
+        const skillName = item.name || item;
+        
+        // Mock Learning Resources for missing/improve skills
+        let resourcesHtml = '';
+        if (icon === '❌' || icon === '⚠') {
+            resourcesHtml = `
+            <div class="learning-resources" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 0.85rem;">
+                <p style="margin: 0 0 6px 0; font-weight: 600; color: var(--text-dark);">Recommended Resources:</p>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <a href="https://www.coursera.org/search?query=${encodeURIComponent(skillName)}" target="_blank" style="color: var(--primary); text-decoration: none; background: rgba(37,99,235,0.1); padding: 4px 8px; border-radius: 4px;"><i class="fas fa-graduation-cap"></i> Courses</a>
+                    <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(skillName + ' tutorial')}" target="_blank" style="color: #EF4444; text-decoration: none; background: rgba(239,68,68,0.1); padding: 4px 8px; border-radius: 4px;"><i class="fab fa-youtube"></i> YouTube</a>
+                    <a href="https://developer.mozilla.org/en-US/search?q=${encodeURIComponent(skillName)}" target="_blank" style="color: #10B981; text-decoration: none; background: rgba(16,185,129,0.1); padding: 4px 8px; border-radius: 4px;"><i class="fas fa-book"></i> Docs</a>
+                </div>
+            </div>`;
+        }
+
+        return `
+        <div class="skill-item" style="display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div class="skill-info">
+                    <span class="skill-name">${skillName} <span style="margin-left: 6px; font-size: 1.1rem;">${icon}</span></span>
+                    <span class="skill-category-text">${item.category || ''}</span>
+                </div>
+                <div class="sg-item-right">
+                    <span class="sg-badge ${badgeClass}">${badgeText}</span>
+                </div>
             </div>
-            <div class="sg-item-right">
-                <span class="sg-badge ${badgeClass}">${badgeText}</span>
-                ${showCourseLink ? `
-                <a href="roadmap.html" class="sg-course-link" title="Go to Roadmap">
-                    <i class="fas fa-external-link-alt"></i>
-                </a>` : ''}
-            </div>
+            ${resourcesHtml}
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // Donut Chart

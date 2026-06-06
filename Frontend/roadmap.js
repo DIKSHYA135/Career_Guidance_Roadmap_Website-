@@ -340,6 +340,51 @@ const ROADMAP_DATA = {
             ]
         },
         { id: "capstone", title: "Analytics Capstone", desc: "Analyze a dataset and present a BI dashboard.", keywords: [], courses: [] }
+    ],
+    "AI Engineer": [
+        {
+            id: "python-basics", title: "Python Basics", desc: "Master core Python syntax and structures.", keywords: ["python"],
+            courses: [
+                { name: "W3Schools Python", url: "https://www.w3schools.com/python/" },
+                { name: "Kaggle Python Course (Free)", url: "https://www.kaggle.com/learn/python" }
+            ]
+        },
+        {
+            id: "problem-solving", title: "Problem Solving & Logic", desc: "Data structures and algorithms.", keywords: ["algorithms", "dsa", "logic"],
+            courses: [
+                { name: "LeetCode Crash Course", url: "https://leetcode.com/explore/" },
+                { name: "GeeksforGeeks DSA", url: "https://www.geeksforgeeks.org/data-structures/" }
+            ]
+        },
+        {
+            id: "machine-learning", title: "Machine Learning", desc: "Supervised and unsupervised learning, Scikit-learn.", keywords: ["ml", "scikit-learn"],
+            courses: [
+                { name: "Google ML Crash Course", url: "https://developers.google.com/machine-learning/crash-course" },
+                { name: "Kaggle ML Intro", url: "https://www.kaggle.com/learn/intro-to-machine-learning" }
+            ]
+        },
+        {
+            id: "data-analysis", title: "Data Analysis", desc: "Pandas, NumPy, and data wrangling.", keywords: ["pandas", "numpy"],
+            courses: [
+                { name: "Kaggle Pandas", url: "https://www.kaggle.com/learn/pandas" },
+                { name: "W3Schools NumPy", url: "https://www.w3schools.com/python/numpy/" }
+            ]
+        },
+        {
+            id: "deep-learning", title: "Deep Learning", desc: "Neural networks, PyTorch, TensorFlow.", keywords: ["deep learning", "pytorch", "tensorflow"],
+            courses: [
+                { name: "Fast.ai Practical Deep Learning", url: "https://course.fast.ai/" },
+                { name: "DeepLearning.AI (Coursera)", url: "https://www.coursera.org/specializations/deep-learning" }
+            ]
+        },
+        {
+            id: "mlops", title: "MLOps", desc: "Model deployment, tracking, and lifecycle management.", keywords: ["mlops", "deployment"],
+            courses: [
+                { name: "MLOps.org", url: "https://ml-ops.org/" },
+                { name: "Hugging Face Deployment", url: "https://huggingface.co/docs" }
+            ]
+        },
+        { id: "capstone", title: "Industry Project & Portfolio", desc: "Build an end-to-end AI project and showcase it.", keywords: [], courses: [] }
     ]
 };
 
