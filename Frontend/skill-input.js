@@ -65,20 +65,48 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('userLevel', assignedLevel);
     
     // 5. Generate Button Logic
-    document.getElementById('generate-btn').addEventListener('click', (e) => {
+    document.getElementById('generate-btn').addEventListener('click', async (e) => {
         const btn = e.currentTarget;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
         btn.disabled = true;
         
-        // Mock generation delay
-        setTimeout(() => {
-            // Also ensure selected_path is set (fallback to target career)
-            const targetCareer = localStorage.getItem('xyverra_target_career') || 'Web Developer';
-            if (!localStorage.getItem('xyverra_selected_path')) {
-                localStorage.setItem('xyverra_selected_path', targetCareer);
+        // Ensure selected_path is set (fallback to target career)
+        const targetCareer = localStorage.getItem('xyverra_target_career') || 'Web Developer';
+        let finalPath = localStorage.getItem('xyverra_selected_path');
+        if (!finalPath) {
+            finalPath = targetCareer;
+            localStorage.setItem('xyverra_selected_path', targetCareer);
+        }
+
+        // Save completion to backend
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                await fetch('http://localhost:5000/api/user/save-onboarding', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        interests: [finalPath],
+                        skills: [], // Can be filled in profile later
+                        selectedLevel: assignedLevel,
+                        careerGoal: `Master ${finalPath}`,
+                        timeline: '6 months', // default placeholder
+                        weeklyHours: '10' // default placeholder
+                    })
+                });
+            } catch (err) {
+                console.warn('Could not reach backend, onboarding saved locally only.', err);
             }
-            
+        }
+        
+        localStorage.setItem('xyverra_onboarded', 'true');
+
+        // Delay slightly for effect
+        setTimeout(() => {
             window.location.href = 'roadmap.html';
-        }, 1500);
+        }, 800);
     });
 });

@@ -245,7 +245,9 @@ app.post(
                             dailyStreak: existingUser.dailyStreak,
                             lastActivePage: existingUser.lastActivePage,
                             quizScores: existingUser.quizScores,
-                            completedModules: existingUser.completedModules
+                            completedModules: existingUser.completedModules,
+                            onboardingCompleted: existingUser.onboardingCompleted || false,
+                            interests: existingUser.interests || []
                         }
                     });
                 } else {
@@ -279,7 +281,9 @@ app.post(
                     id: newUser._id,
                     email: newUser.email,
                     name: newUser.name,
-                    skills: newUser.skills
+                    skills: newUser.skills,
+                    onboardingCompleted: false,
+                    interests: []
                 }
             });
         } catch (error) {
@@ -361,7 +365,9 @@ app.post(
                     dailyStreak: user.dailyStreak,
                     lastActivePage: user.lastActivePage,
                     quizScores: user.quizScores,
-                    completedModules: user.completedModules
+                    completedModules: user.completedModules,
+                    onboardingCompleted: user.onboardingCompleted || false,
+                    interests: user.interests || []
                 }
             });
         } catch (error) {
@@ -608,6 +614,74 @@ app.post('/api/user/save-completed-modules', authMiddleware, async (req, res) =>
         });
     } catch (error) {
         return serverError(res, 'Save Completed Modules Error', error);
+    }
+});
+
+// ==========================
+// SAVE ONBOARDING ROUTE (auth required)
+// ==========================
+app.post('/api/user/save-onboarding', authMiddleware, async (req, res) => {
+    try {
+        const { interests, skills, selectedLevel, careerGoal, timeline, weeklyHours } = req.body;
+
+        const updates = { onboardingCompleted: true };
+
+        if (Array.isArray(interests)) {
+            updates.interests = interests.slice(0, 20);
+        }
+        if (Array.isArray(skills)) {
+            updates.skills = skills.filter(s => typeof s === 'string').map(s => s.trim()).slice(0, 100);
+        }
+        if (selectedLevel && typeof selectedLevel === 'string') {
+            updates.selectedLevel = selectedLevel.trim();
+        }
+        if (careerGoal && typeof careerGoal === 'string') {
+            updates.careerGoal = careerGoal.trim().slice(0, 300);
+        }
+        if (timeline && typeof timeline === 'string') {
+            updates.timeline = timeline.trim();
+        }
+        if (weeklyHours && typeof weeklyHours === 'string') {
+            updates.weeklyHours = weeklyHours.trim();
+        }
+
+        // Set selectedPath from first interest if not already set
+        const user = await User.findById(req.user.userId);
+        if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+        if (!user.selectedPath && interests && interests.length > 0) {
+            const INTEREST_TO_PATH = {
+                'Web Development': 'Web Development',
+                'Full Stack Development': 'Full Stack Development',
+                'Backend / APIs': 'Backend / APIs',
+                'Data Science': 'Data Science',
+                'AI / Machine Learning': 'NLP / AI',
+                'AI / ML': 'NLP / AI',
+                'Cloud / DevOps': 'Cloud / DevOps',
+                'UI/UX Design': 'UI/UX Design',
+                'Mobile Development': 'Mobile Development',
+                'Cybersecurity': 'Cybersecurity',
+                'Data Analytics': 'Data Analytics',
+                'AI Engineer': 'AI Engineer'
+            };
+            updates.selectedPath = INTEREST_TO_PATH[interests[0]] || interests[0];
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user.userId,
+            { $set: updates },
+            { returnDocument: 'after' }
+        );
+
+        return res.json({
+            success: true,
+            message: 'Onboarding saved successfully',
+            selectedPath: updatedUser.selectedPath,
+            selectedLevel: updatedUser.selectedLevel,
+            onboardingCompleted: updatedUser.onboardingCompleted
+        });
+    } catch (error) {
+        return serverError(res, 'Save Onboarding Error', error);
     }
 });
 

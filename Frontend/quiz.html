@@ -65,6 +65,21 @@
             padding: 20px;
         }
     </style>
+    <!-- Quiz Access Guard: requires roadmap to be generated first -->
+    <script>
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            const hasModule = params.has('module');
+            const roadmapGenerated = localStorage.getItem('roadmapGenerated') === 'true';
+            const hasPath = !!localStorage.getItem('xyverra_selected_path');
+            // Allow if: coming from a specific module link OR roadmap has been generated
+            if (!hasModule && !roadmapGenerated && !hasPath) {
+                // No roadmap loaded yet — redirect back
+                sessionStorage.setItem('quiz_blocked_msg', 'Please generate your roadmap first before taking the quiz.');
+                window.location.replace('roadmap.html');
+            }
+        })();
+    </script>
 </head>
 <body>
 

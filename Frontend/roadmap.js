@@ -388,25 +388,47 @@ const ROADMAP_DATA = {
     ]
 };
 
+// Interest → ROADMAP_DATA key mapping
+const INTEREST_TO_PATH = {
+    'Web Development': 'Web Development',
+    'Full Stack Development': 'Full Stack Development',
+    'Backend / APIs': 'Backend / APIs',
+    'Data Science': 'Data Science',
+    'AI / Machine Learning': 'NLP / AI',
+    'AI / ML': 'NLP / AI',
+    'NLP / AI': 'NLP / AI',
+    'Cloud / DevOps': 'Cloud / DevOps',
+    'UI/UX Design': 'UI/UX Design',
+    'Mobile Development': 'Mobile Development',
+    'Cybersecurity': 'Cybersecurity',
+    'Data Analytics': 'Data Analytics',
+    'AI Engineer': 'AI Engineer'
+};
+
 document.addEventListener("DOMContentLoaded", () => {
     const accordionContainer = document.getElementById("roadmap-accordion");
     const overallProgressText = document.getElementById("overall-progress-text");
     const overallProgressBar = document.getElementById("overall-progress-bar");
     const topQuizBtn = document.getElementById("top-quiz-btn");
     const headerTitle = document.getElementById("roadmap-header-title");
+
+    // Hide quiz button until roadmap renders
+    if (topQuizBtn) topQuizBtn.style.display = 'none';
     
     // Load state
     const targetCareer = localStorage.getItem('xyverra_target_career') || localStorage.getItem('xyverra_selected_path') || 'Web Developer';
     const selectedPath = localStorage.getItem("xyverra_selected_path") || "Web Development";
     
-    let matchedPathKey = selectedPath;
-    if (!ROADMAP_DATA[matchedPathKey]) {
-        // Simple heuristic matching
+    // Try exact match first, then interest mapping, then heuristic
+    let matchedPathKey = ROADMAP_DATA[selectedPath] ? selectedPath : null;
+    if (!matchedPathKey) matchedPathKey = INTEREST_TO_PATH[selectedPath] || INTEREST_TO_PATH[targetCareer];
+    if (!matchedPathKey) {
         matchedPathKey = Object.keys(ROADMAP_DATA).find(key => 
             targetCareer.toLowerCase().includes(key.toLowerCase()) || 
             key.toLowerCase().includes(selectedPath.toLowerCase().split(' ')[0])
-        ) || "Web Development";
+        );
     }
+    if (!matchedPathKey) matchedPathKey = "Web Development";
     
     if (headerTitle) {
         headerTitle.innerText = `${targetCareer} Roadmap`;
@@ -419,7 +441,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let completedCourses = JSON.parse(localStorage.getItem('completedCourses') || '[]');
 
     // Auto-unlock modules based on assigned userLevel
-    const userLevelStr = localStorage.getItem('userLevel') || "Beginner";
+    const userLevelStr = localStorage.getItem('userLevel') || localStorage.getItem('xyverra_selected_level') || "Beginner";
     let startIdx = 0;
     
     // Most paths have 5 modules: 2 beginner, 2 intermediate, 1 capstone
@@ -661,7 +683,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const quizLevel = localStorage.getItem('quizResultLevel');
     const quizScore = localStorage.getItem('quizResultScore');
-    const userLevelStr = quizLevel || localStorage.getItem("userLevel") || "Beginner";
 
     if (quizLevel) {
         const resultBanner = document.getElementById('quiz-result-banner');
@@ -686,6 +707,13 @@ document.addEventListener("DOMContentLoaded", () => {
     visibleModulesData.push(...beginnerModules, ...intermediateModules, ...advancedModules);
 
     updateOverallProgress();
+
+    // Mark roadmap as generated and show quiz button
+    localStorage.setItem('roadmapGenerated', 'true');
+    if (topQuizBtn) {
+        topQuizBtn.style.display = 'inline-flex';
+        topQuizBtn.style.animation = 'fadeInUp 0.5s ease forwards';
+    }
 
     setTimeout(() => {
         const allItems = document.querySelectorAll('.accordion-item');

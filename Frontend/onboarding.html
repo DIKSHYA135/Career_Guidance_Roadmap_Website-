@@ -722,7 +722,7 @@
             }
         }
 
-        function saveAndContinue() {
+        async function saveAndContinue() {
             // Collect interests
             const interests = Array.from(document.querySelectorAll('.interest-chip.selected')).map(c => c.dataset.val);
             // Skills
@@ -736,6 +736,25 @@
             const timeline = document.getElementById('timeline-input').value;
             const hours = document.getElementById('hours-input').value;
 
+            // Interest → path mapping (matches roadmap.js ROADMAP_DATA keys)
+            const INTEREST_TO_PATH = {
+                'Web Development': 'Web Development',
+                'Full Stack Development': 'Full Stack Development',
+                'Backend / APIs': 'Backend / APIs',
+                'Data Science': 'Data Science',
+                'AI / Machine Learning': 'NLP / AI',
+                'AI / ML': 'NLP / AI',
+                'Cloud / DevOps': 'Cloud / DevOps',
+                'UI/UX Design': 'UI/UX Design',
+                'Mobile Development': 'Mobile Development',
+                'Cybersecurity': 'Cybersecurity',
+                'Data Analytics': 'Data Analytics',
+                'AI Engineer': 'AI Engineer'
+            };
+            const primaryPath = interests.length > 0
+                ? (INTEREST_TO_PATH[interests[0]] || interests[0])
+                : 'Web Development';
+
             // Save to localStorage
             localStorage.setItem('xyverra_interests', JSON.stringify(interests));
             localStorage.setItem('userSkills', JSON.stringify(skills));
@@ -745,9 +764,46 @@
             localStorage.setItem('xyverra_timeline', timeline);
             localStorage.setItem('xyverra_hours', hours);
             localStorage.setItem('xyverra_onboarded', 'true');
+            localStorage.setItem('xyverra_selected_path', primaryPath);
 
-            // Redirect to career assessment / recommendation
-            window.location.href = 'career-discovery.html';
+            // Update button state
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.disabled = true;
+            nextBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            // Attempt to save to backend (graceful fallback if server is offline)
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    const response = await fetch('http://localhost:5000/api/user/save-onboarding', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            interests,
+                            skills,
+                            selectedLevel: level,
+                            careerGoal: goal,
+                            timeline,
+                            weeklyHours: hours
+                        })
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.selectedPath) {
+                            localStorage.setItem('xyverra_selected_path', data.selectedPath);
+                        }
+                    }
+                } catch (err) {
+                    // Server offline — data already saved to localStorage
+                    console.warn('Could not reach backend, onboarding saved locally only.');
+                }
+            }
+
+            // Redirect to dashboard
+            window.location.href = 'dashboard.html';
         }
 
         // Init

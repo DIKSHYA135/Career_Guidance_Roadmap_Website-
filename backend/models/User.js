@@ -76,6 +76,32 @@ const userSchema = new mongoose.Schema({
         default: {}
     },
 
+    // Onboarding questionnaire answers
+    interests: {
+        type: [String],
+        default: []
+    },
+
+    careerGoal: {
+        type: String,
+        default: null
+    },
+
+    timeline: {
+        type: String,
+        default: null
+    },
+
+    weeklyHours: {
+        type: String,
+        default: null
+    },
+
+    onboardingCompleted: {
+        type: Boolean,
+        default: false
+    },
+
     createdAt: {
         type: Date,
         default: Date.now

@@ -33,8 +33,25 @@ document.addEventListener("DOMContentLoaded", async () => {
                     skills: data.skills || [],
                     selectedPath: data.selectedPath || userData.selectedPath,
                     selectedLevel: data.selectedLevel || userData.selectedLevel,
-                    createdAt: data.createdAt || null
+                    createdAt: data.createdAt || null,
+                    interests: data.interests || [],
+                    careerGoal: data.careerGoal || '',
+                    timeline: data.timeline || '',
+                    weeklyHours: data.weeklyHours || ''
                 };
+                // Sync interest data to localStorage if not already set
+                if (data.interests && data.interests.length > 0 && !localStorage.getItem('xyverra_interests')) {
+                    localStorage.setItem('xyverra_interests', JSON.stringify(data.interests));
+                }
+                if (data.careerGoal && !localStorage.getItem('xyverra_goal')) {
+                    localStorage.setItem('xyverra_goal', data.careerGoal);
+                }
+                if (data.timeline && !localStorage.getItem('xyverra_timeline')) {
+                    localStorage.setItem('xyverra_timeline', data.timeline);
+                }
+                if (data.weeklyHours && !localStorage.getItem('xyverra_hours')) {
+                    localStorage.setItem('xyverra_hours', data.weeklyHours);
+                }
             } else {
                 console.warn("Could not fetch profile from server, using localStorage.");
             }
@@ -73,7 +90,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const emailEl = document.getElementById('profile-email');
         if (emailEl) emailEl.innerHTML = `<i class="fas fa-envelope"></i> ${userData.email}`;
 
-        // DOB display (only show if provided)
+        // DOB display
         const dobDisplay = document.getElementById('profile-dob-display');
         const dobText = document.getElementById('profile-dob-text');
         if (dobDisplay && dobText) {
@@ -96,12 +113,24 @@ document.addEventListener("DOMContentLoaded", async () => {
             } catch {}
         }
 
+        // Level chip
+        const levelChipText = document.getElementById('level-chip-text');
+        if (levelChipText) levelChipText.textContent = userData.selectedLevel || 'Beginner';
+
         // Learning Path
         const catEl = document.getElementById('display-category');
         if (catEl) catEl.textContent = userData.selectedPath || 'Not Selected';
 
         const lvlEl = document.getElementById('display-level');
         if (lvlEl) lvlEl.textContent = userData.selectedLevel || 'Beginner';
+
+        // Timeline & Hours from localStorage
+        const timeline = localStorage.getItem('xyverra_timeline') || '';
+        const hours = localStorage.getItem('xyverra_hours') || '';
+        const timelineEl = document.getElementById('display-timeline');
+        if (timelineEl) timelineEl.textContent = timeline || '—';
+        const hoursEl = document.getElementById('display-hours');
+        if (hoursEl) hoursEl.textContent = hours ? `${hours} hrs/week` : '—';
 
         // Skills
         const skillsContainer = document.getElementById('profile-skills-container');
@@ -118,10 +147,63 @@ document.addEventListener("DOMContentLoaded", async () => {
                 skillsContainer.innerHTML = `
                     <div class="no-skills-state">
                         <i class="fas fa-layer-group"></i>
-                        <span>No skills added yet. Visit the Skills page.</span>
+                        <span>No skills added yet. Complete onboarding.</span>
                     </div>`;
             }
         }
+
+        // ── Stats Row ──
+        const xp = parseInt(localStorage.getItem('xyverra_xp') || '0', 10);
+        const streak = parseInt(localStorage.getItem('xyverra_user_streak') || '0', 10);
+        const score = parseInt(localStorage.getItem('xyverra_skill_score') || '0', 10);
+
+        // Roadmap % from completed modules
+        let roadmapPct = 0;
+        try {
+            const completed = JSON.parse(localStorage.getItem('completedModules') || '[]');
+            roadmapPct = Math.min(Math.round((completed.length / 5) * 100), 100);
+        } catch(e) {}
+
+        const statXp     = document.getElementById('stat-xp');
+        const statStreak = document.getElementById('stat-streak');
+        const statRoadmap= document.getElementById('stat-roadmap');
+        const statScore  = document.getElementById('stat-score');
+        if (statXp)      statXp.textContent     = xp.toLocaleString();
+        if (statStreak)  statStreak.textContent  = streak;
+        if (statRoadmap) statRoadmap.textContent = `${roadmapPct}%`;
+        if (statScore)   statScore.textContent   = score;
+
+        // ── Interests ──
+        const interestsContainer = document.getElementById('profile-interests-container');
+        if (interestsContainer) {
+            let interests = [];
+            try { interests = JSON.parse(localStorage.getItem('xyverra_interests') || '[]'); } catch(e){}
+            if (!interests.length && Array.isArray(userData.interests)) interests = userData.interests;
+            if (interests.length > 0) {
+                interestsContainer.innerHTML = interests.map(i =>
+                    `<span class="interest-display-chip"><i class="fas fa-tag" style="font-size:0.7rem;"></i>${i}</span>`
+                ).join('');
+            } else {
+                interestsContainer.innerHTML = `
+                    <div class="no-skills-state">
+                        <i class="fas fa-compass" style="font-size:1.3rem; opacity:0.25;"></i>
+                        <span>No interests selected yet. Complete onboarding.</span>
+                    </div>`;
+            }
+        }
+
+        // ── Goals ──
+        const goal        = localStorage.getItem('xyverra_goal') || '';
+        const timelineG   = localStorage.getItem('xyverra_timeline') || '';
+        const hoursG      = localStorage.getItem('xyverra_hours') || '';
+
+        const goalEl      = document.getElementById('display-goal');
+        const timelineGEl = document.getElementById('display-timeline-goal');
+        const hoursGEl    = document.getElementById('display-hours-goal');
+
+        if (goalEl)      goalEl.textContent      = goal      || 'Not set — complete onboarding';
+        if (timelineGEl) timelineGEl.textContent = timelineG || 'Not set';
+        if (hoursGEl)    hoursGEl.textContent    = hoursG    ? `${hoursG} hrs/week` : 'Not set';
 
         // Sidebar sync
         const sidebarName = document.getElementById('user-display-name');

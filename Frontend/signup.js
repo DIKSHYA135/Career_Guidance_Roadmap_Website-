@@ -163,11 +163,12 @@ document.addEventListener("DOMContentLoaded", () => {
                         console.log("showSuccessPopup not found, skipping popup.");
                     }
 
-                    // If existing user with a path, go to dashboard; otherwise path selection
-                    if (data.user.selectedPath) {
+                    // Redirect: new users → onboarding, returning users → dashboard
+                    const alreadyOnboarded = localStorage.getItem('xyverra_onboarded');
+                    if (data.user.selectedPath || alreadyOnboarded) {
                         window.location.href = 'dashboard.html';
                     } else {
-                        window.location.href = 'path-selection.html';
+                        window.location.href = 'career-discovery.html';
                     }
                 } else {
                     // Backend returned an error

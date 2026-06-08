@@ -78,15 +78,12 @@
             </div>
         </aside>
 
-        <!-- Main Content -->
         <main class="main-content">
             <div class="profile-container dashboard-container">
 
                 <!-- Profile Header Card -->
                 <div class="profile-header-card content-card">
-                    <!-- Gradient accent strip -->
                     <div class="profile-banner"></div>
-                    <!-- Avatar + Info + Actions -->
                     <div class="profile-top-row">
                         <div class="profile-left">
                             <div class="profile-avatar-ring">
@@ -99,6 +96,7 @@
                                 <div class="profile-meta-chips">
                                     <span class="meta-chip"><i class="fas fa-circle-check"></i> Active Member</span>
                                     <span class="meta-chip" id="member-since-chip" style="display:none;"><i class="fas fa-calendar-alt"></i> <span id="member-since-text"></span></span>
+                                    <span class="meta-chip" id="level-chip"><i class="fas fa-layer-group"></i> <span id="level-chip-text">Beginner</span></span>
                                 </div>
                             </div>
                         </div>
@@ -113,14 +111,36 @@
                     </div>
                 </div>
 
+                <!-- Stats Metrics Row -->
+                <div class="profile-stats-row">
+                    <div class="stat-metric-card">
+                        <div class="stat-metric-icon"><i class="fas fa-star"></i></div>
+                        <span class="stat-metric-value primary" id="stat-xp">0</span>
+                        <span class="stat-metric-label">Total XP</span>
+                    </div>
+                    <div class="stat-metric-card">
+                        <div class="stat-metric-icon orange"><i class="fas fa-fire"></i></div>
+                        <span class="stat-metric-value orange" id="stat-streak">0</span>
+                        <span class="stat-metric-label">Day Streak</span>
+                    </div>
+                    <div class="stat-metric-card">
+                        <div class="stat-metric-icon green"><i class="fas fa-chart-line"></i></div>
+                        <span class="stat-metric-value green" id="stat-roadmap">0%</span>
+                        <span class="stat-metric-label">Roadmap Done</span>
+                    </div>
+                    <div class="stat-metric-card">
+                        <div class="stat-metric-icon purple"><i class="fas fa-brain"></i></div>
+                        <span class="stat-metric-value purple" id="stat-score">0</span>
+                        <span class="stat-metric-label">Career Score</span>
+                    </div>
+                </div>
+
                 <!-- Info Cards Row -->
                 <div class="profile-cards-row">
                     <!-- Learning Path Card -->
                     <div class="content-card card-box profile-info-card">
                         <div class="pcard-header">
-                            <div class="pcard-icon-wrap">
-                                <i class="fas fa-route"></i>
-                            </div>
+                            <div class="pcard-icon-wrap"><i class="fas fa-route"></i></div>
                             <span class="pcard-title">Learning Path</span>
                         </div>
                         <div class="pcard-body">
@@ -132,21 +152,75 @@
                                 <span class="pcard-label">Skill Level</span>
                                 <span id="display-level" class="pcard-badge">Beginner</span>
                             </div>
+                            <div class="pcard-row">
+                                <span class="pcard-label">Timeline</span>
+                                <span id="display-timeline" class="pcard-value">—</span>
+                            </div>
+                            <div class="pcard-row">
+                                <span class="pcard-label">Weekly Hours</span>
+                                <span id="display-hours" class="pcard-value">—</span>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Skills Card -->
                     <div class="content-card card-box profile-info-card">
                         <div class="pcard-header">
-                            <div class="pcard-icon-wrap">
-                                <i class="fas fa-tools"></i>
-                            </div>
+                            <div class="pcard-icon-wrap"><i class="fas fa-tools"></i></div>
                             <span class="pcard-title">My Skills</span>
                         </div>
                         <div id="profile-skills-container" class="skills-pills-wrap">
                             <div class="no-skills-state">
                                 <i class="fas fa-layer-group"></i>
-                                <span>No skills added yet. Visit the Skills page.</span>
+                                <span>No skills added yet. Complete onboarding.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interests & Goals Row -->
+                <div class="profile-interests-row">
+                    <!-- Interests Card -->
+                    <div class="content-card card-box profile-info-card">
+                        <div class="pcard-header">
+                            <div class="pcard-icon-wrap"><i class="fas fa-heart"></i></div>
+                            <span class="pcard-title">My Interests</span>
+                        </div>
+                        <div id="profile-interests-container" class="interests-chip-wrap">
+                            <div class="no-skills-state">
+                                <i class="fas fa-compass" style="font-size:1.3rem; opacity:0.25;"></i>
+                                <span>No interests selected yet. Complete onboarding.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Goals Card -->
+                    <div class="content-card card-box profile-info-card">
+                        <div class="pcard-header">
+                            <div class="pcard-icon-wrap"><i class="fas fa-bullseye"></i></div>
+                            <span class="pcard-title">Career Goals</span>
+                        </div>
+                        <div class="goals-list" id="profile-goals-container">
+                            <div class="goal-row">
+                                <div class="goal-icon"><i class="fas fa-flag"></i></div>
+                                <div class="goal-content">
+                                    <div class="goal-label">Career Goal</div>
+                                    <div class="goal-value" id="display-goal">Not set</div>
+                                </div>
+                            </div>
+                            <div class="goal-row">
+                                <div class="goal-icon"><i class="fas fa-clock"></i></div>
+                                <div class="goal-content">
+                                    <div class="goal-label">Target Timeline</div>
+                                    <div class="goal-value" id="display-timeline-goal">Not set</div>
+                                </div>
+                            </div>
+                            <div class="goal-row">
+                                <div class="goal-icon"><i class="fas fa-calendar-week"></i></div>
+                                <div class="goal-content">
+                                    <div class="goal-label">Weekly Commitment</div>
+                                    <div class="goal-value" id="display-hours-goal">Not set</div>
+                                </div>
                             </div>
                         </div>
                     </div>

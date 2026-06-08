@@ -107,6 +107,9 @@ document.addEventListener("DOMContentLoaded", () => {
             if (data.user.skills && data.user.skills.length > 0) {
                 localStorage.setItem("userSkills", JSON.stringify(data.user.skills));
             }
+            if (data.user.interests && data.user.interests.length > 0) {
+                localStorage.setItem("xyverra_interests", JSON.stringify(data.user.interests));
+            }
             if (data.user.completedModules && data.user.completedModules.length > 0) {
                 localStorage.setItem("completedModules", JSON.stringify(data.user.completedModules));
             }
@@ -119,6 +122,10 @@ document.addEventListener("DOMContentLoaded", () => {
             if (data.user.experienceRank !== undefined) {
                 localStorage.setItem("xyverra_xp", data.user.experienceRank);
             }
+            // Persist onboarding status from server
+            if (data.user.onboardingCompleted) {
+                localStorage.setItem('xyverra_onboarded', 'true');
+            }
 
             // Hide loader
             if (premiumLoader) {
@@ -130,12 +137,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 await showSuccessPopup("Login Successful 🎉");
             }
 
-            // Redirect based on onboarding status
-            const alreadyOnboarded = localStorage.getItem('xyverra_onboarded');
-            if (data.user.selectedPath || alreadyOnboarded) {
+            // Redirect: go to dashboard if onboarded or has path, else onboarding
+            const onboardingDone = data.user.onboardingCompleted
+                || !!data.user.selectedPath
+                || localStorage.getItem('xyverra_onboarded') === 'true';
+
+            if (onboardingDone) {
                 window.location.href = 'dashboard.html';
             } else {
-                window.location.href = 'onboarding.html';
+                window.location.href = 'career-discovery.html';
             }
 
         } catch (error) {
