@@ -226,6 +226,21 @@
         </main>
     </div>
 
+    <!-- Module Completion Quiz Modal -->
+    <div class="modal-overlay" id="quiz-popup-modal" style="display: none; position: fixed; inset: 0; background: rgba(11, 25, 44, 0.6); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: white; border-radius: var(--radius-2xl); max-width: 450px; width: 90%; padding: 2.5rem 2rem; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: fadeInUp 0.3s ease;">
+            <div style="font-size: 4rem; color: #10B981; margin-bottom: 1rem; line-height: 1;">🎉</div>
+            <h2 style="font-size: 1.6rem; color: var(--text-dark); margin-bottom: 0.5rem; font-weight: 800;">Module Complete!</h2>
+            <p style="color: var(--text-muted); margin-bottom: 2rem; line-height: 1.6; font-size: 1rem;">
+                You've finished all the material in <strong id="completed-module-title" style="color: var(--primary);">this module</strong>. To verify your knowledge and unlock the next section, you must pass the module quiz.
+            </p>
+            <a href="#" id="take-compulsory-quiz-btn" class="btn btn-primary" style="display: flex; width: 100%; padding: 14px; font-size: 1.1rem; justify-content: center; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                <i class="fas fa-bolt"></i> Take Compulsory Quiz Now
+            </a>
+            <button id="close-quiz-popup-btn" style="background: none; border: none; color: var(--text-muted); cursor: pointer; text-decoration: underline; font-size: 0.9rem;">I'll do it later</button>
+        </div>
+    </div>
+
     <script src="toast.js"></script>
     <script src="app-data.js"></script> 
     <script src="global-sidebar.js"></script>

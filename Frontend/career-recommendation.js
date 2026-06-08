@@ -112,21 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
-    // Add Continue to Path Selection button at the bottom
-    const actionsContainer = document.createElement('div');
-    actionsContainer.style.textAlign = 'center';
-    actionsContainer.style.marginTop = '3rem';
-    actionsContainer.innerHTML = `
-        <button id="continue-path-selection" class="btn btn-primary" style="padding: 16px 36px; font-size: 1.15rem;">
-            Proceed to Path Selection <i class="fas fa-arrow-right"></i>
-        </button>
-    `;
-    container.after(actionsContainer);
-
-    document.getElementById('continue-path-selection').addEventListener('click', () => {
-        window.location.href = 'path-selection.html';
-    });
-
+    // Redundant path selection button removed. Users click "View Details" on the specific career card.
     // Compare
     document.getElementById('compare-btn').addEventListener('click', () => {
         const checked = [...document.querySelectorAll('.compare-checkbox:checked')];

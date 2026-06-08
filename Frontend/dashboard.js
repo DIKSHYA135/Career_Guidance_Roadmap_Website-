@@ -12,9 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const userName = localStorage.getItem('xyverra_user_name') || 'Guest';
-    const selectedPath = localStorage.getItem('xyverra_selected_path');
+    const selectedPath = localStorage.getItem('xyverra_selected_path') || localStorage.getItem('xyverra_target_career') || 'Web Development';
     const userRole = localStorage.getItem('xyverra_target_career');
-    const hasRoadmap = localStorage.getItem('xyverra_roadmap') !== null;
+    const hasRoadmap = localStorage.getItem('roadmapGenerated') === 'true' || localStorage.getItem('xyverra_onboarded') === 'true';
     
     // 1. Populate UI headers
     const userNameEl = document.getElementById('user-welcome-name');

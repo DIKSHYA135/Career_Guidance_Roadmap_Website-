@@ -4,6 +4,25 @@
    ========================================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Check if user already has an active roadmap
+    if (localStorage.getItem('roadmapGenerated') === 'true' || localStorage.getItem('xyverra_onboarded') === 'true') {
+        const targetCareer = localStorage.getItem('xyverra_target_career') || localStorage.getItem('xyverra_selected_path') || 'chosen';
+        const container = document.querySelector('.dashboard-container');
+        if (container) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 5rem 2rem; background: white; border-radius: var(--radius-2xl); border: 1px solid var(--border); max-width: 600px; margin: 4rem auto; box-shadow: var(--shadow-sm);">
+                    <div style="font-size: 3.5rem; margin-bottom: 1.5rem;">🎯</div>
+                    <h2 style="font-size: 1.8rem; color: var(--text-dark); margin-bottom: 1rem; font-weight: 800;">You are on the ${targetCareer} path!</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 2.5rem; font-size: 1.05rem; line-height: 1.6;">You've already generated your active learning roadmap. Please focus on completing your current path before starting a new discovery session.</p>
+                    <a href="roadmap.html" class="btn btn-primary" style="padding: 14px 32px; font-size: 1.1rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        Return to Roadmap <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            `;
+        }
+        return; // Halt further logic
+    }
+
     let currentStep = 1;
     const totalSteps = 4;
 

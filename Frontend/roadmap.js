@@ -599,7 +599,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             </div>
                             <div class="course-details">
                                 <h5>${isDummy ? 'Submit ' + module.title : cName}</h5>
-                                ${cUrl ? `<a href="${cUrl}" target="_blank" class="course-link">View Course <i class="fas fa-external-link-alt"></i></a>` : ''}
+                                ${cUrl ? `<a href="study.html?url=${encodeURIComponent(cUrl)}&title=${encodeURIComponent(cName)}" class="course-link">Study In App <i class="fas fa-arrow-right"></i></a>` : ''}
                             </div>
                         `;
                         
@@ -631,6 +631,18 @@ document.addEventListener("DOMContentLoaded", () => {
                                 if (!completedModules.includes(module.id)) {
                                     completedModules.push(module.id);
                                     localStorage.setItem('completedModules', JSON.stringify(completedModules));
+                                    
+                                    // Trigger Quiz Popup
+                                    const modal = document.getElementById('quiz-popup-modal');
+                                    const titleEl = document.getElementById('completed-module-title');
+                                    const takeBtn = document.getElementById('take-compulsory-quiz-btn');
+                                    const closeBtn = document.getElementById('close-quiz-popup-btn');
+                                    if (modal && titleEl && takeBtn) {
+                                        titleEl.textContent = module.title;
+                                        takeBtn.href = `quiz.html?module=${module.id}`;
+                                        modal.style.display = 'flex';
+                                        if (closeBtn) closeBtn.onclick = () => modal.style.display = 'none';
+                                    }
                                 }
                                 accItem.classList.add('completed');
                                 accItem.querySelector('.progress-bar').style.background = '#10B981';

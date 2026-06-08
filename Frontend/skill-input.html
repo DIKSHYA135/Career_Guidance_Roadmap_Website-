@@ -83,31 +83,71 @@
             <div class="dashboard-container">
                 <!-- Page Header -->
                 <header class="dashboard-header" style="text-align: center; margin-bottom: 2.5rem;">
-                    <h1>Automatic Level Assignment</h1>
-                    <p>We've analyzed your Career Assessment to place you at the right starting point.</p>
+                    <h1>Select Your Starting Level</h1>
+                    <p>Choose your current experience level so we can generate the most accurate learning roadmap for you.</p>
                 </header>
 
-                <!-- Form Card -->
-                <div class="content-card form-card" style="max-width: 600px; margin: 0 auto; text-align: center; padding: 3rem 2rem;">
+                <!-- Level Selection Grid -->
+                <style>
+                    .level-selection-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
+                    .level-card { background: var(--bg-surface); border: 2px solid var(--border); border-radius: var(--radius-xl); padding: 2rem; text-align: left; cursor: pointer; transition: all 0.25s ease; display: flex; flex-direction: column; gap: 0.8rem; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; }
+                    .level-card:hover { border-color: rgba(37,99,235,0.4); transform: translateY(-4px); box-shadow: var(--shadow-md); }
+                    .level-card.active { border-color: var(--primary); background: rgba(37,99,235,0.03); box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
+                    .level-icon { width: 50px; height: 50px; border-radius: var(--radius-md); background: rgba(37,99,235,0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; transition: all 0.25s; }
+                    .level-card:hover .level-icon { transform: scale(1.05); }
+                    .level-card.active .level-icon { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+                    .level-card h3 { font-size: 1.3rem; font-weight: 800; color: var(--text-dark); margin: 0; }
+                    .level-card p { font-size: 0.95rem; color: var(--text-body); margin: 0; line-height: 1.5; }
                     
-                    <div style="font-size: 3.5rem; margin-bottom: 1rem;" id="level-icon">🎓</div>
-                    <h2 style="font-size: 1.3rem; margin-bottom: 0.5rem; color: var(--text-dark);">Your Assessment Score: <strong id="assessment-score" style="color: var(--primary);">--</strong></h2>
-                    
-                    <p style="color: var(--text-body); margin-bottom: 2rem; line-height: 1.6; font-size: 1.1rem;">
-                        Based on your assessment, you have been placed in the:
-                    </p>
-                    
-                    <div style="background: rgba(37, 99, 235, 0.05); border: 2px solid var(--primary); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 2.5rem;">
-                        <h3 id="assigned-level-title" style="font-size: 2.2rem; color: var(--primary); margin: 0;">Loading Level...</h3>
-                        <p style="margin-top: 0.5rem; color: var(--text-dark); font-weight: 500;" id="assigned-level-desc"></p>
-                    </div>
+                    /* Selection indicator (Radio button style) */
+                    .selection-indicator { position: absolute; top: 2rem; right: 2rem; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); transition: all 0.25s; display: flex; align-items: center; justify-content: center; }
+                    .level-card.active .selection-indicator { border-color: var(--primary); background: var(--primary); }
+                    .selection-indicator svg { width: 12px; height: 12px; color: white; opacity: 0; transition: opacity 0.25s; transform: scale(0.5); }
+                    .level-card.active .selection-indicator svg { opacity: 1; transform: scale(1); }
+                </style>
 
-                    <div class="form-actions" style="justify-content: center;">
-                        <button type="button" id="generate-btn" class="btn btn-primary generate-btn" style="padding: 14px 32px; font-size: 1.1rem;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                            Generate Personalized Roadmap
-                        </button>
+                <div class="level-selection-grid" id="level-grid">
+                    <div class="level-card" data-level="Beginner">
+                        <div class="selection-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+                        <div class="level-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        </div>
+                        <h3>Beginner</h3>
+                        <p>I am starting completely fresh with little to no prior coding experience.</p>
                     </div>
+                    
+                    <div class="level-card" data-level="Intermediate">
+                        <div class="selection-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+                        <div class="level-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        </div>
+                        <h3>Intermediate</h3>
+                        <p>I know the basics and want to learn how to build practical applications.</p>
+                    </div>
+                    
+                    <div class="level-card" data-level="Advanced">
+                        <div class="selection-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+                        <div class="level-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                        </div>
+                        <h3>Advanced</h3>
+                        <p>I have strong experience and want to dive deep into system architecture.</p>
+                    </div>
+                    
+                    <div class="level-card" data-level="Capstone">
+                        <div class="selection-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+                        <div class="level-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+                        </div>
+                        <h3>Capstone</h3>
+                        <p>I am highly proficient and just want to build end-to-end portfolio projects.</p>
+                    </div>
+                </div>
+
+                <div style="text-align: center;">
+                    <button type="button" id="generate-btn" class="btn btn-primary" style="padding: 16px 36px; font-size: 1.15rem;" disabled>
+                        <i class="fas fa-magic"></i> Generate Personalized Roadmap
+                    </button>
                 </div>
             </div>
         </main>
