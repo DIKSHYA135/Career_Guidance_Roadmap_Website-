@@ -4,6 +4,33 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    const onboarded = localStorage.getItem('xyverra_onboarded') === 'true';
+    const selectedPath = localStorage.getItem('xyverra_target_career') || localStorage.getItem('xyverra_selected_path');
+
+    if (onboarded && selectedPath) {
+        // Show enrolled state, hide assessment
+        const enrolledState = document.getElementById('already-enrolled-state');
+        const hero = document.querySelector('.assessment-hero');
+        const card = document.querySelector('.assessment-card');
+        
+        if (enrolledState && hero && card) {
+            enrolledState.style.display = 'block';
+            hero.style.display = 'none';
+            card.style.display = 'none';
+            
+            document.getElementById('current-enrolled-path').textContent = selectedPath;
+            
+            document.getElementById('retake-assessment-btn').addEventListener('click', () => {
+                // Clear state and reload to retake
+                localStorage.removeItem('xyverra_onboarded');
+                localStorage.removeItem('xyverra_target_career');
+                localStorage.removeItem('xyverra_selected_path');
+                window.location.reload();
+            });
+        }
+        return; // Stop running the rest of the assessment logic
+    }
+
     let currentStep = 1;
     const totalSteps = 3;
 
