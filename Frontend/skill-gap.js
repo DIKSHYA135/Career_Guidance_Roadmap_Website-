@@ -4,7 +4,26 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    const targetCareer = localStorage.getItem('xyverra_target_career') || localStorage.getItem('xyverra_selected_path') || 'Web Developer';
+    const targetCareer = localStorage.getItem('xyverra_target_career') || localStorage.getItem('xyverra_selected_path');
+    
+    if (!targetCareer) {
+        const container = document.querySelector('.dashboard-container');
+        if (container) {
+            container.innerHTML = `
+                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:60vh; text-align:center; padding:3rem 2rem;">
+                    <div style="font-size:4rem; margin-bottom:1.25rem;">🧭</div>
+                    <h2 style="font-size:1.6rem; font-weight:800; color:var(--text-dark); margin-bottom:0.75rem;">No career path selected yet</h2>
+                    <p style="color:var(--text-muted); max-width:480px; line-height:1.65; margin-bottom:2rem;">
+                        You haven't picked a career path yet! Start with Career Discovery — we'll ask you a few questions and match you to the best tech career for you.
+                    </p>
+                    <a href="career-discovery.html" class="btn btn-primary" style="font-size:1rem; padding:12px 28px; display:inline-flex; align-items:center; gap:0.5rem;">
+                        <i class="fas fa-compass"></i> Start Career Discovery
+                    </a>
+                </div>
+            `;
+        }
+        return;
+    }
     
     // Update header target label
     const targetLabel = document.getElementById('sg-target-path');

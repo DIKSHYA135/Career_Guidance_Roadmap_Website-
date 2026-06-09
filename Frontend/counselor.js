@@ -93,12 +93,10 @@ document.addEventListener('DOMContentLoaded', () => {
             addMessage(response, false);
             
             // Auto set target career if AI Engineer was asked
-            if (text.toLowerCase().includes('ai engineering right for me')) {
-                localStorage.setItem('xyverra_target_career', 'AI Engineer');
-                localStorage.setItem('xyverra_selected_path', 'AI Engineer');
-                setTimeout(() => {
-                    addMessage("<em>(I've automatically updated your target career to <strong>AI Engineer</strong>. Check out the 'My Roadmap' page!)</em>", false);
-                }, 1500);
+            const finalPath = localStorage.getItem('xyverra_target_career') || localStorage.getItem('xyverra_selected_path');
+            if (finalPath) {
+                localStorage.setItem('xyverra_selected_path', finalPath);
+                localStorage.setItem('xyverra_onboarded', 'true');
             }
         }, 1200);
     };

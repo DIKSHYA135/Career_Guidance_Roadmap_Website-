@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Discover the right tech career path with Xyverra's personalized assessment.">
-    <title>Career Discovery Assessment - Xyverra</title>
+    <title>Career Discovery - Xyverra</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,7 +14,6 @@
     <link rel="stylesheet" href="career-discovery.css">
 </head>
 <body>
-
 <div class="app-layout">
     <div class="mobile-nav-toggle">
         <div class="sidebar-brand" style="margin-bottom:0;padding:0;">
@@ -26,33 +25,21 @@
         </button>
     </div>
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
-
     <aside class="sidebar" id="sidebar-menu">
         <div class="sidebar-brand">
             <img src="xyverra_logo.jpeg" alt="Xyverra" class="sidebar-logo">
             <span>Xyverra</span>
         </div>
         <nav class="nav-menu">
-            <a href="dashboard.html" class="nav-item nav-dashboard">
-                <i class="fas fa-border-all"></i> Dashboard
-            </a>
+            <a href="dashboard.html" class="nav-item nav-dashboard"><i class="fas fa-border-all"></i> Dashboard</a>
             <a href="career-discovery.html" class="nav-item active nav-career-discovery">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
                 Career Discovery
             </a>
-            <a href="counselor.html" class="nav-item nav-counselor">
-                <i class="fas fa-robot"></i> AI Counselor
-            </a>
-            
-            <a href="skill-gap.html" class="nav-item nav-skill-gap">
-                <i class="fas fa-chart-line"></i> Skill Gap Analysis
-            </a>
-            <a href="skill-input.html" class="nav-item nav-skill-input">
-                <i class="fas fa-road"></i> My Roadmap
-            </a>
-            <a href="progress.html" class="nav-item nav-progress">
-                <i class="fas fa-chart-bar"></i> Progress Tracker
-            </a>
+            <a href="counselor.html" class="nav-item nav-counselor"><i class="fas fa-robot"></i> AI Counselor</a>
+            <a href="skill-gap.html" class="nav-item nav-skill-gap"><i class="fas fa-chart-line"></i> Skill Gap Analysis</a>
+            <a href="roadmap.html" class="nav-item nav-roadmap"><i class="fas fa-road"></i> My Roadmap</a>
+            <a href="progress.html" class="nav-item nav-progress"><i class="fas fa-chart-bar"></i> Progress Tracker</a>
         </nav>
         <div style="flex:1;"></div>
         <div class="user-profile">
@@ -68,129 +55,105 @@
     </aside>
 
     <main class="main-content">
-        <div class="dashboard-container" style="max-width:860px;margin:0 auto;">
+        <div class="dashboard-container" style="max-width:800px;margin:0 auto;">
 
-            <!-- Hero Banner -->
+            <!-- Hero -->
             <div class="assessment-hero">
                 <div class="hero-icon">🧭</div>
                 <div>
                     <h1>Career Discovery Assessment</h1>
-                    <p>Answer a few questions and we'll match you to the perfect tech career path.</p>
+                    <p>Answer these questions honestly — we'll match you to the best tech career for your personality and goals.</p>
                 </div>
             </div>
 
-            <!-- Assessment Card -->
             <div class="assessment-card">
 
-                <!-- Progress Header -->
+                <!-- Progress Steps -->
                 <div class="assessment-progress">
                     <div class="progress-steps">
-                        <div class="step active" data-step="1">
-                            <span class="step-num">1</span>
-                            Interests
-                        </div>
-                        <div class="step" data-step="2">
-                            <span class="step-num">2</span>
-                            Personality
-                        </div>
-                        <div class="step" data-step="3">
-                            <span class="step-num">3</span>
-                            Work Style
-                        </div>
-                        <div class="step" data-step="4">
-                            <span class="step-num">4</span>
-                            Goals
-                        </div>
+                        <div class="step active" data-step="1"><span class="step-num">1</span>Interests</div>
+                        <div class="step" data-step="2"><span class="step-num">2</span>Work Style</div>
+                        <div class="step" data-step="3"><span class="step-num">3</span>Goals</div>
                     </div>
                     <div class="progress-bar-container">
-                        <div class="progress-bar" id="assessment-progress-bar" style="width:25%;"></div>
+                        <div class="progress-bar" id="assessment-progress-bar" style="width:33%;"></div>
                     </div>
                 </div>
 
-                <!-- Step 1: Interests -->
+                <!-- STEP 1: Interests & Personality -->
                 <div class="assessment-step active-step" id="step-1">
                     <div class="step-header">
-                        <h2>Your Technical Interests</h2>
-                        <p>Tell us what kinds of problems and tasks excite you most.</p>
+                        <h2>Your Interests &amp; Personality</h2>
+                        <p>Tell us what kind of work genuinely excites you.</p>
                     </div>
 
                     <div class="question-container">
-                        <p class="question-text"><span class="q-num">1</span>Do you enjoy solving complex technical problems and debugging systems?</p>
+                        <p class="question-text"><span class="q-num">1</span>What type of problem excites you most?</p>
                         <div class="options-grid">
-                            <label class="option-label"><input type="radio" name="q1" value="high"> <span>Absolutely love it</span></label>
-                            <label class="option-label"><input type="radio" name="q1" value="somewhat"> <span>Somewhat enjoy it</span></label>
-                            <label class="option-label"><input type="radio" name="q1" value="neutral"> <span>It's okay</span></label>
-                            <label class="option-label"><input type="radio" name="q1" value="low"> <span>Prefer other tasks</span></label>
+                            <label class="option-label"><input type="radio" name="q1" value="systems"> <span>🏗️ Building scalable systems</span></label>
+                            <label class="option-label"><input type="radio" name="q1" value="creative"> <span>🎨 Designing visual experiences</span></label>
+                            <label class="option-label"><input type="radio" name="q1" value="data"> <span>📊 Finding patterns in data</span></label>
+                            <label class="option-label"><input type="radio" name="q1" value="security"> <span>🔐 Finding &amp; fixing vulnerabilities</span></label>
                         </div>
                     </div>
 
                     <div class="question-container">
-                        <p class="question-text"><span class="q-num">2</span>How do you feel about working with large datasets and drawing insights from numbers?</p>
+                        <p class="question-text"><span class="q-num">2</span>Do you prefer visual/creative work or logical/analytical work?</p>
                         <div class="options-grid">
-                            <label class="option-label"><input type="radio" name="q2" value="high"> <span>Love working with data</span></label>
-                            <label class="option-label"><input type="radio" name="q2" value="somewhat"> <span>It's interesting</span></label>
-                            <label class="option-label"><input type="radio" name="q2" value="neutral"> <span>Neutral about it</span></label>
-                            <label class="option-label"><input type="radio" name="q2" value="low"> <span>Not my thing</span></label>
+                            <label class="option-label"><input type="radio" name="q2" value="creative"> <span>🖼️ Mostly visual &amp; creative</span></label>
+                            <label class="option-label"><input type="radio" name="q2" value="logical"> <span>⚙️ Mostly logical &amp; analytical</span></label>
+                            <label class="option-label"><input type="radio" name="q2" value="balanced"> <span>⚖️ A balanced mix of both</span></label>
+                            <label class="option-label"><input type="radio" name="q2" value="systems"> <span>🔧 Infrastructure &amp; backend systems</span></label>
+                        </div>
+                    </div>
+
+                    <div class="question-container">
+                        <p class="question-text"><span class="q-num">3</span>How comfortable are you with math and statistics?</p>
+                        <div class="options-grid">
+                            <label class="option-label"><input type="radio" name="q3" value="high"> <span>🔢 Very comfortable — I love it</span></label>
+                            <label class="option-label"><input type="radio" name="q3" value="somewhat"> <span>🙂 Comfortable enough</span></label>
+                            <label class="option-label"><input type="radio" name="q3" value="low"> <span>😅 I prefer to avoid it</span></label>
                         </div>
                     </div>
                 </div>
 
-                <!-- Step 2: Personality -->
+                <!-- STEP 2: Work Style -->
                 <div class="assessment-step" id="step-2">
                     <div class="step-header">
-                        <h2>Your Personality Profile</h2>
-                        <p>How do you naturally approach challenges and daily work?</p>
+                        <h2>Your Work Style</h2>
+                        <p>How do you like to work day-to-day?</p>
                     </div>
 
                     <div class="question-container">
-                        <p class="question-text"><span class="q-num">3</span>Do you prefer creative work (design, visuals, UX) or logical work (algorithms, systems)?</p>
+                        <p class="question-text"><span class="q-num">4</span>Do you enjoy working with teams or prefer working independently?</p>
                         <div class="options-grid">
-                            <label class="option-label"><input type="radio" name="q3" value="creative"> <span>Mostly creative</span></label>
-                            <label class="option-label"><input type="radio" name="q3" value="balanced"> <span>A balanced mix</span></label>
-                            <label class="option-label"><input type="radio" name="q3" value="logical"> <span>Mostly logical</span></label>
-                            <label class="option-label"><input type="radio" name="q3" value="systems"> <span>Infrastructure & systems</span></label>
+                            <label class="option-label"><input type="radio" name="q4" value="team"> <span>🤝 Highly collaborative teams</span></label>
+                            <label class="option-label"><input type="radio" name="q4" value="balanced"> <span>⚖️ A balanced mix</span></label>
+                            <label class="option-label"><input type="radio" name="q4" value="independent"> <span>🧘 Mostly independent</span></label>
                         </div>
                     </div>
 
                     <div class="question-container">
-                        <p class="question-text"><span class="q-num">4</span>Do you enjoy designing user interfaces and visual digital experiences?</p>
+                        <p class="question-text"><span class="q-num">5</span>Would you enjoy automating workflows and building tools for other developers?</p>
                         <div class="options-grid">
-                            <label class="option-label"><input type="radio" name="q4" value="high"> <span>Yes, that's my passion</span></label>
-                            <label class="option-label"><input type="radio" name="q4" value="somewhat"> <span>Sometimes</span></label>
-                            <label class="option-label"><input type="radio" name="q4" value="neutral"> <span>Only functional design</span></label>
-                            <label class="option-label"><input type="radio" name="q4" value="low"> <span>I prefer backend work</span></label>
+                            <label class="option-label"><input type="radio" name="q5" value="high"> <span>🚀 Absolutely — sounds exciting</span></label>
+                            <label class="option-label"><input type="radio" name="q5" value="somewhat"> <span>🤔 It sounds interesting</span></label>
+                            <label class="option-label"><input type="radio" name="q5" value="low"> <span>❌ Not really my thing</span></label>
+                        </div>
+                    </div>
+
+                    <div class="question-container">
+                        <p class="question-text"><span class="q-num">6</span>How do you feel about managing cloud infrastructure and DevOps pipelines?</p>
+                        <div class="options-grid">
+                            <label class="option-label"><input type="radio" name="q6" value="high"> <span>☁️ Very interested in this</span></label>
+                            <label class="option-label"><input type="radio" name="q6" value="somewhat"> <span>🙂 Somewhat interested</span></label>
+                            <label class="option-label"><input type="radio" name="q6" value="low"> <span>💻 I'd rather just write code</span></label>
                         </div>
                     </div>
                 </div>
 
-                <!-- Step 3: Work Style -->
+                <!-- STEP 3: Goals -->
                 <div class="assessment-step" id="step-3">
-                    <div class="step-header">
-                        <h2>Preferred Work Style</h2>
-                        <p>How do you perform best in a professional setting?</p>
-                    </div>
-
-                    <div class="question-container">
-                        <p class="question-text"><span class="q-num">5</span>Do you enjoy teamwork and collaboration, or do you prefer working independently?</p>
-                        <div class="options-grid">
-                            <label class="option-label"><input type="radio" name="q5" value="team"> <span>Highly collaborative</span></label>
-                            <label class="option-label"><input type="radio" name="q5" value="balanced"> <span>Balanced mix</span></label>
-                            <label class="option-label"><input type="radio" name="q5" value="independent"> <span>Mostly independent</span></label>
-                        </div>
-                    </div>
-
-                    <div class="question-container">
-                        <p class="question-text"><span class="q-num">6</span>How do you feel about maintaining infrastructure, cloud platforms, and DevOps pipelines?</p>
-                        <div class="options-grid">
-                            <label class="option-label"><input type="radio" name="q6" value="high"> <span>Very interested in ops</span></label>
-                            <label class="option-label"><input type="radio" name="q6" value="somewhat"> <span>Somewhat interested</span></label>
-                            <label class="option-label"><input type="radio" name="q6" value="low"> <span>Prefer to just write code</span></label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 4: Goals -->
-                <div class="assessment-step" id="step-4">
                     <div class="step-header">
                         <h2>Your Career Goals</h2>
                         <p>Help us understand where you want to go.</p>
@@ -199,25 +162,35 @@
                     <div class="question-container">
                         <p class="question-text"><span class="q-num">7</span>What is your primary goal in the next 12 months?</p>
                         <div class="options-grid">
-                            <label class="option-label"><input type="radio" name="q7" value="fast_job"> <span>Land a job as fast as possible</span></label>
-                            <label class="option-label"><input type="radio" name="q7" value="high_salary"> <span>Maximise starting salary</span></label>
-                            <label class="option-label"><input type="radio" name="q7" value="deep_skill"> <span>Master a deep technical skill</span></label>
-                            <label class="option-label"><input type="radio" name="q7" value="creative_portfolio"> <span>Build a creative portfolio</span></label>
+                            <label class="option-label"><input type="radio" name="q7" value="fast_job"> <span>🚀 Land a job as fast as possible</span></label>
+                            <label class="option-label"><input type="radio" name="q7" value="high_salary"> <span>💰 Maximise my starting salary</span></label>
+                            <label class="option-label"><input type="radio" name="q7" value="deep_skill"> <span>🧠 Master a deep technical skill</span></label>
+                            <label class="option-label"><input type="radio" name="q7" value="creative_portfolio"> <span>🎨 Build a creative portfolio</span></label>
                         </div>
                     </div>
 
                     <div class="question-container">
                         <p class="question-text"><span class="q-num">8</span>How much time can you realistically commit to learning per week?</p>
                         <div class="options-grid">
-                            <label class="option-label"><input type="radio" name="q8" value="5h"> <span>Less than 5 hours</span></label>
-                            <label class="option-label"><input type="radio" name="q8" value="10h"> <span>5–10 hours</span></label>
-                            <label class="option-label"><input type="radio" name="q8" value="20h"> <span>10–20 hours</span></label>
-                            <label class="option-label"><input type="radio" name="q8" value="full"> <span>Full-time dedication</span></label>
+                            <label class="option-label"><input type="radio" name="q8" value="5h"> <span>⏱️ Less than 5 hours</span></label>
+                            <label class="option-label"><input type="radio" name="q8" value="10h"> <span>📅 5–10 hours/week</span></label>
+                            <label class="option-label"><input type="radio" name="q8" value="20h"> <span>💪 10–20 hours/week</span></label>
+                            <label class="option-label"><input type="radio" name="q8" value="full"> <span>🔥 Full-time dedication</span></label>
+                        </div>
+                    </div>
+
+                    <div class="question-container">
+                        <p class="question-text"><span class="q-num">9</span>What kind of product would you most enjoy building?</p>
+                        <div class="options-grid">
+                            <label class="option-label"><input type="radio" name="q9" value="app"> <span>📱 A consumer app (web or mobile)</span></label>
+                            <label class="option-label"><input type="radio" name="q9" value="ai_product"> <span>🤖 An AI-powered tool or assistant</span></label>
+                            <label class="option-label"><input type="radio" name="q9" value="secure_system"> <span>🔒 A secure financial/enterprise system</span></label>
+                            <label class="option-label"><input type="radio" name="q9" value="data_dashboard"> <span>📊 A data dashboard or analytics tool</span></label>
                         </div>
                     </div>
                 </div>
 
-                <!-- Bottom Action Bar -->
+                <!-- Actions -->
                 <div class="assessment-actions">
                     <button class="btn btn-outline" id="prev-btn" style="display:none;">
                         <i class="fas fa-arrow-left"></i> Previous
@@ -227,7 +200,7 @@
                         Next Step <i class="fas fa-arrow-right"></i>
                     </button>
                     <button class="btn btn-primary" id="submit-btn" style="display:none;" disabled>
-                        <i class="fas fa-magic"></i> See My Recommendations
+                        <i class="fas fa-magic"></i> See My Matches
                     </button>
                 </div>
 
@@ -238,5 +211,6 @@
 
 <script src="global-sidebar.js"></script>
 <script src="career-discovery.js"></script>
+<script src="back-nav.js"></script>
 </body>
 </html>

@@ -1,118 +1,230 @@
 /**
  * signup.js
- * Debugged and fixed version for Xyverra Signup Flow
+ * Premium Auth Flow — Real-time validation, no alerts, password checklist
  */
-
-console.log("Signup.js loaded - Fixed Version");
 
 document.addEventListener("DOMContentLoaded", () => {
     const signupForm = document.getElementById('signup-form');
     const nameInput = document.getElementById('signup-name');
     const emailInput = document.getElementById('signup-email');
     const passwordInput = document.getElementById('signup-password');
+    const confirmInput = document.getElementById('signup-confirm');
+    const submitBtn = document.getElementById('signup-btn');
+    const btnLabel = document.getElementById('btn-label');
+    
+    // Toggles
     const togglePassword = document.getElementById('toggle-password');
+    const toggleConfirm = document.getElementById('toggle-confirm');
 
-    // Error message containers
+    // Error elements
     const nameError = document.getElementById('name-error');
     const emailError = document.getElementById('email-error');
     const passwordError = document.getElementById('password-error');
+    const confirmError = document.getElementById('confirm-error');
+    
+    const generalErrorCard = document.getElementById('general-error');
+    const generalErrorText = document.getElementById('general-error-text');
 
-    // Password Toggle Logic
-    if (togglePassword && passwordInput) {
-        togglePassword.addEventListener('click', () => {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            togglePassword.classList.toggle('fa-eye');
-            togglePassword.classList.toggle('fa-eye-slash');
-        });
-    }
+    // Checklist elements
+    const pwChecklist = document.getElementById('pw-checklist');
+    const ruleLength = document.getElementById('rule-length');
+    const ruleNumber = document.getElementById('rule-number');
+    const ruleSpecial = document.getElementById('rule-special');
 
-    // Helper: Show error
-    const showError = (element, message, input) => {
-        if (element) {
-            element.textContent = message;
-        }
-        if (input) {
-            input.classList.add('input-error');
+    // ── Toast Helper Removed (Using XyModal globally) ──
+    const showFieldError = (input, errorDiv, message) => {
+        input.classList.remove('input-field-success');
+        input.classList.add('input-field-error');
+        errorDiv.textContent = message;
+        errorDiv.classList.add('visible');
+    };
+
+    const clearFieldError = (input, errorDiv) => {
+        input.classList.remove('input-field-error');
+        errorDiv.classList.remove('visible');
+    };
+
+    const setFieldSuccess = (input, errorDiv) => {
+        clearFieldError(input, errorDiv);
+        if (input.value.trim() !== '') {
+            input.classList.add('input-field-success');
+        } else {
+            input.classList.remove('input-field-success');
         }
     };
 
-    // Helper: Clear errors
-    const clearErrors = () => {
-        [nameError, emailError, passwordError].forEach(el => {
-            if (el) el.textContent = '';
-        });
-        [nameInput, emailInput, passwordInput].forEach(el => {
-            if (el) el.classList.remove('input-error');
-        });
+    const showGeneralError = (message) => {
+        window.XyError('Validation Error', message);
     };
 
+    const hideGeneralError = () => {
+        // No longer using inline general error
+    };
+
+    // ── Password Toggle ──
+    const setupToggle = (btn, input) => {
+        if (!btn || !input) return;
+        btn.addEventListener('click', () => {
+            const isText = input.type === 'text';
+            input.type = isText ? 'password' : 'text';
+            btn.className = isText ? 'far fa-eye eye-icon' : 'far fa-eye-slash eye-icon';
+        });
+    };
+    setupToggle(togglePassword, passwordInput);
+    setupToggle(toggleConfirm, confirmInput);
+
+    // ── Validation State ──
+    let state = {
+        name: false,
+        email: false,
+        password: false,
+        confirm: false
+    };
+
+    const checkFormReady = () => {
+        if (state.name && state.email && state.password && state.confirm) {
+            submitBtn.disabled = false;
+        } else {
+            submitBtn.disabled = true;
+        }
+    };
+
+    // ── Real-time Input Listeners ──
+
+    // Name
+    nameInput.addEventListener('input', () => {
+        hideGeneralError();
+        if (nameInput.value.trim().length >= 2) {
+            setFieldSuccess(nameInput, nameError);
+            state.name = true;
+        } else {
+            clearFieldError(nameInput, nameError); // Don't show error while typing early
+            nameInput.classList.remove('input-field-success');
+            state.name = false;
+        }
+        checkFormReady();
+    });
+
+    nameInput.addEventListener('blur', () => {
+        if (nameInput.value.trim() !== '' && nameInput.value.trim().length < 2) {
+            showFieldError(nameInput, nameError, 'Name must be at least 2 characters');
+        }
+    });
+
+    // Email
+    emailInput.addEventListener('input', () => {
+        hideGeneralError();
+        clearFieldError(emailInput, emailError);
+        emailInput.classList.remove('input-field-success');
+        state.email = false;
+        checkFormReady();
+    });
+
+    emailInput.addEventListener('blur', () => {
+        const email = emailInput.value.trim();
+        if (email === '') return;
+        
+        if (/\S+@\S+\.\S+/.test(email)) {
+            setFieldSuccess(emailInput, emailError);
+            state.email = true;
+        } else {
+            showFieldError(emailInput, emailError, 'Please enter a valid email address');
+        }
+        checkFormReady();
+    });
+
+    // Password
+    passwordInput.addEventListener('input', () => {
+        hideGeneralError();
+        clearFieldError(passwordInput, passwordError);
+        
+        const pw = passwordInput.value;
+        
+        // Rules
+        const isLength = pw.length >= 8;
+        const hasNum = /\d/.test(pw);
+        const hasSpec = /[!@#$%^&*(),.?":{}|<>]/.test(pw);
+
+        // Update checklist UI
+        if (isLength) ruleLength.classList.add('rule-pass'); else ruleLength.classList.remove('rule-pass');
+        if (hasNum) ruleNumber.classList.add('rule-pass'); else ruleNumber.classList.remove('rule-pass');
+        if (hasSpec) ruleSpecial.classList.add('rule-pass'); else ruleSpecial.classList.remove('rule-pass');
+
+        if (isLength && hasNum && hasSpec) {
+            pwChecklist.classList.add('all-valid');
+            setFieldSuccess(passwordInput, passwordError);
+            state.password = true;
+        } else {
+            pwChecklist.classList.remove('all-valid');
+            passwordInput.classList.remove('input-field-success');
+            state.password = false;
+        }
+
+        // Re-validate confirm password if it has value
+        if (confirmInput.value !== '') {
+            validateConfirm();
+        }
+
+        checkFormReady();
+    });
+
+    // Confirm Password
+    const validateConfirm = () => {
+        if (confirmInput.value === '') {
+            state.confirm = false;
+            return;
+        }
+        
+        if (confirmInput.value === passwordInput.value) {
+            setFieldSuccess(confirmInput, confirmError);
+            state.confirm = true;
+        } else {
+            showFieldError(confirmInput, confirmError, 'Passwords do not match');
+            state.confirm = false;
+        }
+    };
+
+    confirmInput.addEventListener('input', () => {
+        hideGeneralError();
+        if (confirmInput.value !== '' && confirmInput.value === passwordInput.value) {
+            setFieldSuccess(confirmInput, confirmError);
+            state.confirm = true;
+        } else {
+            clearFieldError(confirmInput, confirmError);
+            confirmInput.classList.remove('input-field-success');
+            state.confirm = false;
+        }
+        checkFormReady();
+    });
+
+    confirmInput.addEventListener('blur', validateConfirm);
+
+
+    // ── Form Submit ──
     if (signupForm) {
         signupForm.addEventListener('submit', async (e) => {
-            // 1. Prevent Default Behavior (STOPS PAGE REFRESH)
             e.preventDefault();
-            console.log("Signup form submission started...");
-
-            // 2. Clear previous errors
-            clearErrors();
-
-            // 3. Gather Values
-            const name = nameInput ? nameInput.value.trim() : "";
-            const email = emailInput ? emailInput.value.trim() : "";
-            const password = passwordInput ? passwordInput.value : "";
-
-            // Fix: Safely handle the optional skills field
-            const skillsElement = document.getElementById('signup-skills');
-            const skillsRaw = skillsElement ? skillsElement.value : "";
-            const skills = skillsRaw ? skillsRaw.split(',').map(s => s.trim()).filter(s => s !== "") : [];
-
-            console.log("Form values gathered:", { name, email, password: '***', skills: skills.length });
-
-            // 4. Client-side Validation
-            let isValid = true;
-
-            if (!name) {
-                showError(nameError, "Full name is required", nameInput);
-                isValid = false;
-            }
-
-            if (!email) {
-                showError(emailError, "Email address is required", emailInput);
-                isValid = false;
-            } else if (!/\S+@\S+\.\S+/.test(email)) {
-                showError(emailError, "Please enter a valid email", emailInput);
-                isValid = false;
-            }
-
-            if (!password) {
-                showError(passwordError, "Password is required", passwordInput);
-                isValid = false;
-            } else if (password.length < 6) {
-                showError(passwordError, "Password must be at least 6 characters", passwordInput);
-                isValid = false;
-            }
-
-            if (!isValid) {
-                console.warn("Validation failed");
+            
+            // Safety check
+            if (!state.name || !state.email || !state.password || !state.confirm) {
+                showGeneralError("Please complete all required fields correctly.");
                 return;
             }
 
-            // 5. Show Loading State
-            const submitBtn = signupForm.querySelector('button[type="submit"]');
-            let originalBtnHTML = "";
-            if (submitBtn) {
-                originalBtnHTML = submitBtn.innerHTML;
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
-            }
+            // Gather Values
+            const name = nameInput.value.trim();
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            const skills = []; // Optional skills can go here if needed later
+
+            // Loading state
+            submitBtn.disabled = true;
+            btnLabel.innerHTML = '<span class="btn-spinner"></span> Creating Account...';
+            submitBtn.querySelector('i').style.display = 'none';
 
             try {
                 const payload = { name, email, password, skills };
-                console.log("Sending Payload to Backend:", JSON.stringify({ ...payload, password: '***' }, null, 2));
-
-                // 6. API Request
                 const apiUrl = 'http://localhost:5000/api/auth/register';
-                console.log("Sending registration request to:", apiUrl);
 
                 const response = await fetch(apiUrl, {
                     method: 'POST',
@@ -121,79 +233,60 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 const data = await response.json();
-                console.log("Server response received:", response.status);
 
                 if (response.ok) {
                     // Success!
-                    console.log("Registration/Login successful");
+                    
+                    // Clear previous user state
+                    const keysToClear = ['xyverra_user_name', 'xyverra_user_email', 'xyverra_selected_path', 'userLevel', 'xyverra_selected_level', 'userSkills', 'xyverra_interests', 'completedModules', 'xyverra_skill_score', 'xyverra_user_streak', 'xyverra_xp', 'xyverra_onboarded', 'roadmapGenerated', 'completedCourses', 'quizResultLevel', 'quizResultScore', 'moduleQuizPassed'];
+                    keysToClear.forEach(k => localStorage.removeItem(k));
 
                     // Save to localStorage
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('xyverra_user_name', data.user.name);
                     localStorage.setItem('xyverra_user_email', data.user.email);
 
-                    // Restore state if they already had an account
-                    if (data.user.selectedPath) {
-                        localStorage.setItem("xyverra_selected_path", data.user.selectedPath);
-                    }
-                    if (data.user.selectedLevel) {
-                        localStorage.setItem("userLevel", data.user.selectedLevel);
-                        localStorage.setItem("xyverra_selected_level", data.user.selectedLevel);
-                    }
-                    if (data.user.skills && data.user.skills.length > 0) {
-                        localStorage.setItem("userSkills", JSON.stringify(data.user.skills));
-                    }
-                    if (data.user.completedModules && data.user.completedModules.length > 0) {
-                        localStorage.setItem("completedModules", JSON.stringify(data.user.completedModules));
-                    }
-                    if (data.user.competencyScore !== undefined) {
-                        localStorage.setItem("xyverra_skill_score", data.user.competencyScore);
-                    }
-                    if (data.user.dailyStreak !== undefined) {
-                        localStorage.setItem("xyverra_user_streak", data.user.dailyStreak);
-                    }
-                    if (data.user.experienceRank !== undefined) {
-                        localStorage.setItem("xyverra_xp", data.user.experienceRank);
-                    }
+                    // Show success modal and redirect on close
+                    window.XySuccess(
+                        "Welcome to XYVEERA", 
+                        data.message.includes("exists") ? "Login successful." : "Account created successfully! 🎉", 
+                        () => {
+                            const onboardingDone = data.user.onboardingCompleted || !!data.user.selectedPath || localStorage.getItem('xyverra_onboarded') === 'true';
+                            if (data.message.includes("exists") && onboardingDone) {
+                                window.location.href = 'dashboard.html';
+                            } else {
+                                window.location.href = 'career-discovery.html';
+                            }
+                        }
+                    );
 
-                    // Show success popup and redirect
-                    if (window.showSuccessPopup) {
-                        await window.showSuccessPopup(data.message.includes("exists") ? "Login Successful 🎉" : "Account Created Successfully ✅");
-                    } else {
-                        console.log("showSuccessPopup not found, skipping popup.");
-                    }
-
-                    // Redirect: new users → onboarding, returning users → dashboard
-                    const alreadyOnboarded = localStorage.getItem('xyverra_onboarded');
-                    if (data.user.selectedPath || alreadyOnboarded) {
-                        window.location.href = 'dashboard.html';
-                    } else {
-                        window.location.href = 'career-discovery.html';
-                    }
                 } else {
                     // Backend returned an error
-                    console.warn("Registration failed:", data.message);
-
-                    // Specific handling for "user already exists"
                     if (data.message && data.message.toLowerCase().includes('exists')) {
-                        showError(emailError, data.message, emailInput);
+                        showFieldError(emailInput, emailError, data.message);
                     } else {
-                        alert(data.message || 'Registration failed. Please try again.');
+                        showGeneralError(data.message || 'Registration failed. Please try again.');
                     }
+                    
+                    // Restore button
+                    submitBtn.disabled = false;
+                    btnLabel.innerHTML = 'Create Free Account';
+                    submitBtn.querySelector('i').style.display = 'inline-block';
                 }
             } catch (error) {
                 console.error("Signup error details:", error);
-                alert("Unable to connect to the server. Please ensure the backend is running at http://localhost:5000");
-            } finally {
-                // 7. Restore Button State (Only if not redirected)
-                // We check if we are still on the signup page
-                if (submitBtn && window.location.pathname.indexOf('path-selection.html') === -1) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalBtnHTML;
-                }
+                showGeneralError("Unable to connect to the server. Please check your connection.");
+                
+                // Restore button
+                submitBtn.disabled = false;
+                btnLabel.innerHTML = 'Create Free Account';
+                submitBtn.querySelector('i').style.display = 'inline-block';
             }
         });
-    } else {
-        console.error("Signup form element (#signup-form) not found!");
     }
+
+    // Terms triggers
+    document.getElementById('terms-link')?.addEventListener('click', () => window.XyInfo("Coming Soon", "Terms of Service page is under construction."));
+    document.getElementById('privacy-link')?.addEventListener('click', () => window.XyInfo("Coming Soon", "Privacy Policy page is under construction."));
+
 });

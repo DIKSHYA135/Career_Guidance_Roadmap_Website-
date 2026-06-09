@@ -52,7 +52,7 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg>
                     Skill Gap Analysis
                 </a>
-                <a href="skill-input.html" class="nav-item nav-skill-input">
+                <a href="roadmap.html" class="nav-item nav-roadmap">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     Create Roadmap
                 </a>
@@ -185,6 +185,14 @@
                     </div>
                 </div>
 
+                <!-- Quick Actions Bar -->
+                <div class="quick-actions-bar" style="display: flex; gap: 1rem; margin-bottom: 2rem; overflow-x: auto; padding-bottom: 0.5rem;">
+                    <button class="btn btn-primary" onclick="window.location.href='roadmap.html'" style="white-space: nowrap; box-shadow: var(--shadow-sm);"><i class="fas fa-play-circle" style="margin-right: 6px;"></i> Continue Learning</button>
+                    <button class="btn btn-outline" onclick="window.location.href='quiz.html'" style="white-space: nowrap; background: white;"><i class="fas fa-bolt" style="margin-right: 6px;"></i> Take Assessment</button>
+                    <button class="btn btn-outline" onclick="window.location.href='counselor.html'" style="white-space: nowrap; background: white;"><i class="fas fa-robot" style="margin-right: 6px;"></i> Ask AI Assistant</button>
+                    <button class="btn btn-outline" onclick="window.location.href='skill-gap.html'" style="white-space: nowrap; background: white;"><i class="fas fa-chart-line" style="margin-right: 6px;"></i> View Insights</button>
+                </div>
+
                 <!-- Bottom grids content area -->
                 <div class="content-grid">
                     
@@ -269,15 +277,53 @@
                         </button>
                     </div>
 
+                    <!-- Bento Card 4: Recommended Resources -->
+                    <div class="content-card card-box" style="display:flex; flex-direction:column; justify-content:space-between; grid-column: 1 / -1;">
+                        <div class="card-header">
+                            <div class="card-icon" style="color: var(--primary);">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <h2>Recommended Resources</h2>
+                        </div>
+                        
+                        <div class="recommended-resources-info" style="margin-top: 1rem;">
+                            <p style="font-size:0.9rem; color:var(--text-body); margin-bottom: 1rem;">Curated learning materials specifically for your current active milestone.</p>
+                            
+                            <div id="recommended-links-container" style="display:flex; flex-direction:column; gap:0.8rem;">
+                                <!-- Links will be injected here by dashboard.js -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bento Card 5: Activity Timeline -->
+                    <div class="content-card card-box" style="grid-column: 1 / -1; display:flex; flex-direction:column;">
+                        <div class="card-header">
+                            <div class="card-icon" style="color: var(--accent);">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <h2>Activity Timeline</h2>
+                        </div>
+                        <div style="margin-top: 1rem; position: relative; padding-left: 1rem; border-left: 2px solid var(--border);" id="activity-timeline-container">
+                            <!-- Populated dynamically -->
+                            <div style="position: relative; margin-bottom: 1.5rem;">
+                                <div style="position: absolute; left: -1.35rem; top: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--success); border: 2px solid white; box-shadow: 0 0 0 2px var(--success);"></div>
+                                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.25rem;">Path Selected: <span id="timeline-path-name">Loading...</span></h4>
+                                <p style="font-size: 0.85rem; color: var(--text-muted);">You generated your customized AI roadmap.</p>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </main>
     </div>
 
+    <script src="auth-guard.js"></script>
     <script src="toast.js"></script>
     <script src="app-data.js"></script>
     <script src="global-sidebar.js"></script>
     <script src="roadmap.js"></script>
     <script src="dashboard.js"></script>
+    <script src="back-nav.js"></script>
 </body>
 </html>

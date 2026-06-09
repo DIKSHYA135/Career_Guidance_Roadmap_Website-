@@ -392,8 +392,10 @@ const ROADMAP_DATA = {
 const INTEREST_TO_PATH = {
     'Web Development': 'Web Development',
     'Full Stack Development': 'Full Stack Development',
+    'Backend Development': 'Backend / APIs',
     'Backend / APIs': 'Backend / APIs',
     'Data Science': 'Data Science',
+    'Machine Learning': 'AI Engineer',
     'AI / Machine Learning': 'NLP / AI',
     'AI / ML': 'NLP / AI',
     'NLP / AI': 'NLP / AI',
@@ -415,23 +417,53 @@ document.addEventListener("DOMContentLoaded", () => {
     // Hide quiz button until roadmap renders
     if (topQuizBtn) topQuizBtn.style.display = 'none';
     
-    // Load state
-    const targetCareer = localStorage.getItem('xyverra_target_career') || localStorage.getItem('xyverra_selected_path') || 'Web Developer';
-    const selectedPath = localStorage.getItem("xyverra_selected_path") || "Web Development";
-    
+    // Load state — never fall back to a default path
+    const targetCareer = localStorage.getItem('xyverra_target_career') || localStorage.getItem('xyverra_selected_path') || '';
+    const selectedPath = localStorage.getItem("xyverra_selected_path") || '';
+
+    // If the user has not chosen a path yet, send them to career discovery
+    if (!selectedPath && !targetCareer) {
+        if (accordionContainer) {
+            accordionContainer.innerHTML = `
+                <div style="text-align:center; padding: 3rem 2rem;">
+                    <div style="font-size:3rem; margin-bottom:1rem;">🧭</div>
+                    <h3 style="margin-bottom:0.75rem; color:var(--text-dark);">You haven't picked a career path yet!</h3>
+                    <p style="color:var(--text-muted); margin-bottom:1.5rem;">Go through Career Discovery first — we'll help you find the perfect path.</p>
+                    <a href="career-discovery.html" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:0.5rem;">
+                        <i class="fas fa-compass"></i> Start Career Discovery
+                    </a>
+                </div>`;
+        }
+        return;
+    }
+
     // Try exact match first, then interest mapping, then heuristic
     let matchedPathKey = ROADMAP_DATA[selectedPath] ? selectedPath : null;
     if (!matchedPathKey) matchedPathKey = INTEREST_TO_PATH[selectedPath] || INTEREST_TO_PATH[targetCareer];
     if (!matchedPathKey) {
-        matchedPathKey = Object.keys(ROADMAP_DATA).find(key => 
-            targetCareer.toLowerCase().includes(key.toLowerCase()) || 
-            key.toLowerCase().includes(selectedPath.toLowerCase().split(' ')[0])
+        matchedPathKey = Object.keys(ROADMAP_DATA).find(key =>
+            (targetCareer && targetCareer.toLowerCase().includes(key.toLowerCase())) ||
+            (selectedPath && key.toLowerCase().includes(selectedPath.toLowerCase().split(' ')[0]))
         );
     }
-    if (!matchedPathKey) matchedPathKey = "Web Development";
-    
+    // If still no match, tell user to pick a path
+    if (!matchedPathKey) {
+        if (accordionContainer) {
+            accordionContainer.innerHTML = `
+                <div style="text-align:center; padding: 3rem 2rem;">
+                    <div style="font-size:3rem; margin-bottom:1rem;">⚠️</div>
+                    <h3 style="margin-bottom:0.75rem; color:var(--text-dark);">We couldn't match your path</h3>
+                    <p style="color:var(--text-muted); margin-bottom:1.5rem;">Please go through Career Discovery to select a valid path.</p>
+                    <a href="career-discovery.html" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:0.5rem;">
+                        <i class="fas fa-compass"></i> Career Discovery
+                    </a>
+                </div>`;
+        }
+        return;
+    }
+
     if (headerTitle) {
-        headerTitle.innerText = `${targetCareer} Roadmap`;
+        headerTitle.innerText = `${targetCareer || selectedPath} Roadmap`;
     }
 
     const pathData = ROADMAP_DATA[matchedPathKey];

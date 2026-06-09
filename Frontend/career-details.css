@@ -2,10 +2,10 @@
    career-details.css  – Premium career details layout
    ========================================================= */
 
-/* ── Hero banner ─────────────────────────────────────── */
 .details-hero {
+    background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
     border-radius: 20px;
-    padding: 2.5rem 3rem;
+    padding: 3.5rem 4rem;
     margin-bottom: 2rem;
     color: #fff;
     position: relative;
@@ -85,7 +85,7 @@
     background: #fff;
     border: 1px solid #E4E4E7;
     border-radius: 18px;
-    padding: 2rem;
+    padding: 2.5rem;
     margin-bottom: 1.5rem;
     box-shadow: 0 4px 20px rgba(15,23,42,0.04);
 }
@@ -120,7 +120,7 @@
 .resp-list li:last-child { border-bottom: none; padding-bottom: 0; }
 .resp-list li::before {
     content: "→";
-    color: #2563EB;
+    color: #4F46E5;
     font-weight: 700;
     flex-shrink: 0;
     margin-top: 2px;
@@ -133,7 +133,7 @@
     position: absolute;
     left: 8px; top: 8px; bottom: 8px;
     width: 2px;
-    background: linear-gradient(180deg, #2563EB, #7C3AED);
+    background: linear-gradient(180deg, #4F46E5, #7C3AED);
     border-radius: 2px;
 }
 .growth-step {
@@ -148,7 +148,7 @@
     top: 6px;
     width: 12px; height: 12px;
     background: #fff;
-    border: 3px solid #2563EB;
+    border: 3px solid #4F46E5;
     border-radius: 50%;
 }
 .growth-step h4 {
@@ -169,7 +169,7 @@
     background: #fff;
     border: 1px solid #E4E4E7;
     border-radius: 18px;
-    padding: 1.5rem;
+    padding: 2rem;
     box-shadow: 0 4px 16px rgba(15,23,42,0.04);
 }
 .side-card h3 {
@@ -203,7 +203,7 @@
 .opp-value {
     font-size: 1.6rem;
     font-weight: 800;
-    color: #2563EB;
+    color: #4F46E5;
     margin-bottom: 0.4rem;
     letter-spacing: -0.03em;
 }
@@ -211,7 +211,7 @@
 
 /* CTA card */
 .cta-card {
-    background: linear-gradient(135deg, #1D4ED8, #7C3AED);
+    background: linear-gradient(135deg, #4F46E5, #7C3AED);
     border: none;
     text-align: center;
     padding: 2rem 1.5rem;
@@ -220,7 +220,7 @@
 .cta-card p  { color: rgba(255,255,255,0.65); font-size: 0.85rem; margin-bottom: 1.25rem; }
 .cta-card .btn {
     background: #fff;
-    color: #1D4ED8;
+    color: #4F46E5;
     width: 100%;
     justify-content: center;
     font-weight: 800;

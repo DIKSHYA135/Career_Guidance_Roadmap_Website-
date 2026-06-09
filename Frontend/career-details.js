@@ -167,16 +167,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('cd-opportunities').textContent = career.opportunities;
 
     // Roadmap CTA
-    document.getElementById('generate-roadmap-btn').addEventListener('click', () => {
+    const startBtn = document.getElementById('generate-roadmap-btn');
+    startBtn.addEventListener('click', () => {
         localStorage.setItem('xyverra_selected_path', career.targetPath);
         localStorage.setItem('xyverra_target_career', career.title);
+        localStorage.setItem('xyverra_onboarded', 'true');
+        localStorage.setItem('userLevel', 'Beginner');
 
-        const btn = document.getElementById('generate-roadmap-btn');
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Setting up...';
-        btn.disabled = true;
+        startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Setting up roadmap...';
+        startBtn.disabled = true;
 
         setTimeout(() => {
-            window.location.href = 'skill-input.html';
+            window.location.href = 'roadmap.html';
         }, 800);
     });
 });

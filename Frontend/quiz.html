@@ -118,7 +118,7 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg>
                     Skill Gap Analysis
                 </a>
-                <a href="skill-input.html" class="nav-item active nav-skill-input">
+                <a href="roadmap.html" class="nav-item active nav-roadmap">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     My Roadmap
                 </a>
@@ -173,9 +173,12 @@
                     <div class="quiz-progress-dots" id="quiz-progress-dots"></div>
 
                     <!-- Question Meta Row -->
-                    <div class="question-meta">
+                    <div class="question-meta" style="display: flex; justify-content: space-between; align-items: center;">
                         <span id="question-meta-text">Question 1 of 1</span>
-                        <span id="timer-text" class="timer-badge">20s Reading Time</span>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <span id="adaptive-difficulty-badge" class="timer-badge" style="background: linear-gradient(135deg, var(--accent), var(--primary)); color: white; border: none; font-weight: bold;"><i class="fas fa-brain" style="margin-right: 4px;"></i> Level: Adaptive</span>
+                            <span id="timer-text" class="timer-badge">20s Reading Time</span>
+                        </div>
                     </div>
 
                     <!-- Question & Options (quiz body) -->
@@ -276,10 +279,13 @@
         </div>
     </div>
 
+    <script src="auth-guard.js"></script>
     <script src="quiz-data.js"></script>
     <script src="localstorage-state-management.js"></script>
     <script src="quiz-lock-manager.js"></script>
     <script src="global-sidebar.js"></script>
     <script src="quiz.js?v=4"></script>
+    <script src="adaptive-quiz.js"></script>
+    <script src="back-nav.js"></script>
 </body>
 </html>

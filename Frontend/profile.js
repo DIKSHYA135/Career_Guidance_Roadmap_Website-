@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         email: currentEmail,
         dob: localStorage.getItem('xyverra_user_dob') || '',
         skills: [],
-        selectedPath: localStorage.getItem('xyverra_selected_path') || 'Web Development',
+        selectedPath: localStorage.getItem('xyverra_selected_path') || '',
         selectedLevel: localStorage.getItem('userLevel') || 'Beginner'
     };
 
@@ -272,7 +272,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.getElementById('edit-name').value     = userData.name || '';
             document.getElementById('edit-email').value    = userData.email || '';
             document.getElementById('edit-dob').value      = userData.dob || '';
-            document.getElementById('edit-category').value = userData.selectedPath || 'Web Development';
+            document.getElementById('edit-category').value = userData.selectedPath || '';
             document.getElementById('edit-level').value    = userData.selectedLevel || 'Beginner';
             editProfileModal.classList.add('active');
         });

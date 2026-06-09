@@ -17964,20 +17964,36 @@ document.addEventListener("DOMContentLoaded", () => {
         quizStatus.textContent = '';
 
         // Exit button → always roadmap or verification
-        btnExitQuiz.textContent = isVerify ? '← Back to Verification' : '← Back to Roadmap';
+        btnExitQuiz.textContent = isVerify ? '← Back to Level Selection' : '← Back to Roadmap';
         
         // Remove old listeners and add a specific one for results page
         const newBtnExit = btnExitQuiz.cloneNode(true);
         btnExitQuiz.parentNode.replaceChild(newBtnExit, btnExitQuiz);
-        newBtnExit.addEventListener('click', () => {
-             if (isVerify && !passed) {
-                 window.location.href = `skill-verification.html?failed=${moduleId}`;
-             } else if (isVerify && passed) {
-                 window.location.href = `skill-verification.html`;
+             if (isVerify) {
+                 // Removed skill-input, so go to roadmap
+                 window.location.href = 'roadmap.html';
              } else {
-                 window.location.href = `roadmap.html`;
+                 window.location.href = 'roadmap.html';
              }
         });
+        
+        // In verify mode, auto-redirect after 3 seconds
+        if (isVerify) {
+            setTimeout(() => {
+                window.location.href = 'roadmap.html';
+            }, 3000);
+            const countdown = document.getElementById('score-text');
+            if (countdown) {
+                let secs = 3;
+                const iv = setInterval(() => {
+                    secs--;
+                    if (secs <= 0) { clearInterval(iv); return; }
+                    if (countdown) countdown.textContent = (passed
+                        ? `✅ Verified! Returning in ${secs}s...`
+                        : `❌ Score too low. Returning in ${secs}s...`);
+                }, 1000);
+            }
+        }
         
         if (btnNextQuestion) btnNextQuestion.style.display = 'none';
 
