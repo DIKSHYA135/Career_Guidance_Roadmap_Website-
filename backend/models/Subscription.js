@@ -9,8 +9,8 @@ const subscriptionSchema = new mongoose.Schema({
     },
     planType: {
         type: String,
-        enum: ['premium_monthly', 'premium_yearly'],
-        default: 'premium_monthly'
+        enum: ['premium_monthly', 'premium_yearly', 'Xyverra Pro Monthly'],
+        default: 'Xyverra Pro Monthly'
     },
     status: {
         type: String,

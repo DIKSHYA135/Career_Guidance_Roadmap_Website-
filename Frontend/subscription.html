@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Upgrade to Premium — Xyverra</title>
-    <meta name="description" content="Unlock unlimited AI career coaching, personalized roadmaps, and premium features for just $1.30/month." />
+    <title>Upgrade to Xyverra Pro</title>
+    <meta name="description" content="Unlock unlimited AI career coaching, personalized roadmaps, and Xyverra Pro features for just $1.30/month." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet" />
@@ -183,6 +183,36 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .processing-overlay p { color: #64748b; font-size: 1rem; font-weight: 600; }
 
+        /* ── Custom Modals ── */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; z-index: 1000;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;
+        }
+        .modal-overlay.visible { display: flex; opacity: 1; }
+        .modal-card {
+            background: #fff; border-radius: 20px; padding: 2rem; max-width: 400px; width: 90%;
+            text-align: center; transform: scale(0.95); transition: transform 0.2s;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+        }
+        .modal-overlay.visible .modal-card { transform: scale(1); }
+        .modal-icon {
+            width: 64px; height: 64px; border-radius: 50%; background: rgba(239,68,68,0.1);
+            color: var(--rose); display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; margin: 0 auto 1.5rem;
+        }
+        .modal-title { font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-bottom: 0.5rem; }
+        .modal-desc { color: #64748b; font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.5; }
+        .modal-actions { display: flex; gap: 1rem; }
+        .modal-btn {
+            flex: 1; padding: 0.8rem; border: none; border-radius: 10px; font-weight: 600;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .modal-btn-cancel { background: #f1f5f9; color: #475569; }
+        .modal-btn-cancel:hover { background: #e2e8f0; }
+        .modal-btn-confirm { background: var(--rose); color: white; }
+        .modal-btn-confirm:hover { background: #dc2626; }
+        
         /* eSewa form hidden */
         #esewa-form { display: none; }
     </style>
@@ -210,14 +240,14 @@
     <div class="active-sub-banner" id="active-sub-banner">
         <i class="fas fa-check-circle"></i>
         <div>
-            <h3>You have an active Premium subscription!</h3>
+            <h3>You have an active Xyverra Pro subscription!</h3>
             <p id="sub-expiry-text">Your subscription is active and all features are unlocked.</p>
         </div>
     </div>
 
     <div class="hero">
-        <div class="hero-badge"><i class="fas fa-crown"></i> Premium Membership</div>
-        <h1>Unlock Your Full Career <span>Potential</span></h1>
+        <div class="hero-badge"><i class="fas fa-crown"></i> Xyverra Pro Membership</div>
+        <h1>Supercharge your career with <span>Xyverra Pro</span></h1>
         <p>Get unlimited AI counseling, personalized roadmaps, and everything you need to land your dream job.</p>
     </div>
 
@@ -254,7 +284,7 @@
         <!-- Premium Plan -->
         <div class="pricing-card featured">
             <div class="card-badge">MOST POPULAR</div>
-            <div class="plan-name">Premium</div>
+            <div class="plan-name">Xyverra Pro</div>
             <div class="plan-price">
                 <span class="amount">$1.30</span>
                 <span class="period">/month</span>
@@ -313,6 +343,19 @@
     </div>
 </main>
 
+<!-- Cancel Modal -->
+<div class="modal-overlay" id="cancel-modal">
+    <div class="modal-card">
+        <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="modal-title">Cancel Subscription?</div>
+        <div class="modal-desc">You'll lose access to unlimited AI career coaching, custom roadmaps, and all Xyverra Pro features at the end of your billing cycle. Are you sure?</div>
+        <div class="modal-actions">
+            <button class="modal-btn modal-btn-cancel" onclick="closeCancelModal()">Keep Pro</button>
+            <button class="modal-btn modal-btn-confirm" id="btn-confirm-cancel" onclick="executeCancel()">Yes, Cancel</button>
+        </div>
+    </div>
+</div>
+
 <script src="auth-guard.js"></script>
 <script>
 const API = 'http://localhost:5000';
@@ -323,7 +366,7 @@ function getToken() {
 
 async function loadStatus() {
     try {
-        const res = await fetch(`${API}/api/payment/status`, {
+        const res = await fetch(`${API}/api/subscription/status`, {
             headers: { 'Authorization': `Bearer ${getToken()}` }
         });
         const data = await res.json();
@@ -331,16 +374,56 @@ async function loadStatus() {
             const banner = document.getElementById('active-sub-banner');
             banner.classList.add('visible');
             const exp = new Date(data.subscription.endDate).toLocaleDateString('en-US', { dateStyle: 'long' });
-            document.getElementById('sub-expiry-text').textContent = `Your Premium access is active until ${exp}.`;
+            document.getElementById('sub-expiry-text').innerHTML = `Your Xyverra Pro access is active until <strong>${exp}</strong>.`;
+            
+            // Add Cancel button
+            if (!document.getElementById('btn-cancel-sub')) {
+                const cancelBtn = document.createElement('button');
+                cancelBtn.id = 'btn-cancel-sub';
+                cancelBtn.textContent = 'Cancel Subscription';
+                cancelBtn.style.cssText = 'margin-top: 10px; background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem;';
+                cancelBtn.onclick = () => document.getElementById('cancel-modal').classList.add('visible');
+                document.getElementById('sub-expiry-text').parentElement.appendChild(cancelBtn);
+            }
+
             document.getElementById('btn-upgrade').disabled = true;
-            document.getElementById('btn-upgrade').textContent = '✓ Subscribed';
+            document.getElementById('btn-upgrade').textContent = '✓ Subscribed to Xyverra Pro';
         }
     } catch (_) {}
 }
 
+function closeCancelModal() {
+    document.getElementById('cancel-modal').classList.remove('visible');
+}
+
+async function executeCancel() {
+    const btn = document.getElementById('btn-confirm-cancel');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    try {
+        const res = await fetch(`${API}/api/subscription/cancel`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${getToken()}` }
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert('Subscription cancelled successfully.');
+            window.location.reload();
+        } else {
+            alert(data.message || 'Failed to cancel subscription.');
+            btn.disabled = false;
+            btn.innerHTML = 'Yes, Cancel';
+        }
+    } catch (err) {
+        alert('Network error. Please try again.');
+        btn.disabled = false;
+        btn.innerHTML = 'Yes, Cancel';
+    }
+}
+
 async function loadTransactions() {
     try {
-        const res = await fetch(`${API}/api/payment/transactions`, {
+        const res = await fetch(`${API}/api/subscription/history`, {
             headers: { 'Authorization': `Bearer ${getToken()}` }
         });
         const data = await res.json();
@@ -371,7 +454,7 @@ async function initiatePayment() {
     document.getElementById('processing-text').textContent = 'Preparing your secure payment...';
 
     try {
-        const res = await fetch(`${API}/api/payment/esewa/initiate`, {
+        const res = await fetch(`${API}/api/subscription/create-payment`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -387,20 +470,20 @@ async function initiatePayment() {
             return;
         }
 
-        // Populate and submit the hidden eSewa form
-        const { esewaData, gatewayUrl } = data;
-        const form = document.getElementById('esewa-form');
-        form.action = gatewayUrl;
-        document.getElementById('f-amount').value = esewaData.amount;
-        document.getElementById('f-total').value = esewaData.total_amount;
-        document.getElementById('f-uuid').value = esewaData.transaction_uuid;
-        document.getElementById('f-code').value = esewaData.product_code;
-        document.getElementById('f-success').value = esewaData.success_url;
-        document.getElementById('f-failure').value = esewaData.failure_url;
-        document.getElementById('f-signature').value = esewaData.signature;
+        if (data.fakePayment) {
+            document.getElementById('processing-text').textContent = 'Simulating payment...';
+            setTimeout(() => {
+                window.location.href = data.redirectUrl;
+            }, 800);
+            return;
+        }
 
-        document.getElementById('processing-text').textContent = 'Redirecting to eSewa secure payment...';
-        setTimeout(() => form.submit(), 800);
+        // Store mock data then redirect to mock checkout
+        sessionStorage.setItem('mockPaymentData', JSON.stringify(data));
+        document.getElementById('processing-text').textContent = 'Redirecting to payment page...';
+        setTimeout(() => {
+            window.location.href = 'mock-checkout.html';
+        }, 800);
     } catch (err) {
         overlay.classList.remove('visible');
         btn.disabled = false;

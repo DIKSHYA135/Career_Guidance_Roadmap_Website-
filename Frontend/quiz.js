@@ -420,7 +420,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const specificModulesParam = urlParams.get('specificModules');
     const targetLevel  = urlParams.get('targetLevel') || 'Beginner';
     const categoryParam = urlParams.get('category') || localStorage.getItem('xyverra_selected_path') || 'Web Development';
-    moduleId = urlParams.get('module') || 'html';
+    moduleId = urlParams.get('module') || urlParams.get('moduleId') || 'html';
     const isVerify = urlParams.get('verify') === 'true';
 
     let quizData = { title: "Assessment", questions: [] };
@@ -804,11 +804,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ────────────────────────────────────────────────────
-    function showResults() {
+    async function showResults() {
         clearInterval(quizTimerInterval);
 
         const pct = Math.round((score / totalQuestions) * 100);
-        const passed = pct >= 70;
+        let passed = pct >= 70;
+
+        // POST /api/progress/submit-quiz
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (token && activeModuleIds.length > 0) {
+            try {
+                // Submit for the first active module ID
+                const res = await fetch('http://localhost:5000/api/progress/submit-quiz', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ moduleId: activeModuleIds[0], roadmapId: activeModuleIds[0], scorePercentage: pct })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    passed = data.passed;
+                }
+            } catch (err) {
+                console.error('Error submitting quiz to backend:', err);
+            }
+        }
 
         // Hide quiz body, show result
         if (quizBody) quizBody.style.display = 'none';
@@ -858,7 +877,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         if (btnNextQuestion) btnNextQuestion.style.display = 'none';
 
-        // Save if passed
+        // Save if passed (keep localStorage fallback for now so UI doesn't break)
         if (passed) {
             const pendingStart = localStorage.getItem('pendingStartModule');
             if (pendingStart) {
@@ -866,10 +885,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 localStorage.removeItem('pendingStartModule');
             }
 
-            // TODO: POST /api/quiz/submit { moduleId, score, total: totalQuestions }
             let completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
-            
-            // Push all active modules
             activeModuleIds.forEach(id => {
                 if (!completedModules.includes(id)) {
                     completedModules.push(id);
@@ -877,7 +893,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             localStorage.setItem('completedModules', JSON.stringify(completedModules));
 
-            // TODO: Update user skill score via PATCH /api/user/score
             let currentScore = parseInt(localStorage.getItem('xyverra_skill_score') || '0');
             localStorage.setItem('xyverra_skill_score', currentScore + 10);
         }

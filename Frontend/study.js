@@ -66,15 +66,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ── API: report lesson studied to server (fire-and-forget) ──────────────
-    function reportLessonStudied(id, mod, secs) {
-        const token = localStorage.getItem('token');
+    // ── API: report lesson studied to server ──────────────
+    async function reportLessonStudied(id, mod, secs) {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (!id || !token) return;
-        fetch('http://localhost:5000/api/user/mark-lesson-studied', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-            body: JSON.stringify({ courseId: id, moduleId: mod || null, timeSpentSeconds: secs || 0 })
-        }).catch(() => { /* non-blocking; localStorage is source of truth */ });
+        try {
+            await fetch('http://localhost:5000/api/progress/mark-viewed', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                body: JSON.stringify({ moduleId: mod || id, roadmapId: id, timeSpentSeconds: secs || 0 })
+            });
+        } catch (e) {
+            console.error('Failed to mark viewed:', e);
+        }
     }
     // --- Loader handling ---
     let loaderHidden = false;
@@ -145,14 +149,19 @@ document.addEventListener('DOMContentLoaded', () => {
         params.set('returnTo', returnTo);
         if (completed && courseId) params.set('completed', courseId);
         if (moduleId) params.set('moduleId', moduleId);
+        if (completed) {
+            return 'quiz.html?' + params.toString() + '&title=' + encodeURIComponent(courseTitle);
+        }
         return 'roadmap.html?' + params.toString();
     }
 
-    function completeLesson() {
+    async function completeLesson() {
+        completeBtn.disabled = true;
+        completeBtn.textContent = 'Saving...';
         if (courseId) {
             markCourseOpened(courseId);
             persistTimeSpent(courseId, Math.max(seconds, REQUIRED_SECONDS));
-            reportLessonStudied(courseId, moduleId, Math.max(seconds, REQUIRED_SECONDS));
+            await reportLessonStudied(courseId, moduleId, Math.max(seconds, REQUIRED_SECONDS));
         }
         clearInterval(intervalId);
         window.location.href = buildReturnUrl(true);

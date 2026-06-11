@@ -165,6 +165,11 @@ const apiLimiter = rateLimit({
 
 app.use('/api/', apiLimiter);
 
+// Mount custom routes
+app.use('/api/subscription', require('./routes/subscriptionRoutes'));
+app.use('/api/progress', require('./routes/progressRoutes'));
+
+
 // ==========================
 // MONGODB CONNECTION
 // ==========================
@@ -729,17 +734,15 @@ app.get('/api/chat/usage', authMiddleware, async (req, res) => {
 // ==========================
 
 // In-memory chat history per user session (resets on server restart)
-// For persistence use MongoDB chatHistory field (see AI chat history route below)
-const chatHistoryStore = new Map();
-
-async function callGemini(userMessage, chatHistory, userContext) {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey || apiKey === 'YOUR_GEMINI_API_KEY_HERE') {
-        // Fallback to keyword-based response if no Gemini key
+// For persistence use MongoDB
+async function callGroq(userMessage, chatHistory, userContext) {
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) {
+        console.warn('GROQ_API_KEY not set — AI responses unavailable');
         return null;
     }
 
-    const systemPrompt = `You are an expert AI Career Counselor for Xyverra, an AI-powered career guidance platform. 
+    const systemPrompt = `You are an expert AI Career Counselor for Xyverra, an AI-powered career guidance platform.
 You help students and professionals navigate their tech career journey with personalized, actionable advice.
 
 User Context:
@@ -754,80 +757,68 @@ Your role:
 3. Help with interview prep, portfolio building, and job searching
 4. Be encouraging, professional, and concise
 5. Always relate advice to their specific career path when possible
-6. Format responses with bullet points and bold text for clarity
+6. Format responses with **bold** for key terms and - bullet points for lists
 
-Keep responses concise (2-4 paragraphs max). Be encouraging and practical.`;
+Keep responses concise (2-4 paragraphs max). Be warm, encouraging, and practical.`;
 
-    // Build conversation history for Gemini
-    const contents = [];
-    
-    // Add chat history (last 10 messages for context)
-    const recentHistory = chatHistory.slice(-10);
-    for (const msg of recentHistory) {
-        contents.push({
-            role: msg.role === 'user' ? 'user' : 'model',
-            parts: [{ text: msg.content }]
-        });
-    }
-    
-    // Add current message
-    contents.push({
-        role: 'user',
-        parts: [{ text: userMessage }]
-    });
+    const messages = [
+        { role: 'system', content: systemPrompt },
+        ...chatHistory.slice(-10).map(m => ({
+            role: m.role === 'user' ? 'user' : 'assistant',
+            content: m.content
+        })),
+        { role: 'user', content: userMessage }
+    ];
 
     const requestBody = JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents,
-        generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 800,
-            topP: 0.9
-        }
+        model: 'llama-3.3-70b-versatile',
+        messages,
+        temperature: 0.7,
+        max_tokens: 800,
+        top_p: 0.9
     });
 
-    return new Promise((resolve, reject) => {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-        const urlObj = new URL(url);
-        
+    return new Promise((resolve) => {
         const options = {
-            hostname: urlObj.hostname,
-            path: urlObj.pathname + urlObj.search,
+            hostname: 'api.groq.com',
+            path: '/openai/v1/chat/completions',
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`,
                 'Content-Length': Buffer.byteLength(requestBody)
             },
-            timeout: 15000
+            timeout: 20000
         };
 
-        const req = https.request(options, (geminiRes) => {
+        const req = https.request(options, (groqRes) => {
             let data = '';
-            geminiRes.on('data', chunk => data += chunk);
-            geminiRes.on('end', () => {
+            groqRes.on('data', chunk => data += chunk);
+            groqRes.on('end', () => {
                 try {
                     const parsed = JSON.parse(data);
-                    if (parsed.candidates && parsed.candidates[0] && parsed.candidates[0].content) {
-                        const text = parsed.candidates[0].content.parts[0].text;
-                        resolve(text);
+                    if (parsed.choices && parsed.choices[0] && parsed.choices[0].message) {
+                        resolve(parsed.choices[0].message.content);
                     } else if (parsed.error) {
-                        console.error('Gemini API error:', parsed.error.message);
+                        console.error('Groq API error:', parsed.error.message);
                         resolve(null);
                     } else {
                         resolve(null);
                     }
                 } catch (e) {
+                    console.error('Groq parse error:', e.message);
                     resolve(null);
                 }
             });
         });
-        
-        req.on('error', (e) => { console.error('Gemini request error:', e.message); resolve(null); });
+
+        req.on('error', (e) => { console.error('Groq request error:', e.message); resolve(null); });
         req.on('timeout', () => { req.destroy(); resolve(null); });
         req.write(requestBody);
         req.end();
     });
 }
+
 
 app.post('/api/chat/message', authMiddleware, async (req, res) => {
     try {
@@ -862,7 +853,7 @@ app.post('/api/chat/message', authMiddleware, async (req, res) => {
             { returnDocument: 'after' }
         );
 
-        // Call Gemini AI for response
+        // Call Groq AI (llama-3.3-70b) for response
         const chatHistory = Array.isArray(history) ? history : [];
         const userContext = {
             name: user.name,
@@ -871,7 +862,7 @@ app.post('/api/chat/message', authMiddleware, async (req, res) => {
             skills: user.skills
         };
 
-        const aiResponse = await callGemini(content.trim(), chatHistory, userContext);
+        const aiResponse = await callGroq(content.trim(), chatHistory, userContext);
 
         return res.json({
             success: true,
@@ -879,7 +870,7 @@ app.post('/api/chat/message', authMiddleware, async (req, res) => {
             messagesUsed: updated ? updated.chatMessagesUsed : (user.chatMessagesUsed || 0) + 1,
             freeLimit: FREE_CHAT_LIMIT,
             isSubscriber: subscriber,
-            aiResponse: aiResponse // null if Gemini unavailable (fallback to frontend keyword engine)
+            aiResponse: aiResponse // null if Groq unavailable (fallback to frontend keyword engine)
         });
     } catch (error) {
         return serverError(res, 'Chat Message Error', error);
@@ -1066,9 +1057,23 @@ app.get('/api/user/profile', authMiddleware, async (req, res) => {
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
-        res.json(user);
+        res.json({ success: true, user });
     } catch (error) {
         return serverError(res, 'Get Profile Error', error);
+    }
+});
+
+// Alias: /api/user/me → same as /api/user/profile (used by dashboard.js)
+app.get('/api/user/me', authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId)
+            .select('-password -emailVerificationOTP -emailVerificationExpiry');
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        res.json({ success: true, user });
+    } catch (error) {
+        return serverError(res, 'Get Me Error', error);
     }
 });
 

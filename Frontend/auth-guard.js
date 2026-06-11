@@ -36,17 +36,6 @@
         return;
     }
 
-    // ── Check 2: Email verification guard ──
-    // Only redirect if the flag is EXPLICITLY 'false'.
-    // If the key is missing (e.g. old accounts pre-OTP), allow through.
-    const emailVerified = localStorage.getItem('xyverra_email_verified');
-    if (emailVerified === 'false') {
-        if (currentPage !== 'signup.html') {
-            console.warn('[AuthGuard] Email not verified. Redirecting to signup verify step.');
-            window.location.replace('signup.html?verify=1');
-            return;
-        }
-    }
 
     // ── Check 3: Onboarding guard for specific protected pages ──
     if (ONBOARDING_REQUIRED.includes(currentPage)) {

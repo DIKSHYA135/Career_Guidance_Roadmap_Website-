@@ -24,6 +24,30 @@ document.addEventListener("DOMContentLoaded", () => {
     let resendTimer = null;
     let resendCooldown = 60; // seconds
 
+    // Check for ?verify=1 redirect
+    if (window.location.search.includes('verify=1')) {
+        const storedEmail = localStorage.getItem('xyverra_user_email');
+        const token = localStorage.getItem('token');
+        if (storedEmail && token) {
+            signupForm.style.display = 'none';
+            otpForm.style.display = 'block';
+            otpEmailDisplay.textContent = storedEmail;
+
+            // Auto-send OTP on load
+            fetch('http://localhost:5000/api/auth/send-otp', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            }).then(res => res.json()).then(data => {
+                if (data.success || data.message?.includes('sent')) {
+                    startResendTimer();
+                }
+            }).catch(e => console.warn('Auto OTP send failed:', e));
+        }
+    }
+
     // Toggles
     const togglePassword = document.getElementById('toggle-password');
     const toggleConfirm = document.getElementById('toggle-confirm');
@@ -369,6 +393,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const data = await response.json();
 
                 if (response.ok) {
+                    localStorage.setItem('xyverra_email_verified', 'true');
                     window.XySuccess("Account Verified", "Your account has been successfully verified! 🎉", () => {
                         window.location.href = 'career-discovery.html';
                     });

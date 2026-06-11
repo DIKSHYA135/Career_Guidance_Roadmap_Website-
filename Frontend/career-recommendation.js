@@ -171,23 +171,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* ── Choose a path → save it → redirect to roadmap ── */
     document.querySelectorAll('.choose-path-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
             const path = btn.getAttribute('data-path');
 
-            // Save the selected path
+            // Save to localStorage immediately
             localStorage.setItem('xyverra_selected_path', path);
             localStorage.setItem('xyverra_target_career', path);
             localStorage.setItem('xyverra_onboarded', 'true');
-            localStorage.setItem('userLevel', 'Beginner'); // default level
+            localStorage.setItem('userLevel', 'Beginner');
 
             // Loading state on button
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Setting up your roadmap...';
             btn.disabled = true;
 
-            // Redirect straight to roadmap
+            // Persist to backend (fire-and-forget is OK; localStorage is immediate fallback)
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            if (token) {
+                try {
+                    // Save path
+                    await fetch('http://localhost:5000/api/user/save-path', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        body: JSON.stringify({ selectedPath: path })
+                    });
+                    // Mark onboarding complete
+                    await fetch('http://localhost:5000/api/user/save-onboarding', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        body: JSON.stringify({ selectedLevel: 'Beginner' })
+                    });
+                } catch (e) {
+                    console.warn('[CareerRec] Backend save failed, proceeding with localStorage only.', e);
+                }
+            }
+
+            // Redirect to roadmap
             setTimeout(() => {
                 window.location.href = 'roadmap.html';
-            }, 800);
+            }, 600);
         });
     });
 

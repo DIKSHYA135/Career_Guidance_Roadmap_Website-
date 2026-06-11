@@ -354,7 +354,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const selectedPath = localStorage.getItem("xyverra_selected_path") || "Web Development";
     let matchedPathKey = selectedPath;
     if (!ROADMAP_DATA[matchedPathKey]) {
-        matchedPathKey = Object.keys(ROADMAP_DATA).find(key => selectedPath.includes(key)) || "Web Development";
+        const p = selectedPath.toLowerCase();
+        if (p.includes('machine learning') || p.includes('ai') || p.includes('nlp')) {
+            matchedPathKey = "NLP / AI";
+        } else if (p.includes('data')) {
+            matchedPathKey = "Data Science";
+        } else {
+            matchedPathKey = Object.keys(ROADMAP_DATA).find(key => p.includes(key.toLowerCase())) || "Web Development";
+        }
     }
     
     if (headerTitle) {
@@ -367,6 +374,39 @@ document.addEventListener("DOMContentLoaded", () => {
     let completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
     let completedCourses = JSON.parse(localStorage.getItem('completedCourses') || '[]');
 
+    // ── Sync completedModules from backend (authoritative source) ──
+    (async function syncFromBackend() {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (!token) return;
+        try {
+            const res = await fetch('http://localhost:5000/api/user/me', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (!res.ok) return;
+            const data = await res.json();
+            if (data.success && Array.isArray(data.user.completedModules)) {
+                const serverModules = data.user.completedModules;
+                localStorage.setItem('completedModules', JSON.stringify(serverModules));
+                // Only re-render if data changed
+                if (JSON.stringify(serverModules) !== JSON.stringify(completedModules)) {
+                    completedModules = serverModules;
+                    // Re-render accordion with fresh data
+                    if (accordionContainer) accordionContainer.innerHTML = '';
+                    visibleModulesData = [];
+                    renderGroup('🌱 Beginner',     pathData.slice(0, 2),  0);
+                    renderGroup('⚡ Intermediate', pathData.slice(2, 4), 2);
+                    renderGroup('🚀 Advanced',     pathData.slice(4),    4);
+                    visibleModulesData.push(...pathData.slice(0, 2), ...pathData.slice(2, 4), ...pathData.slice(4));
+                    updateOverallProgress();
+                }
+            }
+        } catch (e) {
+            console.warn('[Roadmap] Backend sync failed, using localStorage fallback.', e);
+        }
+    })();
+
+
+    let visibleModulesData = [];
     // Respect "Start from Module"
     const selectedStartModule = localStorage.getItem('selectedStartModule') || '';
     if (selectedStartModule) {
@@ -381,8 +421,6 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem('completedModules', JSON.stringify(completedModules));
         }
     }
-
-    let visibleModulesData = [];
 
     // Helper: update overall progress
     const updateOverallProgress = () => {
@@ -399,12 +437,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Helper: Build course ID
     const getCourseId = (moduleId, courseName) => `${moduleId}_${courseName.replace(/\s+/g, '')}`;
 
-    // Helper: Check if a module is considered passed (quiz >= 70% OR pre-completed)
-    const isModulePassed = (modId) => {
-        if (completedModules.includes(modId)) return true;
-        const scores = JSON.parse(localStorage.getItem('moduleQuizPassed') || '{}');
-        return (scores[modId] || 0) >= 70;
-    };
+    // Helper: Check if a module is considered passed.
+    // ONLY completedModules (backend-synced) determines unlock — no client-side bypass.
+    const isModulePassed = (modId) => completedModules.includes(modId);
 
     // Helper: Render a group
     const renderGroup = (title, modulesToRender, pathStartIndex) => {
@@ -445,13 +480,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
 
-            // Auto mark module complete if courses are 100%
-            if (completedCount === totalCourses && !completedModules.includes(module.id)) {
-                completedModules.push(module.id);
-                localStorage.setItem('completedModules', JSON.stringify(completedModules));
-            }
-            
-            const moduleCompleted = completedCount === totalCourses || completedModules.includes(module.id);
+            // Module is only considered completed if the backend (quiz) confirmed it.
+            // Course checkboxes are study aids — they do NOT complete the module.
+            const moduleCompleted = completedModules.includes(module.id);
             const modulePct = moduleCompleted ? 100 : Math.round((completedCount / totalCourses) * 100);
 
             const accItem = document.createElement("div");
@@ -541,16 +572,12 @@ document.addEventListener("DOMContentLoaded", () => {
                             accItem.querySelector('.progress-bar').style.width = `${newPct}%`;
                             accItem.querySelector('.module-progress-text').innerText = `${newPct}%`;
                             
-                            if (currentCount === totalCourses) {
-                                if (!completedModules.includes(module.id)) {
-                                    completedModules.push(module.id);
-                                    localStorage.setItem('completedModules', JSON.stringify(completedModules));
-                                }
+                            // Update visual progress bar only — do NOT change module completion.
+                            // Module completion requires passing the quiz (backend-enforced).
+                            if (completedModules.includes(module.id)) {
                                 accItem.classList.add('completed');
                                 accItem.querySelector('.progress-bar').style.background = '#10B981';
                             } else {
-                                completedModules = completedModules.filter(id => id !== module.id);
-                                localStorage.setItem('completedModules', JSON.stringify(completedModules));
                                 accItem.classList.remove('completed');
                                 accItem.querySelector('.progress-bar').style.background = 'var(--primary)';
                             }

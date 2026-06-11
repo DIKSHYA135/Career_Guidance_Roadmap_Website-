@@ -1,5 +1,26 @@
 // progress.js
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+
+    // ── 0. Sync fresh data from server ───────────────────────
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (token) {
+        try {
+            const res = await fetch('http://localhost:5000/api/user/me', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success && data.user) {
+                    const u = data.user;
+                    if (u.selectedPath)  localStorage.setItem('xyverra_selected_path', u.selectedPath);
+                    if (Array.isArray(u.completedModules)) localStorage.setItem('completedModules', JSON.stringify(u.completedModules));
+                    if (typeof u.dailyStreak === 'number') localStorage.setItem('xyverra_user_streak', String(u.dailyStreak));
+                }
+            }
+        } catch (e) {
+            console.warn('[Progress] Backend sync failed, using localStorage.', e);
+        }
+    }
 
     // ── 1. Data Retrieval ────────────────────────────────────────
     const selectedPath   = localStorage.getItem("xyverra_selected_path") || "";
