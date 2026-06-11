@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Xyverra — Tell Us About Yourself</title>
+    <title>Welcome to Xyverra - Tell Us About Yourself</title>
     <meta name="description" content="Complete your Xyverra profile to get personalized career recommendations.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -475,7 +475,7 @@
                     <span>Xyverra</span>
                 </div>
                 <h2 id="panel-title">What are your career interests?</h2>
-                <p id="panel-sub">Select all that excite you — we'll use this to match you with the best career paths.</p>
+                <p id="panel-sub">Select all that excite you. We'll use this to match you with the best career paths.</p>
             </div>
 
             <div class="ob-card-body">
@@ -633,7 +633,7 @@
         ];
 
         const panelSubs = [
-            'Select all that excite you — we\'ll use this to match you with the best career paths.',
+            'Select all that excite you. We\'ll use this to match you with the best career paths.',
             'Add any programming languages, tools, or frameworks you know. Click the chips below or type your own.',
             'This helps us auto-assign your starting level and tailor your roadmap.',
             'The more we know, the better your personalized experience.'
@@ -684,6 +684,14 @@
                 const lvl = document.querySelector('.level-option.selected');
                 if (!lvl) {
                     alert('Please select your experience level.');
+                    return;
+                }
+            }
+            if (currentPanel === 4) {
+                const goalVal = document.getElementById('goal-input').value.trim();
+                if (!goalVal || goalVal.length < 5) {
+                    alert('Please enter your career goal (at least 5 characters) to continue.');
+                    document.getElementById('goal-input').focus();
                     return;
                 }
             }

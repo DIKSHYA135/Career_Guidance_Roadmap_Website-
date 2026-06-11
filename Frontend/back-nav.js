@@ -7,10 +7,10 @@
 (function () {
     // Determine if we should show a back button based on page
     const page = window.location.pathname.split('/').pop() || 'index.html';
-    
+
     // Pages that shouldn't have a back button (top level)
     const noBackPages = ['index.html', 'dashboard.html', 'login.html', 'signup.html', 'landing.html'];
-    
+
     const shouldShowBack = !noBackPages.includes(page) && page.endsWith('.html');
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -27,7 +27,7 @@
                         Back
                     </a>
                 `;
-                
+
                 // Insert before the first child of main-content
                 const firstChild = mainContent.firstElementChild;
                 if (firstChild) {
@@ -89,9 +89,11 @@
         });
 
         // --- 6. Highlight active nav item based on current page ---
+        // Use exact filename match to prevent false positives (e.g. 'dashboard' matching 'dash')
         document.querySelectorAll('.nav-item').forEach(item => {
             const href = item.getAttribute('href') || '';
-            if (href && page.includes(href.replace('.html', ''))) {
+            const hrefFile = href.split('/').pop();
+            if (hrefFile === page) {
                 item.classList.add('active');
             } else {
                 item.classList.remove('active');
@@ -105,7 +107,11 @@
         });
 
         // --- 8. Smooth page exit on navigation ---
+        // Guard against double-binding if this script runs more than once
         document.querySelectorAll('a[href]').forEach(link => {
+            if (link.dataset.transitionBound) return;
+            link.dataset.transitionBound = '1';
+
             const href = link.getAttribute('href');
             if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('mailto')) return;
             link.addEventListener('click', e => {

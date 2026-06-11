@@ -109,6 +109,33 @@
                 </button>
             </form>
 
+            <!-- OTP Verification Form (Hidden by default) -->
+            <form id="otp-form" novalidate autocomplete="off" style="display: none;">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div style="width: 64px; height: 64px; background: rgba(79,70,229,0.1); color: #4F46E5; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 1.8rem; margin-bottom: 1rem;">
+                        <i class="fas fa-envelope-open-text"></i>
+                    </div>
+                    <h3 style="font-size: 1.2rem; font-weight: 700; color: #0F172A; margin-bottom: 0.5rem;">Check your email</h3>
+                    <p style="font-size: 0.9rem; color: #64748B; line-height: 1.5;">We've sent a 6-digit verification code to <strong id="otp-email-display" style="color:#0F172A"></strong>.</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="otp-code" style="text-align: center; display: block; margin-bottom: 0.5rem;">Enter verification code</label>
+                    <div class="input-wrapper" style="text-align: center;">
+                        <input type="text" id="otp-code" placeholder="• • • • • •" autocomplete="one-time-code" required maxlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5em; padding: 15px;">
+                    </div>
+                    <div id="otp-error" class="inline-field-error" role="alert" style="text-align: center;"></div>
+                </div>
+
+                <button type="submit" class="btn btn-primary signup-btn" id="btn-verify-otp" style="width: 100%; margin-top: 1.5rem;">
+                    <i class="fas fa-check"></i> Verify Email
+                </button>
+
+                <div style="text-align: center; margin-top: 1.5rem;">
+                    <p style="font-size: 0.85rem; color: #64748B;">Didn't receive the code? <button type="button" id="btn-resend-otp" style="background: none; border: none; color: #4F46E5; font-weight: 600; cursor: pointer; text-decoration: underline;">Resend code</button></p>
+                </div>
+            </form>
+
             <p class="terms-note">
                 By signing up, you agree to our
                 <a href="javascript:void(0)" id="terms-link">Terms of Service</a> and

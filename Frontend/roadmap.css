@@ -31,13 +31,14 @@
     font-size: 1rem;
 }
 
+/* Overall Progress Tracker */
 .overall-progress-card {
     background: var(--bg-surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-2xl);
     padding: var(--spacing-6);
     margin-bottom: 2rem;
-    box-shadow: var(--shadow-premium);
+    box-shadow: var(--shadow-sm);
 }
 
 .overall-progress-header {
@@ -206,7 +207,7 @@
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.4s var(--ease);
-    background: var(--bg-surface-solid);
+    background: var(--bg-surface-hover);
 }
 
 .accordion-content-inner {

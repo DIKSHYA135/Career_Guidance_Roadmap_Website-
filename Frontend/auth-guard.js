@@ -14,6 +14,7 @@
         'roadmap.html',
         'skill-gap.html',
         'quiz.html',
+        'study.html',
         'resources.html',
         'achievements.html',
         'analytics.html',
@@ -25,24 +26,41 @@
     // If public page, no guard needed
     if (PUBLIC_PAGES.includes(currentPage)) return;
 
-    // ── Check 1: Must be logged in ──
-    const isLoggedIn = !!localStorage.getItem('xyverra_user_email') || !!localStorage.getItem('token');
-    if (!isLoggedIn) {
+    // ── Check 1: Must be logged in (Token presence) ──
+    // Always prefer localStorage first — token is always written there on login
+    // so it survives page refreshes and new tab opens.
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (!token) {
+        console.warn('[AuthGuard] No token found. Redirecting to login.');
         window.location.replace('login.html');
         return;
     }
 
-    // ── Check 2: Onboarding guard for protected pages ──
+    // ── Check 2: Email verification guard ──
+    // Only redirect if the flag is EXPLICITLY 'false'.
+    // If the key is missing (e.g. old accounts pre-OTP), allow through.
+    const emailVerified = localStorage.getItem('xyverra_email_verified');
+    if (emailVerified === 'false') {
+        if (currentPage !== 'signup.html') {
+            console.warn('[AuthGuard] Email not verified. Redirecting to signup verify step.');
+            window.location.replace('signup.html?verify=1');
+            return;
+        }
+    }
+
+    // ── Check 3: Onboarding guard for specific protected pages ──
     if (ONBOARDING_REQUIRED.includes(currentPage)) {
         const selectedPath = localStorage.getItem('xyverra_selected_path') || localStorage.getItem('xyverra_target_career');
         const onboardingDone = localStorage.getItem('xyverra_onboarded') === 'true';
 
-        if (!selectedPath || !onboardingDone) {
-            // Not fully onboarded (no path or roadmap not generated) — redirect to career discovery
+        if (!selectedPath && !onboardingDone) {
+            console.warn('[AuthGuard] Onboarding incomplete. Redirecting to career-discovery.');
             window.location.replace('career-discovery.html');
             return;
         }
     }
+
+    console.log('[AuthGuard] ✅ Auth OK on:', currentPage);
 
     // ── Utility: Call this from career-discovery.html once path is chosen ──
     window.XyCompleteOnboarding = function(selectedPath, selectedLevel) {
@@ -60,14 +78,8 @@
 
     // ── Utility: Logout ──
     window.XyLogout = function() {
-        const keys = [
-            'xyverra_user_email', 'xyverra_user_name', 'xyverra_selected_path',
-            'xyverra_target_career', 'xyverra_onboarded', 'xyverra_interests',
-            'xyverra_selected_level', 'xyverra_skill_score', 'xyverra_user_streak',
-            'xyverra_xp', 'userLevel', 'userSkills', 'completedModules',
-            'roadmapGenerated', 'token'
-        ];
-        keys.forEach(k => localStorage.removeItem(k));
+        localStorage.clear();
+        sessionStorage.clear();
         window.location.replace('login.html');
     };
 })();

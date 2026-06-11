@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     The quiz suggests you might not be fully ready for <strong>${claimedLevel}</strong> yet.
                     We recommend starting at <strong>${suggestedLevel}</strong> for the best learning experience.
                 </p>
-                <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:2.5rem;">Don't worry — you can always level up later!</p>
+                <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:2.5rem;">Don't worry. You can always level up later!</p>
                 <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
                     <button onclick="acceptSuggestion('${suggestedLevel}')" class="btn-generate" style="background:linear-gradient(135deg,var(--primary),var(--accent));color:white;padding:14px 28px;border-radius:100px;border:none;font-weight:700;font-size:0.95rem;cursor:pointer;box-shadow:0 8px 20px -5px rgba(37,99,235,0.35);">
                         <i class="fas fa-check"></i> Start at ${suggestedLevel}

@@ -340,71 +340,7 @@ const ROADMAP_DATA = {
             ]
         },
         { id: "capstone", title: "Analytics Capstone", desc: "Analyze a dataset and present a BI dashboard.", keywords: [], courses: [] }
-    ],
-    "AI Engineer": [
-        {
-            id: "python-basics", title: "Python Basics", desc: "Master core Python syntax and structures.", keywords: ["python"],
-            courses: [
-                { name: "W3Schools Python", url: "https://www.w3schools.com/python/" },
-                { name: "Kaggle Python Course (Free)", url: "https://www.kaggle.com/learn/python" }
-            ]
-        },
-        {
-            id: "problem-solving", title: "Problem Solving & Logic", desc: "Data structures and algorithms.", keywords: ["algorithms", "dsa", "logic"],
-            courses: [
-                { name: "LeetCode Crash Course", url: "https://leetcode.com/explore/" },
-                { name: "GeeksforGeeks DSA", url: "https://www.geeksforgeeks.org/data-structures/" }
-            ]
-        },
-        {
-            id: "machine-learning", title: "Machine Learning", desc: "Supervised and unsupervised learning, Scikit-learn.", keywords: ["ml", "scikit-learn"],
-            courses: [
-                { name: "Google ML Crash Course", url: "https://developers.google.com/machine-learning/crash-course" },
-                { name: "Kaggle ML Intro", url: "https://www.kaggle.com/learn/intro-to-machine-learning" }
-            ]
-        },
-        {
-            id: "data-analysis", title: "Data Analysis", desc: "Pandas, NumPy, and data wrangling.", keywords: ["pandas", "numpy"],
-            courses: [
-                { name: "Kaggle Pandas", url: "https://www.kaggle.com/learn/pandas" },
-                { name: "W3Schools NumPy", url: "https://www.w3schools.com/python/numpy/" }
-            ]
-        },
-        {
-            id: "deep-learning", title: "Deep Learning", desc: "Neural networks, PyTorch, TensorFlow.", keywords: ["deep learning", "pytorch", "tensorflow"],
-            courses: [
-                { name: "Fast.ai Practical Deep Learning", url: "https://course.fast.ai/" },
-                { name: "DeepLearning.AI (Coursera)", url: "https://www.coursera.org/specializations/deep-learning" }
-            ]
-        },
-        {
-            id: "mlops", title: "MLOps", desc: "Model deployment, tracking, and lifecycle management.", keywords: ["mlops", "deployment"],
-            courses: [
-                { name: "MLOps.org", url: "https://ml-ops.org/" },
-                { name: "Hugging Face Deployment", url: "https://huggingface.co/docs" }
-            ]
-        },
-        { id: "capstone", title: "Industry Project & Portfolio", desc: "Build an end-to-end AI project and showcase it.", keywords: [], courses: [] }
     ]
-};
-
-// Interest → ROADMAP_DATA key mapping
-const INTEREST_TO_PATH = {
-    'Web Development': 'Web Development',
-    'Full Stack Development': 'Full Stack Development',
-    'Backend Development': 'Backend / APIs',
-    'Backend / APIs': 'Backend / APIs',
-    'Data Science': 'Data Science',
-    'Machine Learning': 'AI Engineer',
-    'AI / Machine Learning': 'NLP / AI',
-    'AI / ML': 'NLP / AI',
-    'NLP / AI': 'NLP / AI',
-    'Cloud / DevOps': 'Cloud / DevOps',
-    'UI/UX Design': 'UI/UX Design',
-    'Mobile Development': 'Mobile Development',
-    'Cybersecurity': 'Cybersecurity',
-    'Data Analytics': 'Data Analytics',
-    'AI Engineer': 'AI Engineer'
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -413,57 +349,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const overallProgressBar = document.getElementById("overall-progress-bar");
     const topQuizBtn = document.getElementById("top-quiz-btn");
     const headerTitle = document.getElementById("roadmap-header-title");
-
-    // Hide quiz button until roadmap renders
-    if (topQuizBtn) topQuizBtn.style.display = 'none';
     
-    // Load state — never fall back to a default path
-    const targetCareer = localStorage.getItem('xyverra_target_career') || localStorage.getItem('xyverra_selected_path') || '';
-    const selectedPath = localStorage.getItem("xyverra_selected_path") || '';
-
-    // If the user has not chosen a path yet, send them to career discovery
-    if (!selectedPath && !targetCareer) {
-        if (accordionContainer) {
-            accordionContainer.innerHTML = `
-                <div style="text-align:center; padding: 3rem 2rem;">
-                    <div style="font-size:3rem; margin-bottom:1rem;">🧭</div>
-                    <h3 style="margin-bottom:0.75rem; color:var(--text-dark);">You haven't picked a career path yet!</h3>
-                    <p style="color:var(--text-muted); margin-bottom:1.5rem;">Go through Career Discovery first — we'll help you find the perfect path.</p>
-                    <a href="career-discovery.html" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:0.5rem;">
-                        <i class="fas fa-compass"></i> Start Career Discovery
-                    </a>
-                </div>`;
-        }
-        return;
+    // Load state
+    const selectedPath = localStorage.getItem("xyverra_selected_path") || "Web Development";
+    let matchedPathKey = selectedPath;
+    if (!ROADMAP_DATA[matchedPathKey]) {
+        matchedPathKey = Object.keys(ROADMAP_DATA).find(key => selectedPath.includes(key)) || "Web Development";
     }
-
-    // Try exact match first, then interest mapping, then heuristic
-    let matchedPathKey = ROADMAP_DATA[selectedPath] ? selectedPath : null;
-    if (!matchedPathKey) matchedPathKey = INTEREST_TO_PATH[selectedPath] || INTEREST_TO_PATH[targetCareer];
-    if (!matchedPathKey) {
-        matchedPathKey = Object.keys(ROADMAP_DATA).find(key =>
-            (targetCareer && targetCareer.toLowerCase().includes(key.toLowerCase())) ||
-            (selectedPath && key.toLowerCase().includes(selectedPath.toLowerCase().split(' ')[0]))
-        );
-    }
-    // If still no match, tell user to pick a path
-    if (!matchedPathKey) {
-        if (accordionContainer) {
-            accordionContainer.innerHTML = `
-                <div style="text-align:center; padding: 3rem 2rem;">
-                    <div style="font-size:3rem; margin-bottom:1rem;">⚠️</div>
-                    <h3 style="margin-bottom:0.75rem; color:var(--text-dark);">We couldn't match your path</h3>
-                    <p style="color:var(--text-muted); margin-bottom:1.5rem;">Please go through Career Discovery to select a valid path.</p>
-                    <a href="career-discovery.html" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:0.5rem;">
-                        <i class="fas fa-compass"></i> Career Discovery
-                    </a>
-                </div>`;
-        }
-        return;
-    }
-
+    
     if (headerTitle) {
-        headerTitle.innerText = `${targetCareer || selectedPath} Roadmap`;
+        headerTitle.innerText = `${matchedPathKey} Roadmap`;
     }
 
     const pathData = ROADMAP_DATA[matchedPathKey];
@@ -472,30 +367,17 @@ document.addEventListener("DOMContentLoaded", () => {
     let completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
     let completedCourses = JSON.parse(localStorage.getItem('completedCourses') || '[]');
 
-    // Auto-unlock modules based on assigned userLevel
-    const userLevelStr = localStorage.getItem('userLevel') || localStorage.getItem('xyverra_selected_level') || "Beginner";
-    let startIdx = 0;
-    
-    // Most paths have 5 modules: 2 beginner, 2 intermediate, 1 capstone
-    // We map levels roughly to these indexes
-    if (userLevelStr === "Intermediate") {
-        startIdx = 2;
-    } else if (userLevelStr === "Advanced") {
-        startIdx = 4;
-    } else if (userLevelStr === "Capstone") {
-        startIdx = pathData.length - 1;
-    }
-
-    if (startIdx > 0 && startIdx < pathData.length) {
-        let changed = false;
-        for (let i = 0; i < startIdx; i++) {
-            const m = pathData[i];
-            if (m.id !== 'capstone' && !completedModules.includes(m.id)) {
-                completedModules.push(m.id);
-                changed = true;
+    // Respect "Start from Module"
+    const selectedStartModule = localStorage.getItem('selectedStartModule') || '';
+    if (selectedStartModule) {
+        const startIdx = pathData.findIndex(m => m.id === selectedStartModule);
+        if (startIdx > 0) {
+            for (let i = 0; i < startIdx; i++) {
+                const m = pathData[i];
+                if (m.id !== 'capstone' && !completedModules.includes(m.id)) {
+                    completedModules.push(m.id);
+                }
             }
-        }
-        if (changed) {
             localStorage.setItem('completedModules', JSON.stringify(completedModules));
         }
     }
@@ -631,7 +513,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             </div>
                             <div class="course-details">
                                 <h5>${isDummy ? 'Submit ' + module.title : cName}</h5>
-                                ${cUrl ? `<a href="study.html?url=${encodeURIComponent(cUrl)}&title=${encodeURIComponent(cName)}" class="course-link">Study In App <i class="fas fa-arrow-right"></i></a>` : ''}
+                                ${cUrl ? `<a href="${cUrl}" target="_blank" class="course-link">View Course <i class="fas fa-external-link-alt"></i></a>` : ''}
                             </div>
                         `;
                         
@@ -663,18 +545,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                 if (!completedModules.includes(module.id)) {
                                     completedModules.push(module.id);
                                     localStorage.setItem('completedModules', JSON.stringify(completedModules));
-                                    
-                                    // Trigger Quiz Popup
-                                    const modal = document.getElementById('quiz-popup-modal');
-                                    const titleEl = document.getElementById('completed-module-title');
-                                    const takeBtn = document.getElementById('take-compulsory-quiz-btn');
-                                    const closeBtn = document.getElementById('close-quiz-popup-btn');
-                                    if (modal && titleEl && takeBtn) {
-                                        titleEl.textContent = module.title;
-                                        takeBtn.href = `quiz.html?module=${module.id}`;
-                                        modal.style.display = 'flex';
-                                        if (closeBtn) closeBtn.onclick = () => modal.style.display = 'none';
-                                    }
                                 }
                                 accItem.classList.add('completed');
                                 accItem.querySelector('.progress-bar').style.background = '#10B981';
@@ -727,6 +597,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const quizLevel = localStorage.getItem('quizResultLevel');
     const quizScore = localStorage.getItem('quizResultScore');
+    const userLevelStr = quizLevel || localStorage.getItem("userLevel") || "Beginner";
 
     if (quizLevel) {
         const resultBanner = document.getElementById('quiz-result-banner');
@@ -741,7 +612,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Update side panel target path
     const sideTargetPath = document.getElementById('side-target-path');
-    if (sideTargetPath) sideTargetPath.textContent = targetCareer;
+    if (sideTargetPath) sideTargetPath.textContent = matchedPathKey;
 
     // Render all groups (they will be locked automatically if prior modules aren't completed)
     renderGroup("🌱 Beginner",     beginnerModules,     0);
@@ -751,13 +622,6 @@ document.addEventListener("DOMContentLoaded", () => {
     visibleModulesData.push(...beginnerModules, ...intermediateModules, ...advancedModules);
 
     updateOverallProgress();
-
-    // Mark roadmap as generated and show quiz button
-    localStorage.setItem('roadmapGenerated', 'true');
-    if (topQuizBtn) {
-        topQuizBtn.style.display = 'inline-flex';
-        topQuizBtn.style.animation = 'fadeInUp 0.5s ease forwards';
-    }
 
     setTimeout(() => {
         const allItems = document.querySelectorAll('.accordion-item');

@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'ai-engineer': {
             icon: '🤖',
             title: 'AI Engineer',
-            subtitle: 'Build the systems that make machines think — from natural language to computer vision.',
+            subtitle: 'Build the systems that make machines think, from natural language to computer vision.',
             heroBg: 'linear-gradient(135deg, #1D4ED8 0%, #7C3AED 100%)',
             badges: ['94% Match', '$120k–$185k', 'Very High Demand'],
             roles: [
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'ui-ux-designer': {
             icon: '🎨',
             title: 'UI/UX Designer',
-            subtitle: 'Craft digital experiences that feel effortless — the intersection of psychology, art, and technology.',
+            subtitle: 'Craft digital experiences that feel effortless, at the intersection of psychology, art, and technology.',
             heroBg: 'linear-gradient(135deg, #DB2777 0%, #EA580C 100%)',
             badges: ['76% Match', '$85k–$135k', 'High Demand'],
             roles: [
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'full-stack-dev': {
             icon: '💻',
             title: 'Full Stack Developer',
-            subtitle: 'Build complete web applications from the database to the user interface — end to end.',
+            subtitle: 'Build complete web applications from the database to the user interface, end to end.',
             heroBg: 'linear-gradient(135deg, #059669 0%, #0284C7 100%)',
             badges: ['82% Match', '$100k–$155k', 'High Demand'],
             roles: [

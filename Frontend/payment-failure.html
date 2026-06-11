@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment Failed — Xyverra</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #0f172a; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+
+        .bg-orbs { display: none; }
+        .orb { display: none; }
+
+        .card {
+            position: relative; z-index: 1; max-width: 480px; width: 100%;
+            background: #fff;
+            border: 1px solid rgba(239,68,68,0.25); border-radius: 24px;
+            padding: 3rem 2.5rem; text-align: center;
+            box-shadow: 0 0 40px rgba(239,68,68,0.08), 0 8px 32px rgba(0,0,0,0.08);
+            animation: slideUp 0.6s ease;
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+        .fail-ring {
+            width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 2rem;
+            background: rgba(239,68,68,0.12); display: flex; align-items: center; justify-content: center;
+            border: 2px solid rgba(239,68,68,0.35);
+        }
+        .fail-ring i { font-size: 2.5rem; color: #ef4444; }
+
+        h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 2rem; font-weight: 800; margin-bottom: 0.75rem; color: #ef4444; }
+        p { color: #64748b; line-height: 1.7; margin-bottom: 2rem; }
+
+        .reasons { background: rgba(239,68,68,0.04); border: 1px solid rgba(239,68,68,0.15); border-radius: 12px; padding: 1.25rem; margin-bottom: 2rem; text-align: left; }
+        .reason-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.5rem 0; font-size: 0.9rem; color: #64748b; }
+        .reason-item:not(:last-child) { border-bottom: 1px solid #f1f5f9; }
+        .reason-item i { color: #ef4444; margin-top: 2px; }
+
+        .btn-group { display: flex; flex-direction: column; gap: 0.75rem; }
+        .btn-primary {
+            display: block; width: 100%; padding: 1rem; border-radius: 12px; border: none;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white;
+            font-size: 1rem; font-weight: 700; cursor: pointer; text-decoration: none;
+            transition: all 0.3s; font-family: 'Inter', sans-serif; text-align: center;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(99,102,241,0.4); }
+        .btn-outline {
+            display: block; width: 100%; padding: 1rem; border-radius: 12px; border: 1px solid #e2e8f0;
+            background: transparent; color: #64748b; font-size: 1rem; font-weight: 600;
+            cursor: pointer; text-decoration: none; transition: all 0.3s; text-align: center; font-family: 'Inter', sans-serif;
+        }
+        .btn-outline:hover { border-color: #cbd5e1; color: #0f172a; background: #f8fafc; }
+
+        .support-note { margin-top: 1.5rem; font-size: 0.8rem; color: #64748b; }
+        .support-note a { color: #6366f1; text-decoration: none; }
+    </style>
+</head>
+<body>
+<div class="bg-orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+
+<div class="card">
+    <div class="fail-ring"><i class="fas fa-times"></i></div>
+    <h1>Payment Failed</h1>
+    <p>Your payment could not be processed. Your account has not been charged. Please try again.</p>
+
+    <div class="reasons">
+        <div class="reason-item"><i class="fas fa-exclamation-circle"></i> Payment was cancelled or timed out</div>
+        <div class="reason-item"><i class="fas fa-wifi"></i> Network interruption during payment</div>
+        <div class="reason-item"><i class="fas fa-credit-card"></i> Insufficient eSewa balance</div>
+        <div class="reason-item"><i class="fas fa-key"></i> Incorrect eSewa credentials entered</div>
+    </div>
+
+    <div class="btn-group">
+        <a href="subscription.html" class="btn-primary"><i class="fas fa-redo"></i> Try Again</a>
+        <a href="dashboard.html" class="btn-outline"><i class="fas fa-home"></i> Back to Dashboard</a>
+    </div>
+
+    <p class="support-note">
+        If the problem persists, please <a href="mailto:support@xyverra.com">contact our support team</a>.
+        <br>Transaction reference: <span id="txn-ref" style="font-family:monospace">—</span>
+    </p>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const refId = params.get('ref') || params.get('transaction_uuid') || '—';
+document.getElementById('txn-ref').textContent = refId;
+</script>
+</body>
+</html>

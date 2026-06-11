@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="quiz.css">
+    <link rel="stylesheet" href="ai-recommendation.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .modern-radio-container {
@@ -65,33 +66,17 @@
             padding: 20px;
         }
     </style>
-    <!-- Quiz Access Guard: requires roadmap to be generated first -->
-    <script>
-        (function() {
-            const params = new URLSearchParams(window.location.search);
-            const hasModule = params.has('module');
-            const roadmapGenerated = localStorage.getItem('roadmapGenerated') === 'true';
-            const hasPath = !!localStorage.getItem('xyverra_selected_path');
-            // Allow if: coming from a specific module link OR roadmap has been generated
-            if (!hasModule && !roadmapGenerated && !hasPath) {
-                // No roadmap loaded yet — redirect back
-                sessionStorage.setItem('quiz_blocked_msg', 'Please generate your roadmap first before taking the quiz.');
-                window.location.replace('roadmap.html');
-            }
-        })();
-    </script>
 </head>
 <body>
-
-
-    <div class="app-layout" style="position: relative; z-index: 10; background: transparent;">
+   
+    <div class="app-layout">
         <!-- Mobile Header Toggle -->
         <div class="mobile-nav-toggle">
             <div class="sidebar-brand" style="margin-bottom: 0; padding: 0;">
                 <img src="xyverra_logo.jpeg" alt="Xyverra Logo" class="sidebar-logo">
-                Xyverra
+                <span>Xyverra</span>
             </div>
-            <button id="sidebar-toggle-btn" class="btn" style="padding: 5px; background: transparent;" aria-label="Toggle sidebar">
+            <button id="sidebar-toggle-btn" class="btn" style="padding: 5px; background: transparent; color: var(--primary);">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
         </div>
@@ -110,15 +95,20 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                     Dashboard
                 </a>
-                <a href="counselor.html" class="nav-item nav-counselor">
-                    <i class="fas fa-robot"></i> AI Counselor
+                <a href="career-discovery.html" class="nav-item nav-career-discovery">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+                    Career Discovery
                 </a>
+            <a href="counselor.html" class="nav-item nav-counselor">
+                <i class="fas fa-robot"></i> AI Counselor
+            </a>
+
                 
                 <a href="skill-gap.html" class="nav-item nav-skill-gap">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg>
                     Skill Gap Analysis
                 </a>
-                <a href="roadmap.html" class="nav-item active nav-roadmap">
+                <a href="roadmap.html" class="nav-item nav-roadmap">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     My Roadmap
                 </a>
@@ -173,12 +163,9 @@
                     <div class="quiz-progress-dots" id="quiz-progress-dots"></div>
 
                     <!-- Question Meta Row -->
-                    <div class="question-meta" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="question-meta">
                         <span id="question-meta-text">Question 1 of 1</span>
-                        <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            <span id="adaptive-difficulty-badge" class="timer-badge" style="background: linear-gradient(135deg, var(--accent), var(--primary)); color: white; border: none; font-weight: bold;"><i class="fas fa-brain" style="margin-right: 4px;"></i> Level: Adaptive</span>
-                            <span id="timer-text" class="timer-badge">20s Reading Time</span>
-                        </div>
+                        <span id="timer-text" class="timer-badge">20s Reading Time</span>
                     </div>
 
                     <!-- Question & Options (quiz body) -->
@@ -279,13 +266,12 @@
         </div>
     </div>
 
-    <script src="auth-guard.js"></script>
     <script src="quiz-data.js"></script>
     <script src="localstorage-state-management.js"></script>
     <script src="quiz-lock-manager.js"></script>
+    <script src="roadmap-unlock-logic.js"></script>
     <script src="global-sidebar.js"></script>
     <script src="quiz.js?v=4"></script>
-    <script src="adaptive-quiz.js"></script>
-    <script src="back-nav.js"></script>
+    <script src="ai-recommendation.js"></script>
 </body>
 </html>

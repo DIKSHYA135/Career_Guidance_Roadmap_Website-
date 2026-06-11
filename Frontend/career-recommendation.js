@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         'Machine Learning': {
             icon: '🤖', title: 'ML / AI Engineer',
-            description: 'Train and deploy machine learning models that power intelligent applications — from NLP to computer vision.',
+            description: 'Train and deploy machine learning models that power intelligent applications, from NLP to computer vision.',
             salary: '$120k – $185k', demand: 'Very High', demandClass: 'demand-vhigh', time: '9–14 months',
             skills: ['Python', 'TensorFlow', 'PyTorch', 'Deep Learning', 'MLOps']
         },
@@ -81,7 +81,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const c = CAREER_DATA[pathKey];
         if (!c) return;
 
-        const matchPct = 96 - (index * 7); // 96%, 89%, 82%
+        // Compute real match percentage from assessment scores
+        let matchPct = 96 - (index * 7); // fallback if no scores
+        try {
+            const rawScores = JSON.parse(localStorage.getItem('xyverra_career_scores') || 'null');
+            if (rawScores && typeof rawScores === 'object') {
+                const allVals = Object.values(rawScores).filter(v => typeof v === 'number');
+                const maxScore = Math.max(...allVals, 1);
+                const pathScore = rawScores[pathKey];
+                if (typeof pathScore === 'number' && maxScore > 0) {
+                    // Scale: top path = 75–95%, second = proportionally lower, min 55%
+                    matchPct = Math.max(55, Math.min(95, Math.round((pathScore / maxScore) * 95)));
+                }
+            }
+        } catch (_) {}
 
         const card = document.createElement('div');
         card.className = 'recommendation-card';
@@ -138,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <!-- CTA button -->
                 <button class="choose-path-btn" data-path="${pathKey}"
                     style="width:100%;padding:14px;border:none;border-radius:12px;background:${RANK_COLORS[index]};color:white;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.3s ease;display:flex;align-items:center;justify-content:center;gap:10px;">
-                    <i class="fas fa-rocket"></i> Choose This Path — Start Learning
+                    <i class="fas fa-rocket"></i> Choose This Path - Start Learning
                 </button>
             </div>
         `;

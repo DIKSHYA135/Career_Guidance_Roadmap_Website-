@@ -11,13 +11,23 @@ const userSchema = new mongoose.Schema({
 
     password: {
         type: String,
-        required: true,
-        minlength: 6
+        required: true
     },
 
     name: {
         type: String,
         trim: true
+    },
+
+    isAdmin: {
+        type: Boolean,
+        default: false
+    },
+
+    activeSubscription: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Subscription',
+        default: null
     },
 
     selectedPath: {
@@ -82,10 +92,6 @@ const userSchema = new mongoose.Schema({
         default: []
     },
 
-    careerGoal: {
-        type: String,
-        default: null
-    },
 
     timeline: {
         type: String,
@@ -102,10 +108,74 @@ const userSchema = new mongoose.Schema({
         default: false
     },
 
-    createdAt: {
+    // ==========================
+    // Email verification (OTP)
+    // ==========================
+    emailVerified: {
+        type: Boolean,
+        default: false
+    },
+
+    emailVerificationOTP: {
+        type: String,
+        default: null
+    },
+
+    emailVerificationExpiry: {
         type: Date,
-        default: Date.now
-    }
-});
+        default: null
+    },
+
+    // ==========================
+    // Chat usage / subscription
+    // ==========================
+    chatMessagesUsed: {
+        type: Number,
+        default: 0
+    },
+
+    chatSubscriptionActive: {
+        type: Boolean,
+        default: false
+    },
+
+    chatSubscriptionExpiry: {
+        type: Date,
+        default: null
+    },
+
+    // ==========================
+    // Extended profile fields
+    // ==========================
+
+    profilePicture: {
+        type: String, // base64 string or URL
+        default: null
+    },
+
+
+    careerInterests: {
+        type: [String],
+        default: []
+    },
+
+    // Persisted lesson study records (courseId -> Unix timestamp of last study)
+    studiedLessons: {
+        type: Map,
+        of: Number,
+        default: {}
+    },
+
+    // Persisted AI chat history (array of {role, content, timestamp})
+    chatHistory: {
+        type: [{
+            role: { type: String, enum: ['user', 'assistant'], required: true },
+            content: { type: String, required: true },
+            timestamp: { type: Number, default: Date.now }
+        }],
+        default: []
+    },
+
+}, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

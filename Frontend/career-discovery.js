@@ -200,6 +200,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         localStorage.setItem('xyverra_recommended_paths', JSON.stringify(ranked));
         localStorage.setItem('xyverra_top_recommendation', ranked[0]);
+        // Store raw scores so career-recommendation.js can show real match percentages
+        localStorage.setItem('xyverra_career_scores', JSON.stringify(scores));
 
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing your profile...';
         submitBtn.disabled = true;

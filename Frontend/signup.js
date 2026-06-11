@@ -12,6 +12,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const submitBtn = document.getElementById('signup-btn');
     const btnLabel = document.getElementById('btn-label');
     
+    // OTP elements
+    const otpForm = document.getElementById('otp-form');
+    const otpCodeInput = document.getElementById('otp-code');
+    const otpEmailDisplay = document.getElementById('otp-email-display');
+    const btnVerifyOtp = document.getElementById('btn-verify-otp');
+    const btnResendOtp = document.getElementById('btn-resend-otp');
+    const otpError = document.getElementById('otp-error');
+    
+    // OTP State
+    let resendTimer = null;
+    let resendCooldown = 60; // seconds
+
     // Toggles
     const togglePassword = document.getElementById('toggle-password');
     const toggleConfirm = document.getElementById('toggle-confirm');
@@ -246,19 +258,36 @@ document.addEventListener("DOMContentLoaded", () => {
                     localStorage.setItem('xyverra_user_name', data.user.name);
                     localStorage.setItem('xyverra_user_email', data.user.email);
 
-                    // Show success modal and redirect on close
-                    window.XySuccess(
-                        "Welcome to XYVEERA", 
-                        data.message.includes("exists") ? "Login successful." : "Account created successfully! 🎉", 
-                        () => {
-                            const onboardingDone = data.user.onboardingCompleted || !!data.user.selectedPath || localStorage.getItem('xyverra_onboarded') === 'true';
-                            if (data.message.includes("exists") && onboardingDone) {
-                                window.location.href = 'dashboard.html';
+                    if (data.message.includes("exists")) {
+                        // If user somehow exists and is returned, just redirect them
+                        const onboardingDone = data.user.onboardingCompleted || !!data.user.selectedPath || localStorage.getItem('xyverra_onboarded') === 'true';
+                        window.location.href = onboardingDone ? 'dashboard.html' : 'career-discovery.html';
+                    } else {
+                        // Show OTP UI
+                        signupForm.style.display = 'none';
+                        otpForm.style.display = 'block';
+                        otpEmailDisplay.textContent = email;
+                        
+                        // Automatically trigger sending OTP
+                        try {
+                            const otpResponse = await fetch('http://localhost:5000/api/auth/send-otp', {
+                                method: 'POST',
+                                headers: { 
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${data.token}`
+                                }
+                            });
+                            const otpData = await otpResponse.json();
+                            if (!otpResponse.ok) {
+                                showFieldError(otpCodeInput, otpError, otpData.message || 'Failed to send OTP. Please click resend.');
                             } else {
-                                window.location.href = 'career-discovery.html';
+                                window.XySuccess("Verification", "Verification code sent to your email!");
+                                startResendTimer();
                             }
+                        } catch (err) {
+                            showFieldError(otpCodeInput, otpError, 'Network error while sending OTP.');
                         }
-                    );
+                    }
 
                 } else {
                     // Backend returned an error
@@ -289,4 +318,102 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('terms-link')?.addEventListener('click', () => window.XyInfo("Coming Soon", "Terms of Service page is under construction."));
     document.getElementById('privacy-link')?.addEventListener('click', () => window.XyInfo("Coming Soon", "Privacy Policy page is under construction."));
 
+    // ── OTP Verification ──
+    function startResendTimer() {
+        if (resendTimer) clearInterval(resendTimer);
+        resendCooldown = 60;
+        if (!btnResendOtp) return;
+        
+        btnResendOtp.disabled = true;
+        btnResendOtp.style.color = '#94a3b8';
+        btnResendOtp.style.textDecoration = 'none';
+        btnResendOtp.textContent = `Resend code (${resendCooldown}s)`;
+        
+        resendTimer = setInterval(() => {
+            resendCooldown--;
+            if (resendCooldown <= 0) {
+                clearInterval(resendTimer);
+                btnResendOtp.disabled = false;
+                btnResendOtp.style.color = '#4F46E5';
+                btnResendOtp.style.textDecoration = 'underline';
+                btnResendOtp.textContent = 'Resend code';
+            } else {
+                btnResendOtp.textContent = `Resend code (${resendCooldown}s)`;
+            }
+        }, 1000);
+    }
+
+    if (otpForm) {
+        otpForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const otpValue = otpCodeInput.value.trim();
+            if (otpValue.length !== 6) {
+                showFieldError(otpCodeInput, otpError, 'Please enter a 6-digit code');
+                return;
+            }
+
+            btnVerifyOtp.disabled = true;
+            btnVerifyOtp.innerHTML = '<span class="btn-spinner" style="margin-right: 8px;"></span> Verifying...';
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('http://localhost:5000/api/auth/verify-otp', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ otp: otpValue })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    window.XySuccess("Account Verified", "Your account has been successfully verified! 🎉", () => {
+                        window.location.href = 'career-discovery.html';
+                    });
+                } else {
+                    showFieldError(otpCodeInput, otpError, data.message || 'Invalid verification code');
+                    btnVerifyOtp.disabled = false;
+                    btnVerifyOtp.innerHTML = '<i class="fas fa-check"></i> Verify Email';
+                }
+            } catch (error) {
+                showFieldError(otpCodeInput, otpError, 'Network error while verifying OTP.');
+                btnVerifyOtp.disabled = false;
+                btnVerifyOtp.innerHTML = '<i class="fas fa-check"></i> Verify Email';
+            }
+        });
+
+        if (btnResendOtp) {
+            btnResendOtp.addEventListener('click', async () => {
+                if (resendCooldown > 0 && resendCooldown < 60) return; // Prevent double click
+                btnResendOtp.disabled = true;
+                btnResendOtp.textContent = 'Resending...';
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch('http://localhost:5000/api/auth/send-otp', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        window.XySuccess("Code Sent", "A new verification code has been sent.");
+                        clearFieldError(otpCodeInput, otpError);
+                        startResendTimer();
+                    } else {
+                        showFieldError(otpCodeInput, otpError, data.message || 'Failed to resend code');
+                        btnResendOtp.disabled = false;
+                        btnResendOtp.textContent = 'Resend code';
+                    }
+                } catch (error) {
+                    showFieldError(otpCodeInput, otpError, 'Network error while resending OTP.');
+                    btnResendOtp.disabled = false;
+                    btnResendOtp.textContent = 'Resend code';
+                }
+            });
+        }
+    }
 });

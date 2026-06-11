@@ -11,8 +11,41 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="profile.css">
+    <style>
+        /* â”€â”€ Toast â”€â”€ */
+        #toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;}
+        .toast{min-width:240px;max-width:340px;padding:0.85rem 1rem;border-radius:var(--radius-md,10px);color:#fff;font-size:0.88rem;font-weight:600;display:flex;align-items:center;gap:0.55rem;box-shadow:0 8px 24px rgba(0,0,0,0.18);animation:toastIn .25s ease;}
+        .toast.success{background:#10b981;}
+        .toast.error{background:#ef4444;}
+        .toast.info{background:#6366f1;}
+        @keyframes toastIn{from{opacity:0;transform:translateX(40px);}to{opacity:1;transform:translateX(0);}}
+        /* â”€â”€ Section edit pencil â”€â”€ */
+        .pcard-header{position:relative;}
+        .section-edit-btn{margin-left:auto;background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:0.9rem;padding:4px 6px;border-radius:6px;transition:.15s;}
+        .section-edit-btn:hover{color:var(--primary);background:rgba(99,102,241,0.08);}
+        /* â”€â”€ Avatar upload affordance â”€â”€ */
+        .profile-avatar-large{position:relative;cursor:pointer;overflow:hidden;}
+        .profile-avatar-large img{width:100%;height:100%;object-fit:cover;border-radius:inherit;position:absolute;inset:0;}
+        .avatar-upload-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.45);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;opacity:0;transition:.2s;border-radius:inherit;}
+        .profile-avatar-large:hover .avatar-upload-overlay{opacity:1;}
+        /* â”€â”€ Multi-select chips in modal â”€â”€ */
+        .chip-select{display:flex;flex-wrap:wrap;gap:0.5rem;}
+        .chip-option{padding:0.4rem 0.8rem;border-radius:999px;border:1.5px solid var(--border,#e2e8f0);background:transparent;color:var(--text-muted);cursor:pointer;font-size:0.82rem;font-weight:600;transition:.15s;}
+        .chip-option.selected{background:var(--primary);border-color:var(--primary);color:#fff;}
+        .field-error{color:#ef4444;font-size:0.78rem;margin-top:0.25rem;display:none;}
+        .field-error.show{display:block;}
+        .form-control.invalid{border-color:#ef4444!important;}
+        .field-note{color:var(--text-muted);font-size:0.76rem;margin-top:0.25rem;}
+        .img-preview-row{display:flex;align-items:center;gap:1rem;}
+        .img-preview-row .preview-circle{width:64px;height:64px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;overflow:hidden;flex-shrink:0;}
+        .img-preview-row .preview-circle img{width:100%;height:100%;object-fit:cover;}
+        .modal-actions{display:flex;gap:0.6rem;}
+        .modal-actions .btn{flex:1;}
+    </style>
 </head>
 <body>
+    <div id="toast-container"></div>
+
     <div class="app-layout">
         <!-- Mobile Header Toggle -->
         <div class="mobile-nav-toggle">
@@ -69,7 +102,7 @@
                     <div class="avatar" id="user-avatar"></div>
                     <div class="profile-text">
                         <h4 id="user-display-name">Loading...</h4>
-                        <p>Platform Architect</p>
+                        <p></p>
                     </div>
                 </div>
                 <button class="signout-btn" title="Sign Out" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">
@@ -87,7 +120,10 @@
                     <div class="profile-top-row">
                         <div class="profile-left">
                             <div class="profile-avatar-ring">
-                                <div class="profile-avatar-large" id="profile-avatar">U</div>
+                                <div class="profile-avatar-large" id="profile-avatar" title="Click to change photo">
+                                    U
+                                    <div class="avatar-upload-overlay"><i class="fas fa-camera"></i></div>
+                                </div>
                             </div>
                             <div class="profile-info-primary">
                                 <h1 id="profile-name">User Name</h1>
@@ -142,6 +178,7 @@
                         <div class="pcard-header">
                             <div class="pcard-icon-wrap"><i class="fas fa-route"></i></div>
                             <span class="pcard-title">Learning Path</span>
+                            <button class="section-edit-btn" id="edit-profile-btn-2" title="Edit"><i class="fas fa-pen"></i></button>
                         </div>
                         <div class="pcard-body">
                             <div class="pcard-row">
@@ -154,11 +191,11 @@
                             </div>
                             <div class="pcard-row">
                                 <span class="pcard-label">Timeline</span>
-                                <span id="display-timeline" class="pcard-value">—</span>
+                                <span id="display-timeline" class="pcard-value">Not set</span>
                             </div>
                             <div class="pcard-row">
                                 <span class="pcard-label">Weekly Hours</span>
-                                <span id="display-hours" class="pcard-value">—</span>
+                                <span id="display-hours" class="pcard-value">Not set</span>
                             </div>
                         </div>
                     </div>
@@ -185,6 +222,7 @@
                         <div class="pcard-header">
                             <div class="pcard-icon-wrap"><i class="fas fa-heart"></i></div>
                             <span class="pcard-title">My Interests</span>
+                            <button class="section-edit-btn" id="edit-interests-btn" title="Edit"><i class="fas fa-pen"></i></button>
                         </div>
                         <div id="profile-interests-container" class="interests-chip-wrap">
                             <div class="no-skills-state">
@@ -194,41 +232,14 @@
                         </div>
                     </div>
 
-                    <!-- Goals Card -->
-                    <div class="content-card card-box profile-info-card">
-                        <div class="pcard-header">
-                            <div class="pcard-icon-wrap"><i class="fas fa-bullseye"></i></div>
-                            <span class="pcard-title">Career Goals</span>
-                        </div>
-                        <div class="goals-list" id="profile-goals-container">
-                            <div class="goal-row">
-                                <div class="goal-icon"><i class="fas fa-flag"></i></div>
-                                <div class="goal-content">
-                                    <div class="goal-label">Career Goal</div>
-                                    <div class="goal-value" id="display-goal">Not set</div>
-                                </div>
-                            </div>
-                            <div class="goal-row">
-                                <div class="goal-icon"><i class="fas fa-clock"></i></div>
-                                <div class="goal-content">
-                                    <div class="goal-label">Target Timeline</div>
-                                    <div class="goal-value" id="display-timeline-goal">Not set</div>
-                                </div>
-                            </div>
-                            <div class="goal-row">
-                                <div class="goal-icon"><i class="fas fa-calendar-week"></i></div>
-                                <div class="goal-content">
-                                    <div class="goal-label">Weekly Commitment</div>
-                                    <div class="goal-value" id="display-hours-goal">Not set</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
             </div>
         </main>
     </div>
+
+    <!-- Hidden avatar file input -->
+    <input type="file" id="avatar-file-input" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif" style="display:none;">
 
     <!-- Edit Profile Modal -->
     <div class="modal-overlay" id="edit-profile-modal">
@@ -238,32 +249,35 @@
                 <button class="close-modal-btn" id="close-profile-modal"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body modal-grid">
+                <!-- Profile Picture -->
+                <div class="form-group span-2">
+                    <label>Profile Picture</label>
+                    <div class="img-preview-row">
+                        <div class="preview-circle" id="edit-avatar-preview">U</div>
+                        <div style="display:flex;flex-direction:column;gap:0.4rem;">
+                            <button type="button" class="btn btn-sm" id="edit-pick-photo-btn" style="background:rgba(99,102,241,0.1);color:var(--primary);"><i class="fas fa-upload"></i> Choose Image</button>
+                            <button type="button" class="btn btn-sm" id="edit-remove-photo-btn" style="background:transparent;color:#ef4444;">Remove</button>
+                        </div>
+                    </div>
+                    <p class="field-note">PNG/JPG/WEBP, max 2MB.</p>
+                    <p class="field-error" id="err-photo"></p>
+                </div>
+
                 <div class="form-group span-2">
                     <label>Full Name</label>
                     <input type="text" id="edit-name" class="form-control" placeholder="Your full name">
+                    <p class="field-error" id="err-name"></p>
                 </div>
                 <div class="form-group span-2">
                     <label>Email Address</label>
                     <input type="email" id="edit-email" class="form-control" placeholder="your@email.com">
+                    <p class="field-note" id="email-reverify-note" style="display:none;color:#d97706;"><i class="fas fa-exclamation-triangle"></i> Changing your email will require re-verification.</p>
+                    <p class="field-error" id="err-email"></p>
                 </div>
                 <div class="form-group span-2">
                     <label>Date of Birth</label>
                     <input type="date" id="edit-dob" class="form-control">
-                </div>
-                <div class="form-group span-2 section-divider">
-                    <label>Career Pathway</label>
-                    <select id="edit-category" class="form-control">
-                        <option value="Web Development">Web Development</option>
-                        <option value="Full Stack Development">Full Stack Development</option>
-                        <option value="Backend / APIs">Backend / APIs</option>
-                        <option value="Data Science">Data Science</option>
-                        <option value="NLP / AI">NLP / AI</option>
-                        <option value="Cloud / DevOps">Cloud / DevOps</option>
-                        <option value="UI/UX Design">UI/UX Design</option>
-                        <option value="Mobile Development">Mobile Development</option>
-                        <option value="Cybersecurity">Cybersecurity</option>
-                        <option value="Data Analytics">Data Analytics</option>
-                    </select>
+                    <p class="field-error" id="err-dob"></p>
                 </div>
                 <div class="form-group span-2">
                     <label>Skill Level</label>
@@ -273,8 +287,34 @@
                         <option value="Advanced">Advanced</option>
                     </select>
                 </div>
-                <div class="span-2">
-                    <button class="btn btn-primary btn-block" id="save-profile-btn">Save Changes</button>
+                <div class="form-group span-2">
+                    <label>Timeline</label>
+                    <select id="edit-timeline" class="form-control">
+                        <option value="">Not set</option>
+                        <option value="1-3 months">1-3 months</option>
+                        <option value="3-6 months">3-6 months</option>
+                        <option value="6-12 months">6-12 months</option>
+                        <option value="12+ months">12+ months</option>
+                    </select>
+                </div>
+                <div class="form-group span-2">
+                    <label>Weekly Hours</label>
+                    <select id="edit-hours" class="form-control">
+                        <option value="">Not set</option>
+                        <option value="1-5">1-5 hrs/week</option>
+                        <option value="5-10">5-10 hrs/week</option>
+                        <option value="10-20">10-20 hrs/week</option>
+                        <option value="20+">20+ hrs/week</option>
+                    </select>
+                </div>
+                <div class="form-group span-2">
+                    <label>Career Interests</label>
+                    <div class="chip-select" id="edit-interests-chips"></div>
+                </div>
+
+                <div class="span-2 modal-actions">
+                    <button class="btn" id="cancel-profile-btn" style="background:rgba(0,0,0,0.05);color:var(--text-muted);">Cancel</button>
+                    <button class="btn btn-primary" id="save-profile-btn">Save Changes</button>
                 </div>
             </div>
         </div>

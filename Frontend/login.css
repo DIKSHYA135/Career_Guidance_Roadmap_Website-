@@ -59,7 +59,7 @@ body {
     display: none !important;
 }
 
-login-bg {
+.login-bg {
 
     position: fixed;
 
@@ -305,9 +305,13 @@ label {
     transform: translateY(-50%);
     color: var(--text-light);
     cursor: pointer;
-    font-size: 0.875rem;
+    font-size: 0.9rem;
     transition: color 0.2s;
-    z-index: 2;
+    z-index: 3;
+    pointer-events: auto;
+    user-select: none;
+    -webkit-user-select: none;
+    padding: 4px;
 }
 
 .login-form .eye-icon:hover {
@@ -513,7 +517,7 @@ label {
 }
 
 .loader-progress-track {
-    width: 200px;
+    width: min(200px, 80vw);
     height: 3px;
     background: var(--border);
     border-radius: 2px;
@@ -530,12 +534,22 @@ label {
 
 /* ── Responsive ── */
 @media (max-width: 480px) {
+    body {
+        overflow: auto;
+    }
+
     .login-card {
-        padding: 2rem 1.5rem;
+        padding: 1.5rem 1rem;
         border-radius: var(--radius-lg);
     }
 
     .login-heading h1 {
         font-size: 1.4rem;
+    }
+
+    .login-form input[type="email"],
+    .login-form input[type="password"],
+    .login-form input[type="text"] {
+        font-size: 16px;
     }
 }
