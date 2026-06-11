@@ -340,6 +340,41 @@ const ROADMAP_DATA = {
             ]
         },
         { id: "capstone", title: "Analytics Capstone", desc: "Analyze a dataset and present a BI dashboard.", keywords: [], courses: [] }
+    ],
+    "Machine Learning": [
+        {
+            id: "ml-python", title: "Python for ML", desc: "NumPy, Pandas, Matplotlib — the essential data science stack.", keywords: ["python", "numpy", "pandas", "matplotlib"],
+            courses: [
+                { name: "Kaggle Python Course (Free)", url: "https://www.kaggle.com/learn/python" },
+                { name: "W3Schools Python", url: "https://www.w3schools.com/python/" },
+                { name: "CS50P — Python (edX)", url: "https://www.edx.org/learn/python/harvard-university-cs50-s-introduction-to-programming-with-python" }
+            ]
+        },
+        {
+            id: "ml-fundamentals", title: "ML Fundamentals", desc: "Supervised vs unsupervised learning, model evaluation, bias-variance tradeoff.", keywords: ["supervised", "unsupervised", "regression", "classification"],
+            courses: [
+                { name: "Kaggle Intro to ML (Free)", url: "https://www.kaggle.com/learn/intro-to-machine-learning" },
+                { name: "Google ML Crash Course (Free)", url: "https://developers.google.com/machine-learning/crash-course" },
+                { name: "GeeksforGeeks Machine Learning", url: "https://www.geeksforgeeks.org/machine-learning/" }
+            ]
+        },
+        {
+            id: "ml-sklearn", title: "Scikit-Learn & Model Building", desc: "Linear/logistic regression, decision trees, SVMs, and ensemble methods.", keywords: ["scikit-learn", "sklearn", "random forest", "svm", "xgboost"],
+            courses: [
+                { name: "Kaggle Intermediate ML (Free)", url: "https://www.kaggle.com/learn/intermediate-machine-learning" },
+                { name: "Scikit-Learn Official Docs", url: "https://scikit-learn.org/stable/tutorial/" },
+                { name: "StatQuest ML (YouTube)", url: "https://www.youtube.com/@statquest" }
+            ]
+        },
+        {
+            id: "ml-deep-learning", title: "Deep Learning & Neural Networks", desc: "TensorFlow/Keras, CNNs, RNNs — building and training deep models.", keywords: ["deep learning", "neural networks", "tensorflow", "keras", "pytorch"],
+            courses: [
+                { name: "fast.ai — Practical Deep Learning (Free)", url: "https://course.fast.ai/" },
+                { name: "DeepLearning.AI TensorFlow (Coursera, Audit)", url: "https://www.coursera.org/professional-certificates/tensorflow-in-practice" },
+                { name: "PyTorch Official Tutorials", url: "https://pytorch.org/tutorials/" }
+            ]
+        },
+        { id: "capstone", title: "ML Capstone Project", desc: "Build, train, and deploy an end-to-end ML model on a real dataset.", keywords: [], courses: [] }
     ]
 };
 
@@ -355,9 +390,11 @@ document.addEventListener("DOMContentLoaded", () => {
     let matchedPathKey = selectedPath;
     if (!ROADMAP_DATA[matchedPathKey]) {
         const p = selectedPath.toLowerCase();
-        if (p.includes('machine learning') || p.includes('ai') || p.includes('nlp')) {
+        if (p.includes('machine learning') || p.includes('ml')) {
+            matchedPathKey = "Machine Learning";
+        } else if (p.includes('nlp') || p.includes('natural language') || p.includes(' ai') || p === 'ai') {
             matchedPathKey = "NLP / AI";
-        } else if (p.includes('data')) {
+        } else if (p.includes('data science') || p.includes('data')) {
             matchedPathKey = "Data Science";
         } else {
             matchedPathKey = Object.keys(ROADMAP_DATA).find(key => p.includes(key.toLowerCase())) || "Web Development";

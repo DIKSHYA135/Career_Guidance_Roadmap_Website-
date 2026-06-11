@@ -860,19 +860,13 @@ document.addEventListener("DOMContentLoaded", () => {
         quizStatus.textContent = '';
 
         // Exit button → always roadmap or verification
-        btnExitQuiz.textContent = isVerify ? '← Back to Verification' : '← Back to Roadmap';
+        btnExitQuiz.textContent = '← Back';
         
         // Remove old listeners and add a specific one for results page
         const newBtnExit = btnExitQuiz.cloneNode(true);
         btnExitQuiz.parentNode.replaceChild(newBtnExit, btnExitQuiz);
         newBtnExit.addEventListener('click', () => {
-             if (isVerify && !passed) {
-                 window.location.href = `skill-verification.html?failed=${moduleId}`;
-             } else if (isVerify && passed) {
-                 window.location.href = `skill-verification.html`;
-             } else {
-                 window.location.href = `roadmap.html`;
-             }
+            window.history.back();
         });
         
         if (btnNextQuestion) btnNextQuestion.style.display = 'none';

@@ -1,5 +1,5 @@
 /* ==========================================================
-   skill-gap.js — Skill Gap Analysis (Career Path Driven)
+   skill-gap.js — Skill Gap Analysis (Real-time, Backend Powered)
    ========================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -24,115 +24,113 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return;
     }
-    
-    // Update header target label
+
+    // Update header target label with localStorage value (will be refreshed from backend)
     const targetLabel = document.getElementById('sg-target-path');
     if (targetLabel) targetLabel.textContent = targetCareer;
 
-    // 1. Mock required skills based on the career name
-    const requiredSkills = [
-        { name: "Core Fundamentals", level: "advanced", proficiency: 100, category: "Foundation" },
-        { name: "Advanced " + targetCareer + " Concepts", level: "intermediate", proficiency: 60, category: "Specialization" },
-        { name: "Industry Tools & Workflows", level: "beginner", proficiency: 20, category: "Practical" },
-        { name: "System Architecture", level: "none", proficiency: 0, category: "Advanced" },
-        { name: "Performance Optimization", level: "none", proficiency: 0, category: "Advanced" },
-        { name: "Security Best Practices", level: "none", proficiency: 0, category: "Advanced" }
-    ];
-
-    // 2. Categorize gaps based on roadmap progress
-    let completedModules = [];
-    try { completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]') || []; }
-    catch (e) { completedModules = []; }
-    if (!Array.isArray(completedModules)) completedModules = [];
-    const progressFactor = Math.min(completedModules.length / 6, 1); // Mock progression
-    
-    const criticalGaps = [];
-    const needsImprovement = [];
-    const validated = [];
-
-    // Simple deterministic logic based on progress
-    requiredSkills.forEach((skill, index) => {
-        const threshold = (index + 1) / requiredSkills.length;
-        if (progressFactor >= threshold) {
-            validated.push(skill);
-        } else if (progressFactor >= threshold - 0.3) {
-            needsImprovement.push(skill);
-        } else {
-            criticalGaps.push(skill);
-        }
+    // Show loading state in all skill lists
+    const loadingHTML = `<div style="display:flex; align-items:center; gap:12px; padding:20px; color:var(--text-muted);"><i class="fas fa-spinner fa-spin" style="font-size:1.3rem; color:var(--primary);"></i><span>Analyzing your skills with AI...</span></div>`;
+    ['critical-gaps-list','needs-improvement-list','other-missing-list','validated-skills-list'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = loadingHTML;
     });
 
-    const totalRequired = requiredSkills.length;
-    const matchedCount = validated.length + (needsImprovement.length > 0 ? 1 : 0);
-    const readinessPct = Math.round((matchedCount / totalRequired) * 100);
-
-    // 3. Update Readiness Card
-    const scoreEl = document.getElementById('readiness-score');
-    const scoreBigEl = document.getElementById('readiness-score-big');
-    const textEl = document.getElementById('readiness-text');
-    const progressEl = document.getElementById('readiness-progress');
-
-    if (scoreEl) scoreEl.textContent = `${readinessPct}%`;
-    if (scoreBigEl) scoreBigEl.textContent = `${readinessPct}%`;
-    if (textEl) textEl.textContent = `${matchedCount} / ${totalRequired} Core Skills Acquired`;
-    if (progressEl) {
-        setTimeout(() => { progressEl.style.width = `${readinessPct}%`; }, 150);
+    // Fetch real-time skill gap analysis from backend (Groq AI powered)
+    const token = localStorage.getItem('token');
+    if (!token) {
+        renderError('You must be logged in to view skill analysis.');
+        return;
     }
 
-    // Time estimate
-    const gapsCount = criticalGaps.length;
-    const timeEl = document.getElementById('time-estimate');
-    if (timeEl) {
-        const weeks = gapsCount * 3;
-        timeEl.textContent = weeks === 0 ? 'Ready!' : (weeks < 4 ? `~${weeks} weeks` : `~${Math.round(weeks / 4)} months`);
-    }
-
-    // Update legend counts
-    const ownedCount = document.getElementById('owned-count');
-    const improveCount = document.getElementById('improve-count');
-    const missingCount = document.getElementById('missing-count');
-    if (ownedCount) ownedCount.textContent = `${validated.length} skills`;
-    if (improveCount) improveCount.textContent = `${needsImprovement.length} skills`;
-    if (missingCount) missingCount.textContent = `${criticalGaps.length} skills`;
-
-    // 4. Donut Chart
-    drawDonutChart('distribution-chart', validated.length, needsImprovement.length, criticalGaps.length);
-
-    // 5. Render lists with icons
-    renderList('critical-gaps-list', criticalGaps, 'badge-critical', 'Missing', '❌');
-    renderList('other-missing-list', needsImprovement, 'badge-improvement', 'Improve', '⚠');
-    renderList('needs-improvement-list', needsImprovement, 'badge-improvement', 'Improve', '⚠');
-    renderList('validated-skills-list', validated, 'badge-validated', 'Validated', '✓');
-
-    // 6. Action Banner
-    const banner = document.getElementById('sg-action-banner');
-    const actionTitle = document.getElementById('action-title');
-    if (banner && actionTitle) {
-        banner.style.display = 'flex';
-        if (criticalGaps.length > 0) {
-            actionTitle.textContent = 'Critical Gaps Detected';
-        } else if (needsImprovement.length > 0) {
-            actionTitle.textContent = 'Refine Your Skills';
-        } else {
-            actionTitle.textContent = 'You are Job Ready!';
+    fetch('http://localhost:5000/api/progress/skill-gap', {
+        headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(res => res.json())
+    .then(result => {
+        if (!result.success) {
+            renderError(result.message || 'Could not load skill analysis.');
+            return;
         }
+
+        const { criticalGaps, needsImprovement, validated, targetCareer: serverCareer } = result.data;
+
+        // Update target label with authoritative server value
+        if (targetLabel && serverCareer) targetLabel.textContent = serverCareer;
+
+        const totalRequired = criticalGaps.length + needsImprovement.length + validated.length;
+        const readinessPct = totalRequired > 0 ? Math.round((validated.length / totalRequired) * 100) : 0;
+
+        // Update Readiness Card
+        const scoreEl = document.getElementById('readiness-score');
+        const scoreBigEl = document.getElementById('readiness-score-big');
+        const textEl = document.getElementById('readiness-text');
+        const progressEl = document.getElementById('readiness-progress');
+        if (scoreEl) scoreEl.textContent = `${readinessPct}%`;
+        if (scoreBigEl) scoreBigEl.textContent = `${readinessPct}%`;
+        if (textEl) textEl.textContent = `${validated.length} / ${totalRequired} Core Skills Acquired`;
+        if (progressEl) { setTimeout(() => { progressEl.style.width = `${readinessPct}%`; }, 150); }
+
+        // Time estimate
+        const timeEl = document.getElementById('time-estimate');
+        if (timeEl) {
+            const weeks = criticalGaps.length * 3;
+            timeEl.textContent = weeks === 0 ? 'Ready!' : (weeks < 4 ? `~${weeks} weeks` : `~${Math.round(weeks / 4)} months`);
+        }
+
+        // Update legend counts
+        const ownedCount = document.getElementById('owned-count');
+        const improveCount = document.getElementById('improve-count');
+        const missingCount = document.getElementById('missing-count');
+        if (ownedCount) ownedCount.textContent = `${validated.length} skills`;
+        if (improveCount) improveCount.textContent = `${needsImprovement.length} skills`;
+        if (missingCount) missingCount.textContent = `${criticalGaps.length} skills`;
+
+        // Donut Chart
+        drawDonutChart('distribution-chart', validated.length, needsImprovement.length, criticalGaps.length);
+
+        // Render skill lists
+        renderList('critical-gaps-list', criticalGaps, 'badge-critical', 'Missing', '❌');
+        renderList('other-missing-list', needsImprovement, 'badge-improvement', 'Improve', '⚠');
+        renderList('needs-improvement-list', needsImprovement, 'badge-improvement', 'Improve', '⚠');
+        renderList('validated-skills-list', validated, 'badge-validated', 'Validated', '✓');
+
+        // Action Banner
+        const banner = document.getElementById('sg-action-banner');
+        const actionTitle = document.getElementById('action-title');
+        if (banner && actionTitle) {
+            banner.style.display = 'flex';
+            actionTitle.textContent = criticalGaps.length > 0 ? 'Critical Gaps Detected' :
+                needsImprovement.length > 0 ? 'Refine Your Skills' : 'You are Job Ready!';
+        }
+    })
+    .catch(err => {
+        console.error('Skill gap fetch error:', err);
+        renderError('Could not connect to the server. Please try again.');
+    });
+
+    function renderError(msg) {
+        const errHTML = `<p style="color:var(--text-muted); padding:16px; text-align:center;"><i class="fas fa-exclamation-circle" style="margin-right:6px; color:#EF4444;"></i>${msg}</p>`;
+        ['critical-gaps-list','needs-improvement-list','other-missing-list','validated-skills-list'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = errHTML;
+        });
     }
 });
 
-// Render list of skills
+// Render list of skills with learning resources
 function renderList(elementId, items, badgeClass, badgeText, icon) {
     const container = document.getElementById(elementId);
     if (!container) return;
 
     if (items.length === 0) {
-        container.innerHTML = `<p class="sg-empty">No skills here. 🎉</p>`;
+        container.innerHTML = `<p class="sg-empty">No skills here — great job!</p>`;
         return;
     }
 
     container.innerHTML = items.map(item => {
         const skillName = item.name || item;
         
-        // Mock Learning Resources for missing/improve skills
         let resourcesHtml = '';
         if (icon === '❌' || icon === '⚠') {
             resourcesHtml = `

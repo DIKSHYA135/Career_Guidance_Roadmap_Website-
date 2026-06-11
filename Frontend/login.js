@@ -271,7 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Success feedback then redirect (brief delay so success state is visible)
             if (typeof window.XySuccess === "function") {
-                window.XySuccess("Welcome back", "Login Successful ðŸŽ‰", redirect);
+                window.XySuccess("Welcome back", "Login Successfully", redirect);
             } else {
                 setTimeout(redirect, 800);
             }
