@@ -1,73 +1,103 @@
 const ROADMAP_DATA = {
     "Web Development": [
         {
-            id: "html", title: "HTML Fundamentals", desc: "Master semantic elements, forms, and basic SEO principles.", keywords: ["html", "html5", "markup", "web fundamentals"],
+            id: "web_mod1", title: "Module 1: The Foundations of the Web", desc: "Learn how the internet works and build your first pages with HTML5 and CSS3.", keywords: ["html", "html5", "css", "css3", "web basics"],
             courses: [
-                { name: "MDN HTML Docs", url: "https://developer.mozilla.org/en-US/docs/Learn/HTML" },
-                { name: "W3Schools HTML Tutorial", url: "https://www.w3schools.com/html/" },
-                { name: "GeeksforGeeks HTML", url: "https://www.geeksforgeeks.org/html-tutorial/" }
+                { name: "How the Internet Works", url: "study.html?url=Courses/Web_Development/Module_1_Lesson_1.md&title=How the Internet Works" },
+                { name: "Introduction to HTML5", url: "study.html?url=Courses/Web_Development/Module_1_Lesson_2.md&title=Introduction to HTML5" },
+                { name: "Introduction to CSS3", url: "study.html?url=Courses/Web_Development/Module_1_Lesson_3.md&title=Introduction to CSS3" }
             ]
         },
         {
-            id: "css", title: "CSS & Responsive Design", desc: "Flexbox, Grid, and making layouts work on all devices.", keywords: ["css", "css3", "flexbox", "grid", "responsive", "styling"],
+            id: "web_mod2", title: "Module 2: Building Responsive Layouts", desc: "Master the CSS Box Model, Flexbox, and CSS Grid to create mobile-friendly layouts.", keywords: ["css", "flexbox", "grid", "responsive"],
             courses: [
-                { name: "MDN CSS Docs", url: "https://developer.mozilla.org/en-US/docs/Learn/CSS" },
-                { name: "W3Schools CSS Tutorial", url: "https://www.w3schools.com/css/" },
-                { name: "Kevin Powell CSS (YouTube)", url: "https://www.youtube.com/@KevinPowell" }
+                { name: "The CSS Box Model", url: "study.html?url=Courses/Web_Development/Module_2_Lesson_1.md&title=The CSS Box Model" },
+                { name: "Flexbox Essentials", url: "study.html?url=Courses/Web_Development/Module_2_Lesson_2.md&title=Flexbox Essentials" },
+                { name: "CSS Grid & Responsive Design", url: "study.html?url=Courses/Web_Development/Module_2_Lesson_3.md&title=CSS Grid & Responsive Design" }
             ]
         },
         {
-            id: "js", title: "JavaScript Essentials", desc: "Functions, DOM manipulation, and basic application logic.", keywords: ["javascript", "js", "es6", "dom"],
+            id: "web_mod3", title: "Module 3: Programming with JavaScript", desc: "Learn core programming concepts including variables, loops, functions, and data structures.", keywords: ["javascript", "js", "programming", "logic"],
             courses: [
-                { name: "MDN JavaScript Guide", url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide" },
-                { name: "W3Schools JavaScript", url: "https://www.w3schools.com/js/" },
-                { name: "JavaScript.info", url: "https://javascript.info/" },
-                { name: "GeeksforGeeks JavaScript", url: "https://www.geeksforgeeks.org/javascript/" }
+                { name: "JavaScript Basics", url: "study.html?url=Courses/Web_Development/Module_3_Lesson_1.md&title=JavaScript Basics" },
+                { name: "Control Flow and Functions", url: "study.html?url=Courses/Web_Development/Module_3_Lesson_2.md&title=Control Flow and Functions" },
+                { name: "Arrays and Objects", url: "study.html?url=Courses/Web_Development/Module_3_Lesson_3.md&title=Arrays and Objects" }
             ]
         },
         {
-            id: "react", title: "Frontend Frameworks (React)", desc: "Build modern single-page applications efficiently.", keywords: ["react", "reactjs", "frontend framework", "jsx"],
+            id: "web_mod4", title: "Module 4: Interactive Web Pages (The DOM)", desc: "Use JavaScript to select elements, listen for events, and validate user forms.", keywords: ["dom", "events", "validation", "interactive"],
             courses: [
-                { name: "React Official Docs", url: "https://react.dev/learn" },
-                { name: "GeeksforGeeks React", url: "https://www.geeksforgeeks.org/reactjs-tutorials/" },
-                { name: "CS50W Web Programming (edX)", url: "https://www.edx.org/learn/web-programming/harvard-university-cs50-s-web-programming-with-python-and-javascript" }
+                { name: "Introduction to the DOM", url: "study.html?url=Courses/Web_Development/Module_4_Lesson_1.md&title=Introduction to the DOM" },
+                { name: "Event Listeners & Interaction", url: "study.html?url=Courses/Web_Development/Module_4_Lesson_2.md&title=Event Listeners" },
+                { name: "Form Validation", url: "study.html?url=Courses/Web_Development/Module_4_Lesson_3.md&title=Form Validation" }
             ]
         },
-        { id: "capstone", title: "Capstone Project", desc: "Build an end-to-end project to prove job readiness.", keywords: [], courses: [] }
+        {
+            id: "web_mod5", title: "Module 5: Modern JavaScript & APIs", desc: "Upgrade to ES6+, handle asynchronous code, and fetch live data from REST APIs.", keywords: ["es6", "async", "await", "api", "fetch"],
+            courses: [
+                { name: "ES6+ Features", url: "study.html?url=Courses/Web_Development/Module_5_Lesson_1.md&title=ES6+ Features" },
+                { name: "Promises & Async/Await", url: "study.html?url=Courses/Web_Development/Module_5_Lesson_2.md&title=Promises & Async/Await" },
+                { name: "Fetching API Data", url: "study.html?url=Courses/Web_Development/Module_5_Lesson_3.md&title=Fetching API Data" }
+            ]
+        },
+        {
+            id: "web_mod6", title: "Module 6: Deployment & Career Readiness", desc: "Manage code with Git, host on Vercel/Netlify, and prepare your portfolio.", keywords: ["git", "github", "deployment", "portfolio"],
+            courses: [
+                { name: "Version Control with Git", url: "study.html?url=Courses/Web_Development/Module_6_Lesson_1.md&title=Version Control with Git" },
+                { name: "Hosting Your Website", url: "study.html?url=Courses/Web_Development/Module_6_Lesson_2.md&title=Hosting Your Website" },
+                { name: "Portfolio & Interviews", url: "study.html?url=Courses/Web_Development/Module_6_Lesson_3.md&title=Portfolio & Interviews" }
+            ]
+        }
     ],
     "Full Stack Development": [
         {
-            id: "web-dev-basics", title: "Web Basics (HTML/CSS/JS)", desc: "The core building blocks of the web.", keywords: ["html", "css", "javascript"],
+            id: "fs_mod1", title: "Module 1: Web Basics Review", desc: "A fast-paced review of HTML, CSS, and Client-side JS.", keywords: ["html", "css", "javascript"],
             courses: [
-                { name: "MDN Web Docs — Getting Started", url: "https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web" },
-                { name: "W3Schools Web Tutorial", url: "https://www.w3schools.com/" },
-                { name: "The Odin Project", url: "https://www.theodinproject.com/paths/foundations" }
+                { name: "HTML & CSS Structure", url: "study.html?url=Courses/Full_Stack_Development/Module_1_Lesson_1.md&title=HTML & CSS Structure" },
+                { name: "JavaScript Fundamentals", url: "study.html?url=Courses/Full_Stack_Development/Module_1_Lesson_2.md&title=JavaScript Fundamentals" },
+                { name: "DOM Manipulation Review", url: "study.html?url=Courses/Full_Stack_Development/Module_1_Lesson_3.md&title=DOM Manipulation Review" }
             ]
         },
         {
-            id: "nodejs", title: "Node.js & Express", desc: "Build backend REST APIs using JavaScript.", keywords: ["node", "express", "backend"],
+            id: "fs_mod2", title: "Module 2: Intro to Backend & Node.js", desc: "Running JavaScript on the server, built-in modules, npm.", keywords: ["node", "backend", "npm"],
             courses: [
-                { name: "Node.js Crash Course (YouTube)", url: "https://www.youtube.com/watch?v=TlB_eWDSMt4" },
-                { name: "GeeksforGeeks Node.js", url: "https://www.geeksforgeeks.org/nodejs/" },
-                { name: "W3Schools Node.js", url: "https://www.w3schools.com/nodejs/" }
+                { name: "Introduction to Node.js", url: "study.html?url=Courses/Full_Stack_Development/Module_2_Lesson_1.md&title=Introduction to Node.js" },
+                { name: "NPM & Package Management", url: "study.html?url=Courses/Full_Stack_Development/Module_2_Lesson_2.md&title=NPM & Package Management" },
+                { name: "Building a Simple Web Server", url: "study.html?url=Courses/Full_Stack_Development/Module_2_Lesson_3.md&title=Building a Simple Web Server" }
             ]
         },
         {
-            id: "database", title: "Databases (SQL/NoSQL)", desc: "Data modeling, CRUD operations, and querying.", keywords: ["sql", "mysql", "mongodb"],
+            id: "fs_mod3", title: "Module 3: Databases (SQL/NoSQL)", desc: "Data modeling, MongoDB, and PostgreSQL basics.", keywords: ["sql", "mysql", "mongodb"],
             courses: [
-                { name: "W3Schools SQL Tutorial", url: "https://www.w3schools.com/sql/" },
-                { name: "Khan Academy SQL", url: "https://www.khanacademy.org/computing/computer-programming/sql" },
-                { name: "MongoDB University (Free)", url: "https://learn.mongodb.com/" }
+                { name: "Relational Databases (SQL)", url: "study.html?url=Courses/Full_Stack_Development/Module_3_Lesson_1.md&title=Relational Databases (SQL)" },
+                { name: "NoSQL Databases (MongoDB)", url: "study.html?url=Courses/Full_Stack_Development/Module_3_Lesson_2.md&title=NoSQL Databases (MongoDB)" },
+                { name: "Connecting Databases to Node", url: "study.html?url=Courses/Full_Stack_Development/Module_3_Lesson_3.md&title=Connecting Databases to Node" }
             ]
         },
         {
-            id: "react", title: "Frontend Frameworks (React)", desc: "Build interactive client-side interfaces.", keywords: ["react"],
+            id: "fs_mod4", title: "Module 4: RESTful APIs & Express.js", desc: "Routing, middleware, handling requests/responses.", keywords: ["express", "api", "rest"],
             courses: [
-                { name: "React Official Docs", url: "https://react.dev/learn" },
-                { name: "GeeksforGeeks React Tutorial", url: "https://www.geeksforgeeks.org/reactjs-tutorials/" }
+                { name: "Introduction to Express.js", url: "study.html?url=Courses/Full_Stack_Development/Module_4_Lesson_1.md&title=Introduction to Express.js" },
+                { name: "Building RESTful Routes", url: "study.html?url=Courses/Full_Stack_Development/Module_4_Lesson_2.md&title=Building RESTful Routes" },
+                { name: "Middleware & Error Handling", url: "study.html?url=Courses/Full_Stack_Development/Module_4_Lesson_3.md&title=Middleware & Error Handling" }
             ]
         },
-        { id: "capstone", title: "Full Stack Capstone", desc: "Build a full stack MERN or PERN application.", keywords: [], courses: [] }
+        {
+            id: "fs_mod5", title: "Module 5: Frontend Frameworks (React)", desc: "Components, State, Hooks, fetching from APIs.", keywords: ["react", "frontend"],
+            courses: [
+                { name: "React Components & JSX", url: "study.html?url=Courses/Full_Stack_Development/Module_5_Lesson_1.md&title=React Components & JSX" },
+                { name: "State & Hooks", url: "study.html?url=Courses/Full_Stack_Development/Module_5_Lesson_2.md&title=State & Hooks" },
+                { name: "Connecting React to APIs", url: "study.html?url=Courses/Full_Stack_Development/Module_5_Lesson_3.md&title=Connecting React to APIs" }
+            ]
+        },
+        {
+            id: "fs_mod6", title: "Module 6: Capstone & Deployment", desc: "Connecting React to Express, authentication basics, and deployment.", keywords: ["deployment", "mern"],
+            courses: [
+                { name: "Full Stack Authentication", url: "study.html?url=Courses/Full_Stack_Development/Module_6_Lesson_1.md&title=Full Stack Authentication" },
+                { name: "The MERN Stack Architecture", url: "study.html?url=Courses/Full_Stack_Development/Module_6_Lesson_2.md&title=The MERN Stack Architecture" },
+                { name: "Deploying Full Stack Apps", url: "study.html?url=Courses/Full_Stack_Development/Module_6_Lesson_3.md&title=Deploying Full Stack Apps" }
+            ]
+        }
     ],
     "Backend / APIs": [
         {
@@ -572,55 +602,23 @@ document.addEventListener("DOMContentLoaded", () => {
                         const cId = getCourseId(module.id, cName);
                         const isChecked = completedCourses.includes(cId) || moduleCompleted;
                         
-                        const cItem = document.createElement("label");
+                        let finalUrl = cUrl;
+                        if (cUrl) {
+                            finalUrl = cUrl + (cUrl.includes('?') ? '&' : '?') + `courseId=${encodeURIComponent(cId)}&moduleId=${encodeURIComponent(module.id)}`;
+                        }
+                        
+                        const cItem = document.createElement("div");
                         cItem.className = `course-item ${isChecked ? 'completed' : ''}`;
                         cItem.innerHTML = `
-                            <input type="checkbox" class="course-checkbox" value="${cId}" ${isChecked ? 'checked' : ''}>
-                            <div class="checkbox-custom">
+                            <input type="checkbox" class="course-checkbox" value="${cId}" ${isChecked ? 'checked' : ''} disabled>
+                            <div class="checkbox-custom" style="pointer-events: none;">
                                 <i class="fas fa-check"></i>
                             </div>
                             <div class="course-details">
                                 <h5>${isDummy ? 'Submit ' + module.title : cName}</h5>
-                                ${cUrl ? `<a href="${cUrl}" target="_blank" class="course-link">View Course <i class="fas fa-external-link-alt"></i></a>` : ''}
+                                ${finalUrl ? `<a href="${finalUrl}" class="course-link">View Course <i class="fas fa-external-link-alt"></i></a>` : ''}
                             </div>
                         `;
-                        
-                        const checkbox = cItem.querySelector('.course-checkbox');
-                        checkbox.addEventListener('change', (e) => {
-                            if (e.target.checked) {
-                                if (!completedCourses.includes(cId)) completedCourses.push(cId);
-                                cItem.classList.add('completed');
-                            } else {
-                                completedCourses = completedCourses.filter(id => id !== cId);
-                                cItem.classList.remove('completed');
-                            }
-                            localStorage.setItem('completedCourses', JSON.stringify(completedCourses));
-                            
-                            let currentCount = 0;
-                            if (module.courses && module.courses.length > 0) {
-                                module.courses.forEach(cx => {
-                                    if (completedCourses.includes(getCourseId(module.id, cx.name))) currentCount++;
-                                });
-                            } else {
-                                if (completedCourses.includes(getCourseId(module.id, 'dummy_capstone'))) currentCount++;
-                            }
-                            
-                            const newPct = Math.round((currentCount / totalCourses) * 100);
-                            accItem.querySelector('.progress-bar').style.width = `${newPct}%`;
-                            accItem.querySelector('.module-progress-text').innerText = `${newPct}%`;
-                            
-                            // Update visual progress bar only — do NOT change module completion.
-                            // Module completion requires passing the quiz (backend-enforced).
-                            if (completedModules.includes(module.id)) {
-                                accItem.classList.add('completed');
-                                accItem.querySelector('.progress-bar').style.background = '#10B981';
-                            } else {
-                                accItem.classList.remove('completed');
-                                accItem.querySelector('.progress-bar').style.background = 'var(--primary)';
-                            }
-                            
-                            updateOverallProgress();
-                        });
                         
                         courseListContainer.appendChild(cItem);
                     };

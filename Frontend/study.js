@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const REQUIRED_SECONDS = 30;
+    const REQUIRED_SECONDS = 600; // 10 minutes
 
     const urlParams = new URLSearchParams(window.location.search);
     let courseUrl = urlParams.get('url');
@@ -36,7 +36,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
     newTabBtn1.href = courseUrl;
     newTabBtn2.href = courseUrl;
-    iframe.src = courseUrl;
+    const markdownContainer = document.getElementById('markdown-container');
+    const fallbackMsg = document.getElementById('fallback-msg');
+    
+    // --- Loader helper ---
+    function hideLoader() {
+        if (loader) { loader.style.opacity = '0'; loader.style.pointerEvents = 'none'; }
+    }
+
+    if (courseUrl.endsWith('.md')) {
+        iframe.style.display = 'none';
+        if (fallbackMsg) fallbackMsg.style.display = 'none';
+        if (markdownContainer) markdownContainer.style.display = 'block';
+
+        // Try embedded content first (works on file:// protocol)
+        const embedded = window.LESSON_CONTENT && window.LESSON_CONTENT[courseUrl];
+        if (embedded) {
+            if (window.marked && markdownContainer) {
+                markdownContainer.innerHTML = window.marked.parse(embedded);
+            } else if (markdownContainer) {
+                markdownContainer.innerHTML = '<pre style="white-space: pre-wrap; font-family: inherit;">' + embedded + '</pre>';
+            }
+            hideLoader();
+        } else {
+            // Fallback: try fetch (works on http:// servers)
+            fetch(courseUrl)
+                .then(res => res.text())
+                .then(text => {
+                    if (window.marked && markdownContainer) {
+                        markdownContainer.innerHTML = window.marked.parse(text);
+                    } else if (markdownContainer) {
+                        markdownContainer.innerHTML = '<pre style="white-space: pre-wrap; font-family: inherit;">' + text + '</pre>';
+                    }
+                    hideLoader();
+                })
+                .catch(() => {
+                    if (markdownContainer) markdownContainer.innerHTML = '<p style="color:red;">Error loading lesson content. Please check your connection.</p>';
+                    hideLoader();
+                });
+        }
+    } else {
+        iframe.src = courseUrl;
+    }
 
     // --- localStorage helpers ---
     function getOpenedCourses() {
@@ -56,6 +97,17 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             localStorage.setItem('openedCourses', JSON.stringify(Array.from(set)));
         } catch (e) { /* storage full / blocked */ }
+    }
+
+    function markCourseCompleted(id) {
+        if (!id) return;
+        try {
+            const raw = localStorage.getItem('completedCourses');
+            const arr = raw ? JSON.parse(raw) : [];
+            const set = new Set(Array.isArray(arr) ? arr : []);
+            set.add(id);
+            localStorage.setItem('completedCourses', JSON.stringify(Array.from(set)));
+        } catch (e) { /* ignore */ }
     }
 
     function persistTimeSpent(id, seconds) {
@@ -103,45 +155,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Resume from any previously stored time for this course.
     let seconds = 0;
     if (courseId) {
-        const prior = parseInt(localStorage.getItem('timeSpent_' + courseId) || '0', 10);
-        if (!isNaN(prior) && prior > 0) seconds = Math.min(prior, REQUIRED_SECONDS);
-    }
-
-    let unlocked = false;
-
-    function renderTimer() {
-        const capped = Math.min(seconds, REQUIRED_SECONDS);
-        const pct = Math.round((capped / REQUIRED_SECONDS) * 100);
-        timerText.textContent = capped + '/' + REQUIRED_SECONDS + 's';
-        timerFill.style.width = pct + '%';
-
-        if (seconds >= REQUIRED_SECONDS) {
-            if (!unlocked) unlockComplete();
-        } else {
-            const remaining = REQUIRED_SECONDS - seconds;
-            timerHint.textContent = 'You need to spend ' + remaining + ' more second' + (remaining === 1 ? '' : 's') + ' on this lesson';
-        }
-    }
-
-    function unlockComplete() {
-        unlocked = true;
-        completeBtn.disabled = false;
-        completeBtn.classList.add('ready');
-        completeLabel.textContent = 'Mark as Complete';
-        timerFill.classList.add('done');
-        timerHint.textContent = 'Lesson time met. You can mark this lesson complete.';
-    }
-
-    renderTimer();
-
-    const intervalId = setInterval(() => {
-        seconds += 1;
-        if (courseId) persistTimeSpent(courseId, seconds);
-        renderTimer();
-        if (seconds >= REQUIRED_SECONDS) {
-            clearInterval(intervalId);
-        }
-    }, 1000);
+    completeBtn.disabled = false;
+    completeBtn.classList.add('ready');
+    completeLabel.textContent = 'Mark as Complete';
+    timerHint.textContent = 'You can mark this lesson complete.';
 
     // --- Navigation helpers ---
     function buildReturnUrl(completed) {
@@ -160,15 +177,14 @@ document.addEventListener('DOMContentLoaded', () => {
         completeBtn.textContent = 'Saving...';
         if (courseId) {
             markCourseOpened(courseId);
-            persistTimeSpent(courseId, Math.max(seconds, REQUIRED_SECONDS));
-            await reportLessonStudied(courseId, moduleId, Math.max(seconds, REQUIRED_SECONDS));
+            markCourseCompleted(courseId);
+            persistTimeSpent(courseId, seconds);
+            await reportLessonStudied(courseId, moduleId, seconds);
         }
-        clearInterval(intervalId);
         window.location.href = buildReturnUrl(true);
     }
 
     completeBtn.addEventListener('click', () => {
-        if (!unlocked && seconds < REQUIRED_SECONDS) return;
         completeLesson();
     });
 
@@ -177,14 +193,15 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         clearInterval(intervalId);
 
-        const metRequirement = seconds >= REQUIRED_SECONDS;
+        const metRequirement = true;
         if (metRequirement && courseId) {
             markCourseOpened(courseId);
+            markCourseCompleted(courseId);
             reportLessonStudied(courseId, moduleId, seconds);
         }
         // Pass courseId back as "completed" only when the requirement was met;
         // otherwise just return to the roadmap (time is already persisted).
-        if (seconds > 0 && courseId) {
+        if (courseId) {
             window.location.href = buildReturnUrl(metRequirement);
         } else {
             window.location.href = buildReturnUrl(false);

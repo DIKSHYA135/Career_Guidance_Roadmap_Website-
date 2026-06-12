@@ -414,6 +414,16 @@ function shuffleArray(array) {
     return arr;
 }
 
+if (typeof WEB_DEV_QUIZ_DATA !== 'undefined') {
+    Object.assign(QUIZ_DATA, WEB_DEV_QUIZ_DATA);
+}
+if (typeof FS_QUIZ_DATA !== 'undefined') {
+    Object.assign(QUIZ_DATA, FS_QUIZ_DATA);
+}
+if (typeof window !== 'undefined' && window.QUIZ_DATA) {
+    Object.assign(QUIZ_DATA, window.QUIZ_DATA);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     // ── Read module from URL ──
     const urlParams = new URLSearchParams(window.location.search);
@@ -506,7 +516,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const shuffled = shuffleArray(unusedPool);
-        quizQuestions = shuffled.slice(0, 10);
+        quizQuestions = shuffled.slice(0, 7);
         totalQuestions = quizQuestions.length;
 
         // Add to recently used
@@ -717,19 +727,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
         quizTimerInterval = setInterval(() => {
             timeLeft--;
-            updateTimerBar(timeLeft, quizPhase === 'read' ? 10 : 5, timerBar);
+            updateTimerBar(timeLeft, quizPhase === 'read' ? 10 : 6, timerBar);
 
             if (quizPhase === 'read') {
                 timerText.textContent = `${timeLeft}s Reading Time`;
                 if (timeLeft <= 0) {
                     // Switch to answer phase
                     quizPhase = 'answer';
-                    timeLeft = 5;
+                    timeLeft = 6;
                     quizOptionsCont.classList.remove('disabled');
                     quizStatus.textContent = 'Select your answer!';
                     quizStatus.className = 'quiz-status info';
                     timerText.textContent = `${timeLeft}s to Answer`;
-                    updateTimerBar(timeLeft, 5, timerBar);
+                    updateTimerBar(timeLeft, 6, timerBar);
                 }
             } else {
                 timerText.textContent = `${timeLeft}s to Answer`;

@@ -338,6 +338,28 @@
 
 
 
+            <!-- Sandbox test credentials hint -->
+            <div style="
+                background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(79,70,229,0.06));
+                border: 1px dashed rgba(16,185,129,0.45);
+                border-radius: 12px;
+                padding: 0.9rem 1.1rem;
+                margin-bottom: 1.1rem;
+                font-size: 0.82rem;
+            ">
+                <div style="display:flex; align-items:center; gap:0.5rem; font-weight:700; color:#10b981; margin-bottom:0.55rem;">
+                    <i class="fas fa-info-circle"></i> Sandbox Test Credentials
+                </div>
+                <div style="display:grid; grid-template-columns:auto 1fr; gap:0.25rem 0.75rem; color:#334155;">
+                    <span style="font-weight:600; color:#64748b;">eSewa ID:</span>
+                    <span style="font-family:monospace; font-weight:700; color:#0f172a; letter-spacing:0.03em;">9806800001</span>
+                    <span style="font-weight:600; color:#64748b;">Password:</span>
+                    <span style="font-family:monospace; font-weight:700; color:#0f172a; letter-spacing:0.03em;">Nepal@123</span>
+                    <span style="font-weight:600; color:#64748b;">MPIN:</span>
+                    <span style="font-family:monospace; font-weight:700; color:#0f172a; letter-spacing:0.03em;">1122</span>
+                </div>
+            </div>
+
             <form id="mock-esewa-form" autocomplete="off" onsubmit="event.preventDefault(); handlePay();">
                 <!-- Decoy fields to absorb browser autofill -->
                 <input type="text" style="display:none" name="fake-user" autocomplete="username">

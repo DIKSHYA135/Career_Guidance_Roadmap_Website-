@@ -17,8 +17,15 @@
 
         // --- 1. Inject Back Button ---
         if (shouldShowBack) {
-            const mainContent = document.querySelector('.main-content') || document.querySelector('.dashboard-container');
+            const mainContent = document.querySelector('.main-content') ||
+                                document.querySelector('.dashboard-container') ||
+                                document.querySelector('.page-wrap') ||
+                                document.querySelector('.quiz-container') ||
+                                document.querySelector('.roadmap-container') ||
+                                document.querySelector('main');
+
             if (mainContent) {
+                // Inline-style injected nav bar
                 const nav = document.createElement('div');
                 nav.className = 'page-top-nav fade-in';
                 nav.innerHTML = `
@@ -27,22 +34,60 @@
                         Back
                     </a>
                 `;
-
-                // Insert before the first child of main-content
                 const firstChild = mainContent.firstElementChild;
                 if (firstChild) {
                     mainContent.insertBefore(nav, firstChild);
                 } else {
                     mainContent.appendChild(nav);
                 }
+            } else {
+                // Fallback: inject a floating back button for pages with no recognised container
+                const fab = document.createElement('button');
+                fab.id = 'universal-back-btn';
+                fab.title = 'Go back to previous page';
+                fab.innerHTML = '<i class="fas fa-arrow-left"></i> Back';
+                fab.style.cssText = `
+                    position: fixed;
+                    top: 18px;
+                    left: 18px;
+                    z-index: 9999;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.45rem;
+                    padding: 0.55rem 1.1rem;
+                    background: rgba(255,255,255,0.92);
+                    backdrop-filter: blur(12px);
+                    -webkit-backdrop-filter: blur(12px);
+                    border: 1px solid rgba(79,70,229,0.2);
+                    border-radius: 999px;
+                    color: #4f46e5;
+                    font-family: 'Inter', sans-serif;
+                    font-size: 0.85rem;
+                    font-weight: 700;
+                    cursor: pointer;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+                    transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+                `;
+                fab.addEventListener('mouseenter', () => {
+                    fab.style.background = 'rgba(79,70,229,0.08)';
+                    fab.style.transform = 'translateX(-2px)';
+                });
+                fab.addEventListener('mouseleave', () => {
+                    fab.style.background = 'rgba(255,255,255,0.92)';
+                    fab.style.transform = '';
+                });
+                document.body.appendChild(fab);
+            }
 
-                // Add history.back() logic
-                document.getElementById('universal-back-btn').addEventListener('click', (e) => {
+            // Back navigation logic — shared by both variants
+            const backBtn = document.getElementById('universal-back-btn');
+            if (backBtn) {
+                backBtn.addEventListener('click', (e) => {
                     e.preventDefault();
                     if (window.history.length > 1) {
                         window.history.back();
                     } else {
-                        window.location.href = 'dashboard.html'; // Fallback
+                        window.location.href = 'dashboard.html';
                     }
                 });
             }

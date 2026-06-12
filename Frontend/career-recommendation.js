@@ -69,12 +69,12 @@ document.addEventListener('DOMContentLoaded', () => {
         ? recommended.slice(0, 3)
         : ['Web Development', 'UI/UX Design', 'Data Science'];
 
-    /* ── Render only the top 3 cards ── */
+    /* â”€â”€ Render only the top 3 cards â”€â”€ */
     const RANK_LABELS = ['🥇 Best Match', '🥈 Great Match', '🥉 Good Match'];
     const RANK_COLORS = [
-        'linear-gradient(135deg,#2563EB,#7C3AED)',
-        'linear-gradient(135deg,#0EA5E9,#2563EB)',
-        'linear-gradient(135deg,#6366F1,#8B5CF6)'
+        'linear-gradient(135deg,#1E3A8A,#0F172A)', // beautiful dark blue for best match
+        'linear-gradient(135deg,#1E40AF,#172554)', // slightly different dark blue for great match
+        'linear-gradient(135deg,#1D4ED8,#1E3A8A)'  // slightly lighter dark blue for good match
     ];
 
     topPaths.forEach((pathKey, index) => {
@@ -110,61 +110,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
         card.innerHTML = `
             <!-- Rank bar -->
-            <div style="background:${RANK_COLORS[index]};padding:10px 24px;display:flex;align-items:center;justify-content:space-between;">
-                <span style="color:white;font-weight:700;font-size:0.9rem;letter-spacing:0.3px;">${RANK_LABELS[index]}</span>
-                <span style="background:rgba(255,255,255,0.2);color:white;padding:3px 12px;border-radius:100px;font-weight:700;font-size:0.85rem;">
-                    ${matchPct}% Match
-                </span>
+            <div class="card-rank-header" style="background:${RANK_COLORS[index]};">
+                <span class="rank-title">${RANK_LABELS[index]}</span>
+                <span class="match-badge">${matchPct}% Match</span>
             </div>
 
             <!-- Card body -->
-            <div style="padding:1.75rem 2rem;">
-                <div style="display:flex;align-items:flex-start;gap:1.25rem;margin-bottom:1.25rem;">
-                    <div style="font-size:2.8rem;line-height:1;">${c.icon}</div>
-                    <div>
-                        <h2 style="font-size:1.5rem;font-weight:800;color:var(--text-dark);margin:0 0 0.35rem;">${c.title}</h2>
-                        <p style="color:var(--text-muted);margin:0;font-size:0.95rem;line-height:1.6;">${c.description}</p>
+            <div class="card-body">
+                <div class="rec-info-top">
+                    <div class="rec-icon">${c.icon}</div>
+                    <div class="rec-title-block">
+                        <h2>${c.title}</h2>
+                        <p class="rec-desc">${c.description}</p>
                     </div>
                 </div>
 
                 <!-- Stats row -->
-                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;background:#F8FAFC;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;">
-                    <div>
-                        <div style="font-size:0.75rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.25rem;">Est. Salary</div>
-                        <div style="font-weight:700;color:var(--text-dark);font-size:0.95rem;">${c.salary}</div>
+                <div class="rec-stats">
+                    <div class="stat-item">
+                        <div class="stat-label">Est. Salary</div>
+                        <div class="stat-value">${c.salary}</div>
                     </div>
-                    <div>
-                        <div style="font-size:0.75rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.25rem;">Demand</div>
-                        <div style="font-weight:700;color:${c.demandClass==='demand-vhigh'?'#10B981':'#2563EB'};font-size:0.95rem;">${c.demand}</div>
+                    <div class="stat-item">
+                        <div class="stat-label">Demand</div>
+                        <div class="stat-value ${c.demandClass}">${c.demand}</div>
                     </div>
-                    <div>
-                        <div style="font-size:0.75rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.25rem;">Time to Job</div>
-                        <div style="font-weight:700;color:var(--text-dark);font-size:0.95rem;">${c.time}</div>
+                    <div class="stat-item">
+                        <div class="stat-label">Time to Job</div>
+                        <div class="stat-value">${c.time}</div>
                     </div>
                 </div>
 
                 <!-- Skill chips -->
-                <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.5rem;">
-                    ${c.skills.map(s => `<span style="background:rgba(37,99,235,0.08);color:var(--primary);padding:4px 12px;border-radius:100px;font-size:0.8rem;font-weight:600;">${s}</span>`).join('')}
+                <div class="rec-skill-chips">
+                    ${c.skills.map(s => `<span class="chip">${s}</span>`).join('')}
                 </div>
 
                 <!-- CTA button -->
-                <button class="choose-path-btn" data-path="${pathKey}"
-                    style="width:100%;padding:14px;border:none;border-radius:12px;background:${RANK_COLORS[index]};color:white;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.3s ease;display:flex;align-items:center;justify-content:center;gap:10px;">
-                    <i class="fas fa-rocket"></i> Choose This Path - Start Learning
-                </button>
+                <div class="rec-actions">
+                    <button class="choose-path-btn" data-path="${pathKey}" style="background:${RANK_COLORS[index]};">
+                        <i class="fas fa-rocket"></i> Choose This Path - Start Learning
+                    </button>
+                </div>
             </div>
         `;
-
-        // Hover effect
-        card.addEventListener('mouseenter', () => {
-            card.style.transform = 'translateY(-4px)';
-            card.style.boxShadow = '0 20px 50px -15px rgba(0,0,0,0.15)';
-        });
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'translateY(0)';
-            card.style.boxShadow = '0 10px 40px -15px rgba(0,0,0,0.1)';
-        });
 
         container.appendChild(card);
     });
