@@ -42,7 +42,7 @@
         const selectedPath = localStorage.getItem('xyverra_selected_path') || localStorage.getItem('xyverra_target_career');
         const onboardingDone = localStorage.getItem('xyverra_onboarded') === 'true';
 
-        if (!selectedPath && !onboardingDone) {
+        if (!selectedPath || !onboardingDone) {
             console.warn('[AuthGuard] Onboarding incomplete. Redirecting to career-discovery.');
             window.location.replace('career-discovery.html');
             return;

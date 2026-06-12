@@ -336,10 +336,7 @@
                 <div class="bal-text">Sandbox Balance: <strong>NPR 10,000.00</strong> available</div>
             </div>
 
-            <div class="esewa-hint">
-                <i class="fas fa-info-circle" style="color:#d97706;margin-top:1px"></i>
-                <span>This is a <strong>sandbox environment</strong>. Use test credentials: eSewa ID <strong>9806800001</strong>, password <strong>Nepal@123</strong>, MPIN <strong>1122</strong>, OTP <strong>123456</strong>.</span>
-            </div>
+
 
             <div class="form-group">
                 <label class="form-label" for="esewa-id">eSewa ID / Mobile Number</label>
@@ -402,9 +399,6 @@
 
 <script>
 const FRONTEND_URL = 'http://127.0.0.1:5500/Frontend';
-const EXPECTED_ID   = '9806800001';
-const EXPECTED_PASS = 'Nepal@123';
-const EXPECTED_MPIN = '1122';
 
 // Load payment data from sessionStorage
 const payData = JSON.parse(sessionStorage.getItem('mockPaymentData') || '{}');
@@ -440,11 +434,6 @@ async function handlePay() {
 
     if (!id || !pass || !mpin) {
         showError('Missing Fields', 'Please fill in your eSewa ID, password, and MPIN to continue.');
-        return;
-    }
-
-    if (id !== EXPECTED_ID || pass !== EXPECTED_PASS || mpin !== EXPECTED_MPIN) {
-        showError('Authentication Failed', 'Incorrect eSewa credentials. Use: ID 9806800001 / Password Nepal@123 / MPIN 1122');
         return;
     }
 
