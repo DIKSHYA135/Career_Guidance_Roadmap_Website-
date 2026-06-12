@@ -420,7 +420,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const specificModulesParam = urlParams.get('specificModules');
     const targetLevel  = urlParams.get('targetLevel') || 'Beginner';
     const categoryParam = urlParams.get('category') || localStorage.getItem('xyverra_selected_path') || 'Web Development';
-    moduleId = urlParams.get('module') || urlParams.get('moduleId') || 'html';
+    let moduleId = urlParams.get('module') || urlParams.get('moduleId');
     const isVerify = urlParams.get('verify') === 'true';
 
     let quizData = { title: "Assessment", questions: [] };
@@ -428,43 +428,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (specificModulesParam) {
         activeModuleIds = specificModulesParam.split(',');
-
-        // 1. Try SCALABLE_QUIZ_DATA first (organized by Category → Level)
-        if (typeof SCALABLE_QUIZ_DATA !== 'undefined' && SCALABLE_QUIZ_DATA[categoryParam]) {
-            const catData = SCALABLE_QUIZ_DATA[categoryParam];
-            // Map targetLevel to which level of questions to pull
-            // Beginner → pull Beginner questions
-            // Intermediate → pull Beginner + partial Intermediate
-            // Advanced → pull Beginner + Intermediate
-            let levels = ['Beginner'];
-            if (targetLevel === 'Intermediate') levels = ['Beginner'];
-            if (targetLevel === 'Advanced') levels = ['Beginner', 'Intermediate'];
-
-            let allQ = [];
-            levels.forEach(lvl => {
-                if (catData[lvl]) allQ = allQ.concat(catData[lvl]);
-            });
-            quizData.questions = allQ;
-            quizData.title = `${categoryParam} — ${targetLevel} Assessment`;
-
-        } else {
-            // 2. Fallback: QUIZ_DATA by module ID
-            let titles = [];
-            activeModuleIds.forEach(id => {
-                const data = QUIZ_DATA[id];
-                if (data) {
-                    titles.push(data.title);
-                    quizData.questions = quizData.questions.concat(data.questions);
+    } else if (moduleId) {
+        activeModuleIds = [moduleId];
+    } else {
+        // If no module is specified, fallback to all modules in the user's selected path
+        if (typeof MODULES_DATA !== 'undefined' && MODULES_DATA[categoryParam]) {
+            ['Beginner', 'Intermediate', 'Advanced'].forEach(lvl => {
+                if (MODULES_DATA[categoryParam][lvl]) {
+                    MODULES_DATA[categoryParam][lvl].forEach(m => activeModuleIds.push(m.id));
                 }
             });
-            if (titles.length > 0) quizData.title = titles.join(' & ') + ' Assessment';
         }
-        if (activeModuleIds.length > 0) moduleId = activeModuleIds[0];
-
-    } else {
-        quizData = QUIZ_DATA[moduleId] || QUIZ_DATA['html'];
-        activeModuleIds = [moduleId];
+        if (activeModuleIds.length === 0) {
+            activeModuleIds = ['html'];
+        }
     }
+
+    let titles = [];
+    activeModuleIds.forEach(id => {
+        const data = QUIZ_DATA[id];
+        if (data && data.questions) {
+            if (!titles.includes(data.title)) titles.push(data.title);
+            quizData.questions = quizData.questions.concat(data.questions);
+        }
+    });
+
+    if (quizData.questions.length === 0) {
+        // Fallback if no questions found
+        quizData = QUIZ_DATA['html'];
+        activeModuleIds = ['html'];
+    } else {
+        if (!moduleId && !specificModulesParam) {
+            quizData.title = `${categoryParam} Overall Assessment`;
+        } else {
+            quizData.title = titles.join(' & ');
+        }
+    }
+    
+    // Set moduleId for fallback logic
+    moduleId = activeModuleIds[0];
     
     window.generateNewQuiz = function() {
         // Fetch recent from session storage to avoid reuse across reloads

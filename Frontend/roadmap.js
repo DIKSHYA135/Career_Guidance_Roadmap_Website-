@@ -343,7 +343,7 @@ const ROADMAP_DATA = {
     ],
     "Machine Learning": [
         {
-            id: "ml-python", title: "Python for ML", desc: "NumPy, Pandas, Matplotlib — the essential data science stack.", keywords: ["python", "numpy", "pandas", "matplotlib"],
+            id: "python-data", title: "Python for Data Science", desc: "NumPy, Pandas, Matplotlib — the essential data science stack.", keywords: ["python", "numpy", "pandas", "matplotlib"],
             courses: [
                 { name: "Kaggle Python Course (Free)", url: "https://www.kaggle.com/learn/python" },
                 { name: "W3Schools Python", url: "https://www.w3schools.com/python/" },
@@ -351,27 +351,27 @@ const ROADMAP_DATA = {
             ]
         },
         {
-            id: "ml-fundamentals", title: "ML Fundamentals", desc: "Supervised vs unsupervised learning, model evaluation, bias-variance tradeoff.", keywords: ["supervised", "unsupervised", "regression", "classification"],
+            id: "pandas-numpy", title: "Data Manipulation", desc: "Clean and manipulate datasets efficiently with Pandas.", keywords: ["pandas", "numpy", "data manipulation"],
+            courses: [
+                { name: "Kaggle Pandas (Free)", url: "https://www.kaggle.com/learn/pandas" },
+                { name: "W3Schools NumPy", url: "https://www.w3schools.com/python/numpy/" },
+                { name: "GeeksforGeeks Pandas", url: "https://www.geeksforgeeks.org/pandas-tutorial/" }
+            ]
+        },
+        {
+            id: "data-viz", title: "Data Visualization", desc: "Create insightful charts with Matplotlib/Seaborn.", keywords: ["matplotlib", "seaborn", "visualization"],
+            courses: [
+                { name: "Kaggle Data Visualization (Free)", url: "https://www.kaggle.com/learn/data-visualization" },
+                { name: "W3Schools Matplotlib", url: "https://www.w3schools.com/python/matplotlib_intro.asp" },
+                { name: "GeeksforGeeks Matplotlib", url: "https://www.geeksforgeeks.org/matplotlib-tutorial/" }
+            ]
+        },
+        {
+            id: "machine-learning", title: "Machine Learning", desc: "Supervised vs unsupervised learning, model evaluation, and Scikit-learn.", keywords: ["supervised", "unsupervised", "regression", "classification", "scikit-learn"],
             courses: [
                 { name: "Kaggle Intro to ML (Free)", url: "https://www.kaggle.com/learn/intro-to-machine-learning" },
                 { name: "Google ML Crash Course (Free)", url: "https://developers.google.com/machine-learning/crash-course" },
-                { name: "GeeksforGeeks Machine Learning", url: "https://www.geeksforgeeks.org/machine-learning/" }
-            ]
-        },
-        {
-            id: "ml-sklearn", title: "Scikit-Learn & Model Building", desc: "Linear/logistic regression, decision trees, SVMs, and ensemble methods.", keywords: ["scikit-learn", "sklearn", "random forest", "svm", "xgboost"],
-            courses: [
-                { name: "Kaggle Intermediate ML (Free)", url: "https://www.kaggle.com/learn/intermediate-machine-learning" },
-                { name: "Scikit-Learn Official Docs", url: "https://scikit-learn.org/stable/tutorial/" },
-                { name: "StatQuest ML (YouTube)", url: "https://www.youtube.com/@statquest" }
-            ]
-        },
-        {
-            id: "ml-deep-learning", title: "Deep Learning & Neural Networks", desc: "TensorFlow/Keras, CNNs, RNNs — building and training deep models.", keywords: ["deep learning", "neural networks", "tensorflow", "keras", "pytorch"],
-            courses: [
-                { name: "fast.ai — Practical Deep Learning (Free)", url: "https://course.fast.ai/" },
-                { name: "DeepLearning.AI TensorFlow (Coursera, Audit)", url: "https://www.coursera.org/professional-certificates/tensorflow-in-practice" },
-                { name: "PyTorch Official Tutorials", url: "https://pytorch.org/tutorials/" }
+                { name: "Coursera ML (Audit Free)", url: "https://www.coursera.org/learn/machine-learning" }
             ]
         },
         { id: "capstone", title: "ML Capstone Project", desc: "Build, train, and deploy an end-to-end ML model on a real dataset.", keywords: [], courses: [] }

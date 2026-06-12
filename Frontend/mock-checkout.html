@@ -338,29 +338,35 @@
 
 
 
-            <div class="form-group">
-                <label class="form-label" for="esewa-id">eSewa ID / Mobile Number</label>
-                <div class="input-wrap">
-                    <i class="fas fa-user inp-icon"></i>
-                    <input type="text" id="esewa-id" class="form-input" placeholder="9806800001" maxlength="20" autocomplete="off" />
-                </div>
-            </div>
+            <form id="mock-esewa-form" autocomplete="off" onsubmit="event.preventDefault(); handlePay();">
+                <!-- Decoy fields to absorb browser autofill -->
+                <input type="text" style="display:none" name="fake-user" autocomplete="username">
+                <input type="password" style="display:none" name="fake-pass" autocomplete="current-password">
 
-            <div class="form-group">
-                <label class="form-label" for="esewa-pass">eSewa Password</label>
-                <div class="input-wrap">
-                    <i class="fas fa-lock inp-icon"></i>
-                    <input type="password" id="esewa-pass" class="form-input" placeholder="••••••••" maxlength="32" />
+                <div class="form-group">
+                    <label class="form-label" for="esewa-id">eSewa ID / Mobile Number</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-user inp-icon"></i>
+                        <input type="text" id="esewa-id" name="esewa-id-field" class="form-input" placeholder="9806800001" maxlength="20" autocomplete="new-password" />
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label class="form-label" for="esewa-mpin">MPIN</label>
-                <div class="input-wrap">
-                    <i class="fas fa-key inp-icon"></i>
-                    <input type="password" id="esewa-mpin" class="form-input pin-input" placeholder="••••" maxlength="6" />
+                <div class="form-group">
+                    <label class="form-label" for="esewa-pass">eSewa Password</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-lock inp-icon"></i>
+                        <input type="password" id="esewa-pass" name="esewa-pass-field" class="form-input" placeholder="••••••••" maxlength="32" autocomplete="new-password" />
+                    </div>
                 </div>
-            </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="esewa-mpin">MPIN</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-key inp-icon"></i>
+                        <input type="password" id="esewa-mpin" name="esewa-mpin-field" class="form-input pin-input" placeholder="••••" maxlength="6" autocomplete="new-password" />
+                    </div>
+                </div>
+            </form>
 
             <button class="pay-btn" id="pay-btn" onclick="handlePay()">
                 <i class="fas fa-shield-alt"></i>
@@ -410,6 +416,13 @@ if (!payData || !payData.esewaData) {
 const { esewaData, mockEncodedData } = payData;
 document.getElementById('amount-display').textContent = esewaData.total_amount;
 document.getElementById('btn-amount').textContent = esewaData.total_amount;
+
+// Explicitly clear fields on load to defeat aggressive browser autofill
+setTimeout(() => {
+    document.getElementById('esewa-id').value = '';
+    document.getElementById('esewa-pass').value = '';
+    document.getElementById('esewa-mpin').value = '';
+}, 100);
 
 function showProcessing(title, sub) {
     document.getElementById('proc-title').textContent = title;
