@@ -126,9 +126,7 @@ let globalQuizCode = "";
 paths.forEach(p => {
     const dir = path.join(__dirname, 'Courses', p.dir);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-
-    let qData = [];
-
+    let qData = {};
     p.modules.forEach((m, modIdx) => {
         const modNum = modIdx + 1;
         m.lessons.forEach((l, lessIdx) => {
@@ -138,26 +136,55 @@ paths.forEach(p => {
             fs.writeFileSync(file, content);
         });
 
-        for(let i=1; i<=14; i++) {
-            qData.push({
-                id: `${p.prefix}_mod${modNum}_q${i}`,
+        const genericQuestions = [
+            { q: "What is the primary purpose of {concept}?", correct: "To manage and optimize it effectively", wrong: ["To delete system data", "To slow down the application", "It has no specific purpose"] },
+            { q: "Which of the following best describes {concept}?", correct: "A key component in modern systems", wrong: ["An outdated legacy technology", "A physical hardware device", "A type of computer virus"] },
+            { q: "When would you typically use {concept}?", correct: "When dealing with complex {module} tasks", wrong: ["Only when working offline", "Never", "When formatting a hard drive"] },
+            { q: "What is a major benefit of using {concept}?", correct: "Improved efficiency and structure", wrong: ["Slower execution times", "Increased error rates", "Hardware degradation"] },
+            { q: "How does {concept} relate to {module}?", correct: "It is a foundational element of the field", wrong: ["They are completely unrelated", "It replaces the entire field", "It is only used in legacy systems"] },
+            { q: "What is a common challenge when implementing {concept}?", correct: "Ensuring proper configuration and integration", wrong: ["Buying the right monitor", "Finding an internet connection", "Installing a web browser"] },
+            { q: "Which tool or technique is often paired with {concept}?", correct: "Industry standard best practices", wrong: ["A hammer", "A floppy disk", "A completely random algorithm"] },
+            { q: "What is the first step in mastering {concept}?", correct: "Understanding the core fundamentals", wrong: ["Memorizing every single command", "Ignoring documentation", "Skipping straight to advanced topics"] },
+            { q: "Why is {concept} considered important in {module}?", correct: "It solves critical industry problems", wrong: ["It is a passing trend", "It makes the code look longer", "It is required by older hardware"] },
+            { q: "What is a common misconception about {concept}?", correct: "That it is too difficult to learn", wrong: ["That it is a type of food", "That it requires a supercomputer", "That it was invented yesterday"] }
+        ];
+
+        // Ensure we have at least 14 questions by repeating the templates with variations
+        let templatesToUse = [];
+        while (templatesToUse.length < 14) {
+            templatesToUse = templatesToUse.concat(genericQuestions);
+        }
+
+        for(let i=0; i<14; i++) {
+            if (!qData[`${p.prefix}_mod${modNum}`]) {
+                qData[`${p.prefix}_mod${modNum}`] = {
+                    title: `${p.key} - ${m.title}`,
+                    questions: []
+                };
+            }
+            
+            // Pick a lesson title as the "concept"
+            const concept = m.lessons[i % m.lessons.length];
+            const tpl = templatesToUse[i];
+            
+            const questionText = tpl.q.replace(/{concept}/g, concept).replace(/{module}/g, m.title);
+            const correctText = tpl.correct.replace(/{concept}/g, concept).replace(/{module}/g, m.title);
+            
+            qData[`${p.prefix}_mod${modNum}`].questions.push({
+                id: `${p.prefix}_mod${modNum}_q${i+1}`,
                 moduleId: `${p.prefix}_mod${modNum}`,
-                text: `What is a core concept taught in ${p.key} Module ${modNum}, Question ${i}?`,
+                q: questionText,
                 opts: [
-                    { text: `Correct Answer for Mod ${modNum} Q${i}`, correct: true },
-                    { text: "Incorrect Option A", correct: false },
-                    { text: "Incorrect Option B", correct: false },
-                    { text: "Incorrect Option C", correct: false }
+                    { text: correctText, correct: true },
+                    { text: tpl.wrong[0], correct: false },
+                    { text: tpl.wrong[1], correct: false },
+                    { text: tpl.wrong[2], correct: false }
                 ]
             });
         }
     });
 
-    const output = `const ${p.prefix.toUpperCase()}_QUIZ_DATA = {
-  "${p.prefix}_mod1": [], "${p.prefix}_mod2": [], "${p.prefix}_mod3": [], "${p.prefix}_mod4": [], "${p.prefix}_mod5": [], "${p.prefix}_mod6": []
-};
-const raw_${p.prefix}_QuizData = ${JSON.stringify(qData, null, 2)};
-raw_${p.prefix}_QuizData.forEach(q => ${p.prefix.toUpperCase()}_QUIZ_DATA[q.moduleId].push(q));
+    const output = `const ${p.prefix.toUpperCase()}_QUIZ_DATA = ${JSON.stringify(qData, null, 2)};
 if (typeof window !== "undefined") {
     if(!window.QUIZ_DATA) window.QUIZ_DATA = {};
     Object.assign(window.QUIZ_DATA, ${p.prefix.toUpperCase()}_QUIZ_DATA);

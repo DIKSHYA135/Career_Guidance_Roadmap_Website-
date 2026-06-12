@@ -105,25 +105,25 @@ exports.getSkillGap = async (req, res) => {
         const targetCareer = user.selectedPath || 'General Tech Career';
         const completedModules = user.completedModules || [];
 
-        // Call Groq API to generate a dynamic skill gap analysis
         const apiKey = process.env.GROQ_API_KEY;
         if (!apiKey) {
             return res.json({ success: false, message: 'GROQ_API_KEY not configured' });
         }
 
-        const prompt = `You are a career counselor AI. The user's target career is "${targetCareer}". They have completed the following learning modules: ${completedModules.length > 0 ? completedModules.join(', ') : 'None'}. Provide a real-time skill gap analysis. Reply EXACTLY in the following JSON format and nothing else:
+        const prompt = `You are an expert career counselor AI. The user's target career is "${targetCareer}". They have completed the following learning modules: ${completedModules.length > 0 ? completedModules.join(', ') : 'None'}. Provide a real-time, comprehensive skill gap analysis. Reply EXACTLY in the following JSON format and nothing else:
 {
-  "criticalGaps": [ {"name": "skill1", "level": "beginner", "category": "category1"} ],
-  "needsImprovement": [ {"name": "skill2", "level": "intermediate", "category": "category2"} ],
-  "validated": [ {"name": "skill3", "level": "advanced", "category": "category3"} ]
+  "skills": [
+    {"name": "Skill 1", "currentLevel": 20, "requiredLevel": 80},
+    {"name": "Skill 2", "currentLevel": 90, "requiredLevel": 85}
+  ]
 }
-Make sure 'criticalGaps' contains skills they lack entirely, 'needsImprovement' contains skills they might have touched on based on modules but need more work, and 'validated' contains skills they likely acquired from their completed modules. Provide 2-4 skills per array.`;
+Provide exactly 8 to 10 key skills required for this career. 'currentLevel' should be an integer (0-100) estimating their current ability based on their completed modules. 'requiredLevel' is the integer (0-100) required to be job-ready in that skill.`;
 
         const payload = JSON.stringify({
             model: 'llama-3.3-70b-versatile',
             messages: [{ role: 'user', content: prompt }],
             temperature: 0.2,
-            max_tokens: 1024,
+            max_tokens: 1500,
             response_format: { type: 'json_object' }
         });
 
@@ -150,13 +150,66 @@ Make sure 'criticalGaps' contains skills they lack entirely, 'needsImprovement' 
                     }
                     const aiResponse = parsed.choices[0].message.content;
                     const jsonRes = JSON.parse(aiResponse);
+                    
+                    let skills = jsonRes.skills || [];
+                    let currentTotal = 0;
+                    let requiredTotal = 0;
+
+                    // Calculate Math & Logic on Server
+                    skills = skills.map(skill => {
+                        let currentLevel = Number(skill.currentLevel) || 0;
+                        let requiredLevel = Number(skill.requiredLevel) || 80;
+                        
+                        // Sanity clamp
+                        currentLevel = Math.max(0, Math.min(100, currentLevel));
+                        requiredLevel = Math.max(0, Math.min(100, requiredLevel));
+
+                        currentTotal += currentLevel;
+                        requiredTotal += requiredLevel;
+
+                        const gap = requiredLevel - currentLevel;
+                        let gapLevel = "Strong";
+                        let type = "validated";
+
+                        if (gap >= 50) {
+                            gapLevel = "Critical Gap";
+                            type = "critical";
+                        } else if (gap >= 31) {
+                            gapLevel = "High Gap";
+                            type = "improvement";
+                        } else if (gap >= 11) {
+                            gapLevel = "Moderate Gap";
+                            type = "improvement";
+                        } else {
+                            gapLevel = "Strong";
+                            type = "validated";
+                        }
+
+                        return {
+                            name: skill.name,
+                            currentLevel,
+                            requiredLevel,
+                            gap,
+                            gapLevel,
+                            type
+                        };
+                    });
+
+                    // Match Score Calculation
+                    const overallScore = requiredTotal > 0 ? Math.min(100, Math.round((currentTotal / requiredTotal) * 100)) : 0;
+                    
+                    // Sort for roadmap generation (highest gap first)
+                    const roadmapSkills = [...skills]
+                        .filter(s => s.gap > 0)
+                        .sort((a, b) => b.gap - a.gap);
+
                     res.json({
                         success: true,
                         data: {
                             targetCareer,
-                            criticalGaps: jsonRes.criticalGaps || [],
-                            needsImprovement: jsonRes.needsImprovement || [],
-                            validated: jsonRes.validated || [],
+                            overallScore,
+                            skills,
+                            roadmapSkills,
                             completedModulesCount: completedModules.length
                         }
                     });
