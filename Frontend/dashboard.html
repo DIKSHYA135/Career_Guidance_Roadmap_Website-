@@ -162,6 +162,15 @@
             box-shadow: 0 0 0 3px var(--indigo-soft);
         }
         .pt-milestone span { color: var(--text-muted); font-weight: 600; }
+        .pt-milestone.today span { color: var(--primary); font-weight: 800; }
+        .pt-milestone.today .pt-dot {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(79,70,229,0.25);
+        }
+        .pt-milestone.done.today .pt-dot {
+            background: var(--primary); border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79,70,229,0.25);
+        }
         .pt-view-link {
             display: inline-flex; align-items: center; gap: 0.3rem;
             font-size: 0.78rem; font-weight: 700; color: var(--primary);
@@ -463,12 +472,8 @@
                             <span class="metric-value" style="color: var(--primary); font-size: 1.6rem;" id="streak-val-display">5 Days</span>
                             <span class="metric-total" style="text-transform:none;">streak 🔥</span>
                         </div>
-                        <div class="progress-tracker-milestones" style="display:flex; justify-content:space-between; margin-top: 0.9rem; margin-bottom: 0.9rem;">
-                            <div class="pt-milestone" title="Monday"><div class="pt-dot"></div><span>Mon</span></div>
-                            <div class="pt-milestone" title="Tuesday"><div class="pt-dot"></div><span>Tue</span></div>
-                            <div class="pt-milestone" title="Wednesday"><div class="pt-dot"></div><span>Wed</span></div>
-                            <div class="pt-milestone" title="Thursday"><div class="pt-dot"></div><span>Thu</span></div>
-                            <div class="pt-milestone" title="Friday"><div class="pt-dot"></div><span>Fri</span></div>
+                        <div class="progress-tracker-milestones" id="pt-milestones-row" style="display:flex; justify-content:space-between; margin-top: 0.9rem; margin-bottom: 0.9rem;">
+                            <!-- Populated dynamically by dashboard.js based on today's real date -->
                         </div>
                         <a href="progress.html" class="pt-view-link">Analyze learning velocity <i class="fas fa-arrow-right"></i></a>
                     </div>

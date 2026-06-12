@@ -1,4 +1,4 @@
-﻿/* ==========================================================
+/* ==========================================================
    dashboard.js — Xyverra Dashboard (LocalStorage mock logic)
    Premium redesign — same data contract, enhanced visuals.
    ========================================================== */
@@ -15,11 +15,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const onboardingDone = localStorage.getItem('xyverra_onboarded') === 'true';
     const hasRoadmap     = (onboardingDone || localStorage.getItem('roadmapGenerated') === 'true') && !!selectedPath;
 
-    // ---- Header date pill ----
+    // ---- Header date pill — always uses real local time ----
     const headerDate = document.getElementById('header-date');
     if (headerDate) {
-        headerDate.textContent = new Date().toLocaleDateString('en-US', {
-            weekday: 'short', month: 'short', day: 'numeric'
+        const now = new Date();
+        headerDate.textContent = now.toLocaleDateString(undefined, {
+            weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
         });
     }
 
@@ -173,19 +174,36 @@ document.addEventListener("DOMContentLoaded", () => {
         // ---- Daily Tracker ----
         const streakVal = document.getElementById('streak-val-display');
         if (streakVal) streakVal.textContent = `${streak} Days`;
-    
-        const ptMilestones = document.querySelectorAll('.pt-milestone');
-        ptMilestones.forEach((el, i) => {
-            const dot = el.querySelector('.pt-dot');
-            if (i < Math.min(streak, 5)) {
-                el.classList.add('done');
-                // Pulse the most recent active day.
-                if (dot && (i === Math.min(streak, 5) - 1)) dot.style.animation = 'pulseDot 2s infinite';
-            } else {
-                el.classList.remove('done');
-                if (dot) dot.style.animation = '';
+
+        // Build a dynamic 5-day window ending on TODAY (real system date)
+        const ptRow = document.getElementById('pt-milestones-row');
+        if (ptRow) {
+            const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const dayFullNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const today = new Date();
+            const todayIdx = today.getDay(); // 0=Sun … 6=Sat
+
+            // Build the last 5 days ending with today
+            const days = [];
+            for (let offset = 4; offset >= 0; offset--) {
+                const d = new Date(today);
+                d.setDate(today.getDate() - offset);
+                days.push({ label: dayLabels[d.getDay()], fullName: dayFullNames[d.getDay()], isToday: offset === 0 });
             }
-        });
+
+            // Render dots — mark as 'done' based on streak count (streak fills from today backwards)
+            ptRow.innerHTML = days.map((day, i) => {
+                // i=0 is 4 days ago, i=4 is today
+                // A day is "done" if it falls within the streak window (streak days back from today)
+                const doneFromToday = 4 - i; // how many days ago this slot is
+                const isDone = doneFromToday < streak;
+                const isToday = day.isToday;
+                return `<div class="pt-milestone${isDone ? ' done' : ''}${isToday ? ' today' : ''}" title="${day.fullName}">
+                    <div class="pt-dot"${isDone && isToday ? ' style="animation: pulseDot 2s infinite"' : ''}></div>
+                    <span>${day.label}</span>
+                </div>`;
+            }).join('');
+        }
     
         // ---- Active Milestone ----
         const activeMilestoneTitle = document.getElementById('active-milestone-title');
