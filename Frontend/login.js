@@ -290,7 +290,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Extras
-    document.getElementById('forgot-password-link')?.addEventListener('click', () => { if (typeof window.XyInfo === 'function') window.XyInfo("Coming Soon", "Password recovery is not enabled in this demo."); });
+    // document.getElementById('forgot-password-link')?.addEventListener('click', () => { if (typeof window.XyInfo === 'function') window.XyInfo("Coming Soon", "Password recovery is not enabled in this demo."); });
     document.getElementById('terms-link-login')?.addEventListener('click', () => { if (typeof window.XyInfo === 'function') window.XyInfo("Coming Soon", "Terms of Service page is under construction."); });
     document.getElementById('privacy-link-login')?.addEventListener('click', () => { if (typeof window.XyInfo === 'function') window.XyInfo("Coming Soon", "Privacy Policy page is under construction."); });
 });

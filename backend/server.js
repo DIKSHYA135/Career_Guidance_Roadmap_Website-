@@ -401,6 +401,67 @@ async function sendOtpEmail(email, otp) {
     console.error('   Add SMTP_PASS (Gmail App Password) OR EMAIL_API_KEY (Resend) to your .env');
 }
 
+const resetEmailHtml = (resetUrl) => `
+<!DOCTYPE html><html><body style="font-family:'Inter',Arial,sans-serif;background:#f8fafc;padding:40px 20px;">
+<div style="max-width:480px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+    <div style="background:linear-gradient(135deg,#4f46e5,#7c3aed);padding:32px 24px;text-align:center;">
+        <h1 style="color:#fff;margin:0;font-size:1.6rem;font-weight:800;">🎓 Xyverra</h1>
+        <p style="color:rgba(255,255,255,0.85);margin:8px 0 0;font-size:0.95rem;">AI-Powered Career Guidance</p>
+    </div>
+    <div style="padding:32px 24px;">
+        <h2 style="margin:0 0 8px;font-size:1.2rem;color:#1e293b;">Reset Your Password</h2>
+        <p style="color:#64748b;margin:0 0 24px;line-height:1.6;">You are receiving this email because you (or someone else) requested a password reset for your account. Please click the button below to complete the process. This link expires in <strong>15 minutes</strong>.</p>
+        <div style="text-align:center;margin-bottom:24px;">
+            <a href="${resetUrl}" style="background-color:#4f46e5;color:#fff;padding:12px 24px;text-decoration:none;border-radius:8px;font-weight:bold;display:inline-block;">Reset Password</a>
+        </div>
+        <p style="color:#94a3b8;font-size:0.8rem;margin:0;">If you didn't request this, you can safely ignore this email.</p>
+    </div>
+</div>
+</body></html>`;
+
+async function sendResetEmail(email, resetUrl) {
+    console.log(`\n📧 Sending Password Reset to ${email}`);
+    
+    if (smtpTransporter) {
+        try {
+            await smtpTransporter.sendMail({
+                from: process.env.EMAIL_FROM || `"Xyverra" <${process.env.SMTP_USER}>`,
+                to: email,
+                subject: 'Xyverra Password Reset',
+                text: `You requested a password reset. Please click this link to reset your password: ${resetUrl}\n\nThis link expires in 15 minutes.`,
+                html: resetEmailHtml(resetUrl)
+            });
+            console.log(`✅ Reset email sent via SMTP to ${email}`);
+            return;
+        } catch (smtpErr) {
+            console.error('❌ SMTP send failed:', smtpErr.message);
+            console.log('🔄 Falling back to Resend...');
+        }
+    }
+
+    if (resend) {
+        try {
+            const fromAddress = process.env.EMAIL_FROM_ADDRESS || 'onboarding@resend.dev';
+            const { data, error } = await resend.emails.send({
+                from: `Xyverra <${fromAddress}>`,
+                to: [email],
+                subject: 'Xyverra Password Reset',
+                html: resetEmailHtml(resetUrl),
+            });
+            if (error) {
+                console.error('❌ Resend API Error:', JSON.stringify(error));
+            } else {
+                console.log(`✅ Reset email sent via Resend to ${email}. ID: ${data?.id}`);
+            }
+            return;
+        } catch (resendErr) {
+            console.error('❌ Resend send failed:', resendErr.message);
+        }
+    }
+
+    console.error('❌ No email provider configured. Reset URL for manual testing:', resetUrl);
+}
+
 // Returns true if the user currently has an active (non-expired) chat subscription.
 function isSubscriptionActive(user) {
     if (!user.chatSubscriptionActive) return false;
@@ -579,6 +640,113 @@ app.post(
             });
         } catch (error) {
             return serverError(res, 'Login Error', error);
+        }
+    }
+);
+
+// ==========================
+// FORGOT PASSWORD ROUTE
+// ==========================
+app.post(
+    '/api/auth/forgot-password',
+    authLimiter,
+    [
+        body('email').isEmail().withMessage('A valid email is required')
+            .bail().customSanitizer(v => v.trim().toLowerCase())
+    ],
+    handleValidation,
+    async (req, res) => {
+        try {
+            const { email } = req.body;
+            const user = await User.findOne({ email });
+
+            // To prevent email enumeration, we always return success message 
+            // even if the user doesn't exist.
+            if (!user) {
+                return res.json({ success: true, message: 'If an account with that email exists, a reset link has been sent.' });
+            }
+
+            // Generate Token
+            const resetToken = crypto.randomBytes(32).toString('hex');
+            const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+            // Set token and expiry (15 mins)
+            user.resetPasswordToken = hashedToken;
+            user.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
+            await user.save();
+
+            // Construct Reset URL
+            let referer = req.headers.referer;
+            let resetUrl;
+            if (referer) {
+                // Ensure we replace forgot-password.html with reset-password.html
+                // even if there are query parameters or hashes in the referer
+                let base = referer.split('?')[0].split('#')[0];
+                if (base.endsWith('forgot-password.html')) {
+                    resetUrl = base.replace('forgot-password.html', 'reset-password.html') + `?token=${resetToken}`;
+                } else {
+                    // Fallback if accessed differently
+                    let clientUrl = req.headers.origin && req.headers.origin !== 'null' ? req.headers.origin : 'http://localhost:3000';
+                    resetUrl = `${clientUrl}/Frontend/reset-password.html?token=${resetToken}`;
+                }
+            } else {
+                let clientUrl = req.headers.origin && req.headers.origin !== 'null' ? req.headers.origin : 'http://localhost:3000';
+                resetUrl = `${clientUrl}/reset-password.html?token=${resetToken}`;
+            }
+
+            await sendResetEmail(user.email, resetUrl);
+
+            const responsePayload = { success: true, message: 'If an account with that email exists, a reset link has been sent.' };
+            if (!isProduction) {
+                responsePayload._dev_resetUrl = resetUrl;
+                responsePayload._dev_note = 'Reset URL visible in development mode only';
+            }
+            res.json(responsePayload);
+        } catch (error) {
+            return serverError(res, 'Forgot Password Error', error);
+        }
+    }
+);
+
+// ==========================
+// RESET PASSWORD ROUTE
+// ==========================
+app.post(
+    '/api/auth/reset-password',
+    authLimiter,
+    [
+        body('token').notEmpty().withMessage('Token is required'),
+        body('newPassword')
+            .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long')
+            .matches(/\d/).withMessage('Password must contain at least one number')
+            .matches(/[a-z]/).withMessage('Password must contain at least one lowercase letter')
+            .matches(/[A-Z]/).withMessage('Password must contain at least one uppercase letter')
+            .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage('Password must contain at least one special character')
+    ],
+    handleValidation,
+    async (req, res) => {
+        try {
+            const { token, newPassword } = req.body;
+
+            const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+            const user = await User.findOne({
+                resetPasswordToken: hashedToken,
+                resetPasswordExpire: { $gt: Date.now() }
+            });
+
+            if (!user) {
+                return res.status(400).json({ success: false, message: 'This password reset link is invalid or has expired.' });
+            }
+
+            user.password = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpire = undefined;
+            await user.save();
+
+            res.json({ success: true, message: 'Password reset successful. Please log in with your new password.' });
+        } catch (error) {
+            return serverError(res, 'Reset Password Error', error);
         }
     }
 );

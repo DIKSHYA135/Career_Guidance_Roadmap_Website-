@@ -127,6 +127,19 @@ const userSchema = new mongoose.Schema({
     },
 
     // ==========================
+    // Password Reset
+    // ==========================
+    resetPasswordToken: {
+        type: String,
+        default: null
+    },
+
+    resetPasswordExpire: {
+        type: Date,
+        default: null
+    },
+
+    // ==========================
     // Chat usage / subscription
     // ==========================
     chatMessagesUsed: {
