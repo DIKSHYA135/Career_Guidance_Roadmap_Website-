@@ -1713,7 +1713,7 @@ app.get('/api/subscription/transactions', authMiddleware, async (req, res) => {
 app.post('/api/payment/esewa/initiate', authMiddleware, async (req, res) => {
     try {
         const ESEWA_MERCHANT_CODE = process.env.ESEWA_MERCHANT_CODE || 'EPAYTEST';
-        const PRICE_NPR = 174; // ~$1.30 at ~134 NPR/USD
+        const PRICE_NPR = 500; // ~$3.70 at ~134 NPR/USD
         const now = new Date();
 
         // Block duplicate active subscriptions

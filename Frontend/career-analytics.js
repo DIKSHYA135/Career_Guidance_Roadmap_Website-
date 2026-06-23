@@ -45,10 +45,10 @@ function renderDashboard(data, targetCareer) {
     // Skills List
     const skillsList = document.getElementById('an-top-skills');
     skillsList.innerHTML = topSkillsInDemand.map(skill => `
-        <div class="hot-skill-item">
-            <i class="fas fa-check-circle hot-skill-icon"></i>
-            <span class="hot-skill-name">${skill}</span>
-            <span class="hot-skill-trend"><i class="fas fa-arrow-up"></i> Trending</span>
+        <div class="trending-skill-item">
+            <i class="fas fa-check-circle trending-skill-icon"></i>
+            <span class="trending-skill-name">${skill}</span>
+            <span class="trending-skill-trend"><i class="fas fa-arrow-up"></i> Trending</span>
         </div>
     `).join('');
 

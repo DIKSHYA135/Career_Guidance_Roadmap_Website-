@@ -18,7 +18,7 @@ function generateSignature(total_amount, transaction_uuid, product_code, secret)
 exports.createPayment = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const amountNPR = 175; // Example premium price (equivalent to $1.30)
+        const amountNPR = 500; // Premium price
         const transaction_uuid = `MOCK-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
         const product_code = 'MOCKTEST'; // Use MOCKTEST to bypass eSewa axios status check
 
@@ -141,7 +141,16 @@ exports.verifyPayment = async (req, res) => {
                 chatSubscriptionExpiry: endDate
             });
 
-            return res.json({ success: true, message: 'Payment verified successfully' });
+            return res.json({ 
+                success: true, 
+                message: 'Payment verified successfully',
+                subscription: {
+                    status: 'active',
+                    endDate: endDate,
+                    planType: 'Xyverra Pro Monthly',
+                    amountPaid: transaction.amountNPR
+                }
+            });
         } else {
             transaction.status = 'failed';
             transaction.providerResponse = decodedData;

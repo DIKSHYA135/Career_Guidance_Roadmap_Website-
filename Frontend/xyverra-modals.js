@@ -453,8 +453,8 @@
     // ─────────────────────────────────────────────────────────────
     //  4. XyRequirePro — Pro gate modal (replaces the ugly alert)
     // ─────────────────────────────────────────────────────────────
-    window.XyRequirePro = function(featureName) {
-        if (localStorage.getItem('xyverra_is_pro') === 'true') return true;
+    window.XyRequirePro = function(featureName, force = false) {
+        if (!force && localStorage.getItem('xyverra_is_pro') === 'true') return true;
 
         // Show beautiful pro gate popup (non-blocking with redirect on action)
         const { overlay, close } = showOverlay(`

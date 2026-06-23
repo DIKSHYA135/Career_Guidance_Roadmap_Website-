@@ -17,7 +17,12 @@ router.post('/start', async (req, res) => {
         const mockQuestions = [
             `Can you tell me about your experience with ${jobRole}?`,
             `What is a challenging problem you've faced in a previous role, and how did you solve it?`,
-            `Where do you see yourself in 5 years as a ${jobRole}?`
+            `What are your greatest strengths and how do they align with a ${jobRole} position?`,
+            `Describe a time you disagreed with a team member. How did you handle it?`,
+            `What tools and technologies are you most proficient in for this role?`,
+            `How do you stay updated with the latest trends and developments in your field?`,
+            `Where do you see yourself in 5 years as a ${jobRole}?`,
+            `Finally, why should we hire you for this role?`
         ].map(q => ({ question: q }));
 
         const session = await InterviewSession.create({

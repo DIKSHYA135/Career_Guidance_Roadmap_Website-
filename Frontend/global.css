@@ -58,10 +58,10 @@
     --glass-bg:          rgba(255, 255, 255, 0.72);
 
     /* ── Text ── */
-    --text-dark:         #0F172A;            /* slate 900 — headings */
-    --brand-navy:        #0F172A;
-    --text-body:         #1E293B;            /* slate 800 */
-    --text-muted:        #475569;            /* slate 600 — AA on white */
+    --text-dark:         #0A1A44;            /* deep navy matching logo blue */
+    --brand-navy:        #0A1A44;
+    --text-body:         #17326B;            /* dark blue slate */
+    --text-muted:        #4F6B92;            /* muted blue slate */
     --text-light:        #94A3B8;            /* slate 400 — decorative only */
     --text-on-primary:   #FFFFFF;
 
@@ -76,7 +76,7 @@
     --shadow-md:         0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
     --shadow-lg:         0 10px 20px -5px rgba(15, 23, 42, 0.10), 0 6px 10px -6px rgba(15, 23, 42, 0.06);
     --shadow-xl:         0 24px 48px -12px rgba(15, 23, 42, 0.18);
-    --shadow-premium:    0 0 0 1px rgba(15, 23, 42, 0.04), 0 2px 4px rgba(15, 23, 42, 0.03), 0 12px 32px rgba(15, 23, 42, 0.06);
+    --shadow-premium:    0 0 0 1px rgba(37, 99, 235, 0.05), 0 8px 24px rgba(37, 99, 235, 0.08), 0 2px 4px rgba(15, 23, 42, 0.03);
     --shadow-primary:    0 4px 14px rgba(var(--primary-rgb), 0.30);
     --shadow-focus:      0 0 0 3px rgba(var(--primary-rgb), 0.20);
 

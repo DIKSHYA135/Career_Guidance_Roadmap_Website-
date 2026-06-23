@@ -750,8 +750,8 @@
     // ── Utility: Require Pro — uses xyverra-modals.js beautiful popup ──
     // xyverra-modals.js overrides this with its own version.
     // This is a safe fallback in case modals haven't loaded yet.
-    window.XyRequirePro = window.XyRequirePro || function(featureName) {
-        if (window.XyIsPro()) return true;
+    window.XyRequirePro = window.XyRequirePro || function(featureName, force = false) {
+        if (!force && window.XyIsPro()) return true;
         // If the premium modal system is loaded, use it
         if (typeof window._XyRequireProModal === 'function') {
             return window._XyRequireProModal(featureName);

@@ -25,7 +25,7 @@ router.get('/dashboard', async (req, res) => {
                 completedModules: user.completedModules ? user.completedModules.length : 0,
                 competencyScore: user.competencyScore || 0,
                 projectedSalaryRange: { min: 70000, max: 110000 },
-                readinessScore: user.competencyScore ? Math.min(100, Math.round(user.competencyScore / 10)) : 40
+                readinessScore: user.competencyScore ? Math.min(100, Math.round(user.competencyScore / 10)) : 0
             }
         };
 
