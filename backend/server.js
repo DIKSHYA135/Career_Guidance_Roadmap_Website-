@@ -2038,9 +2038,9 @@ app.get('/api/admin/analytics', authMiddleware, adminMiddleware, async (req, res
 const ESEWA_MERCHANT_CODE = process.env.ESEWA_MERCHANT_CODE || 'EPAYTEST';
 const ESEWA_VERIFY_URL = process.env.ESEWA_VERIFY_URL || 'https://uat.esewa.com.np/api/epay/transaction/status/';
 const ESEWA_GATEWAY_URL = process.env.ESEWA_GATEWAY_URL || 'https://rc-epay.esewa.com.np/api/epay/main/v2/form';
-const PLAN_PRICE_USD = 1.30;
+const PLAN_PRICE_USD = 3.70;
 const NPR_PER_USD = 135; // approximate exchange rate
-const PLAN_PRICE_NPR = Math.round(PLAN_PRICE_USD * NPR_PER_USD);  // ~175 NPR
+const PLAN_PRICE_NPR = 500;  // 500 NPR
 const SUBSCRIPTION_DAYS = 30;
 
 // Helper: build HMAC-SHA256 signature for eSewa v2
