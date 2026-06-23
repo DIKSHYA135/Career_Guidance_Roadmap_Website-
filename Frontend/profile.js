@@ -88,7 +88,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     careerGoal: data.careerGoal !== undefined ? data.careerGoal : userData.careerGoal,
                     timeline: data.timeline !== undefined ? data.timeline : userData.timeline,
                     weeklyHours: data.weeklyHours !== undefined ? data.weeklyHours : userData.weeklyHours,
-                    emailVerified: data.emailVerified || false
+                    emailVerified: data.emailVerified || false,
+                    emailReportsEnabled: data.emailReportsEnabled || false
                 };
                 syncLocalStorage();
             } else {
@@ -284,6 +285,49 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (sidebarAvatar) {
             if (userData.avatar) sidebarAvatar.innerHTML = `<img src="${userData.avatar}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`;
             else sidebarAvatar.textContent = initials;
+        }
+        
+        // Subscription & Email Reports
+        const subPlan = document.getElementById('display-sub-plan');
+        const subActionRow = document.getElementById('sub-action-row');
+        if (subPlan && subActionRow) {
+            if (typeof window.XyIsPro === 'function' && window.XyIsPro()) {
+                subPlan.textContent = 'PRO';
+                subPlan.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+                subActionRow.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem; margin: 0;">You have access to all premium features.</p>';
+            } else {
+                subPlan.textContent = 'Free';
+                subPlan.style.background = 'var(--primary)';
+                subActionRow.innerHTML = '<button class="btn btn-primary" style="width: 100%;" onclick="window.location.href=\'subscription.html\'">Upgrade to Pro</button>';
+            }
+        }
+        
+        const emailToggle = document.getElementById('email-report-toggle');
+        const emailToggleKnob = document.getElementById('email-report-toggle-knob');
+        if (emailToggle && emailToggleKnob) {
+            // Remove old listener to avoid duplicate bindings if renderProfile runs multiple times
+            const newToggle = emailToggle.cloneNode(true);
+            emailToggle.parentNode.replaceChild(newToggle, emailToggle);
+            const newKnob = newToggle.querySelector('#email-report-toggle-knob');
+            
+            const isEmailEnabled = userData.emailReportsEnabled || false;
+            newToggle.dataset.active = isEmailEnabled ? 'true' : 'false';
+            newToggle.style.background = isEmailEnabled ? 'var(--primary)' : 'var(--border)';
+            newKnob.style.left = isEmailEnabled ? '20px' : '2px';
+            
+            newToggle.addEventListener('click', () => {
+                if (typeof window.XyRequirePro === 'function' && !window.XyRequirePro('Email Progress Reports')) return;
+                
+                const isActive = newToggle.dataset.active === 'true';
+                const newState = !isActive;
+                
+                // Optimistic UI update
+                newToggle.dataset.active = String(newState);
+                newToggle.style.background = newState ? 'var(--primary)' : 'var(--border)';
+                newKnob.style.left = newState ? '20px' : '2px';
+                
+                saveToServer({ emailReportsEnabled: newState });
+            });
         }
     };
 

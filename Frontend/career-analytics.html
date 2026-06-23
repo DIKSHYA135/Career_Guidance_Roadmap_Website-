@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Analytics - XYVERRA PRO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="career-analytics.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="auth-guard.js?v=2"></script>
+</head>
+<body>
+<div class="app-layout">
+    <!-- Mobile Header -->
+    <div class="mobile-nav-toggle">
+        <div class="sidebar-brand" style="margin-bottom:0;padding:0;">
+            <img src="xyverra_logo.jpeg" alt="XYVERRA Logo" class="sidebar-logo"> XYVERRA
+        </div>
+        <button id="sidebar-toggle-btn" class="btn" style="padding:5px;background:transparent;">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar-menu">
+        <div class="sidebar-brand">
+            <img src="xyverra_logo.jpeg" alt="XYVERRA Logo" class="sidebar-logo">
+            <span>XYVERRA</span>
+        </div>
+        <nav class="nav-menu">
+            <a href="dashboard.html" class="nav-item nav-dashboard"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="career-discovery.html" class="nav-item nav-career-discovery"><i class="fas fa-compass"></i> Career Discovery</a>
+            <a href="counselor.html" class="nav-item nav-counselor"><i class="fas fa-robot"></i> AI Counselor</a>
+            <a href="skill-gap.html" class="nav-item nav-skill-gap"><i class="fas fa-chart-line"></i> Skill Gap Analysis</a>
+            <a href="roadmap.html" class="nav-item nav-roadmap"><i class="fas fa-map"></i> My Roadmap</a>
+            <a href="progress.html" class="nav-item nav-progress"><i class="fas fa-tasks"></i> Progress Tracker</a>
+        </nav>
+        <div style="flex:1;"></div>
+        <div class="user-profile">
+            <div class="profile-click-area" title="View Profile">
+                <div class="avatar" id="user-avatar"></div>
+                <div class="profile-text">
+                    <h4 id="user-display-name">Loading...</h4>
+                    <p></p>
+                </div>
+            </div>
+            <button class="signout-btn" title="Sign Out" style="background:none;border:none;color:var(--text-muted);cursor:pointer;"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="dashboard-container analytics-container">
+
+            <!-- 1. Header Section -->
+            <header class="analytics-header">
+                <div>
+                    <div style="display:flex; align-items:center; gap: 10px;">
+                        <h1 class="analytics-title">Career Analytics</h1>
+                        <span class="pro-badge">PRO</span>
+                    </div>
+                    <div class="analytics-meta">
+                        <span class="analytics-meta-item"><i class="fas fa-briefcase"></i> Analyzing: <strong id="an-career-target">Loading...</strong></span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Metrics Grid -->
+            <div class="analytics-stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="color: #3b82f6; background: rgba(59, 130, 246, 0.1);"><i class="fas fa-money-bill-wave"></i></div>
+                    <div class="stat-content">
+                        <h3>Projected Salary</h3>
+                        <div class="stat-value" id="an-salary-range">Loading...</div>
+                        <p class="stat-subtext">Based on current trajectory</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="color: #10b981; background: rgba(16, 185, 129, 0.1);"><i class="fas fa-chart-line"></i></div>
+                    <div class="stat-content">
+                        <h3>Market Demand</h3>
+                        <div class="stat-value" id="an-job-demand">Loading...</div>
+                        <p class="stat-subtext">Real-time job market data</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="color: #8b5cf6; background: rgba(139, 92, 246, 0.1);"><i class="fas fa-star"></i></div>
+                    <div class="stat-content">
+                        <h3>Readiness Score</h3>
+                        <div class="stat-value" id="an-readiness">Loading...</div>
+                        <p class="stat-subtext">Derived from assessments</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="analytics-grid">
+                
+                <div class="analytics-card" style="grid-column: span 2;">
+                    <h3><i class="fas fa-chart-area" style="color:var(--primary); margin-right:8px;"></i> Salary Growth Projection</h3>
+                    <div style="height: 300px; margin-top: 1rem;">
+                        <canvas id="salary-chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="analytics-card">
+                    <h3><i class="fas fa-fire" style="color:#ef4444; margin-right:8px;"></i> Hot Skills in Demand</h3>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom: 1rem;">Employers are actively seeking candidates with these skills.</p>
+                    <div id="an-top-skills" class="hot-skills-list">
+                        <!-- Populated by JS -->
+                        <div class="sg-empty-state"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script src="app-data.js"></script>
+<script src="global-sidebar.js"></script>
+<script src="career-analytics.js"></script>
+</body>
+</html>

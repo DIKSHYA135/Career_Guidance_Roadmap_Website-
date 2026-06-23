@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Prep - XYVERRA PRO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="interview-prep.css">
+    <script src="auth-guard.js?v=2"></script>
+</head>
+<body>
+<div class="app-layout">
+    <!-- Mobile Header -->
+    <div class="mobile-nav-toggle">
+        <div class="sidebar-brand" style="margin-bottom:0;padding:0;">
+            <img src="xyverra_logo.jpeg" alt="XYVERRA Logo" class="sidebar-logo"> XYVERRA
+        </div>
+        <button id="sidebar-toggle-btn" class="btn" style="padding:5px;background:transparent;">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar-menu">
+        <div class="sidebar-brand">
+            <img src="xyverra_logo.jpeg" alt="XYVERRA Logo" class="sidebar-logo">
+            <span>XYVERRA</span>
+        </div>
+        <nav class="nav-menu">
+            <a href="dashboard.html" class="nav-item nav-dashboard"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="career-discovery.html" class="nav-item nav-career-discovery"><i class="fas fa-compass"></i> Career Discovery</a>
+            <a href="counselor.html" class="nav-item nav-counselor"><i class="fas fa-robot"></i> AI Counselor</a>
+            <a href="skill-gap.html" class="nav-item nav-skill-gap"><i class="fas fa-chart-line"></i> Skill Gap Analysis</a>
+            <a href="roadmap.html" class="nav-item nav-roadmap"><i class="fas fa-map"></i> My Roadmap</a>
+            <a href="progress.html" class="nav-item nav-progress"><i class="fas fa-tasks"></i> Progress Tracker</a>
+        </nav>
+        <div style="flex:1;"></div>
+        <div class="user-profile">
+            <div class="profile-click-area" title="View Profile">
+                <div class="avatar" id="user-avatar"></div>
+                <div class="profile-text">
+                    <h4 id="user-display-name">Loading...</h4>
+                    <p></p>
+                </div>
+            </div>
+            <button class="signout-btn" title="Sign Out" style="background:none;border:none;color:var(--text-muted);cursor:pointer;"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="dashboard-container int-container">
+
+            <!-- 1. Header Section -->
+            <header class="int-header">
+                <div>
+                    <div style="display:flex; align-items:center; gap: 10px;">
+                        <h1 class="int-title">AI Mock Interview</h1>
+                        <span class="pro-badge">PRO</span>
+                    </div>
+                    <div class="int-meta">
+                        <span class="int-meta-item"><i class="fas fa-bullseye"></i> Goal: <strong id="int-career-goal">Loading...</strong></span>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="start-interview-btn"><i class="fas fa-play"></i> Start New Session</button>
+            </header>
+
+            <div class="int-grid">
+                <!-- Left Panel: Interview Config & History -->
+                <div class="int-left-panel">
+                    
+                    <div class="int-card">
+                        <h3>Session Configuration</h3>
+                        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1rem;">Select the skills and difficulty for your mock interview.</p>
+                        
+                        <div class="form-group">
+                            <label>Difficulty</label>
+                            <select id="int-difficulty" class="form-control">
+                                <option value="Beginner">Beginner</option>
+                                <option value="Intermediate" selected>Intermediate</option>
+                                <option value="Advanced">Advanced</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Focus Areas (Max 3)</label>
+                            <div class="skill-tags-selector" id="int-skills-selector">
+                                <!-- Populated dynamically based on roadmap -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="int-card" style="margin-top:1.5rem;">
+                        <h3>Past Interviews</h3>
+                        <div class="int-history-list" id="int-history-list">
+                            <div class="int-empty-state">No past sessions found. Start one above!</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Panel: Active Session / Dashboard -->
+                <div class="int-right-panel">
+                    <div class="int-card active-session-card" id="int-active-session" style="display:none;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
+                            <h3>Question <span id="int-q-current">1</span> of <span id="int-q-total">5</span></h3>
+                            <span class="int-timer"><i class="fas fa-stopwatch"></i> <span id="int-timer-text">15:00</span></span>
+                        </div>
+                        
+                        <div class="int-question-box">
+                            <h2 id="int-question-text">Loading question...</h2>
+                        </div>
+                        
+                        <div class="int-answer-box">
+                            <label>Your Answer</label>
+                            <textarea id="int-answer-input" class="form-control" rows="8" placeholder="Type your answer here..."></textarea>
+                        </div>
+                        
+                        <div class="int-session-actions">
+                            <button class="btn btn-outline" id="int-end-btn" style="color:#ef4444; border-color:#ef4444;">End Session</button>
+                            <button class="btn btn-primary" id="int-next-btn">Next Question <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="int-card session-report-card" id="int-session-report" style="display:none;">
+                        <h2 style="text-align:center; margin-bottom: 2rem;">Session Report</h2>
+                        <div class="report-score-ring">
+                            <div class="circular-progress" id="int-circle-meter">
+                                <svg viewBox="0 0 100 100">
+                                    <circle class="bg" cx="50" cy="50" r="45"></circle>
+                                    <circle class="meter" id="int-circle-path" cx="50" cy="50" r="45"></circle>
+                                </svg>
+                                <div class="inner-text">
+                                    <span class="percent" id="int-final-score">0</span>
+                                </div>
+                            </div>
+                            <p>Overall Score</p>
+                        </div>
+                        
+                        <div class="report-feedback-list" id="report-feedback-list">
+                            <!-- Feedback injected here -->
+                        </div>
+                        
+                        <div style="text-align:center; margin-top: 2rem;">
+                            <button class="btn btn-primary" onclick="location.reload()"><i class="fas fa-redo"></i> Back to Dashboard</button>
+                        </div>
+                    </div>
+
+                    <!-- Welcome state -->
+                    <div class="int-card welcome-state" id="int-welcome-state" style="text-align:center; padding: 4rem 2rem;">
+                        <div class="icon-bg" style="font-size:3rem; color:var(--primary); margin-bottom:1rem;"><i class="fas fa-laptop-code"></i></div>
+                        <h2>Ready for your interview?</h2>
+                        <p style="color:var(--text-body); max-width: 400px; margin: 0 auto 1.5rem;">Configure your session on the left, and start a timed mock interview to test your skills.</p>
+                        <button class="btn btn-primary" onclick="document.getElementById('start-interview-btn').click()">Start Now</button>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script src="app-data.js"></script>
+<script src="global-sidebar.js"></script>
+<script src="interview-prep.js"></script>
+</body>
+</html>

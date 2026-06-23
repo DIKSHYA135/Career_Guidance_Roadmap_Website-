@@ -711,3 +711,32 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 });
+
+// Global function for the toggle
+window.toggleAdaptiveRoadmap = function() {
+    if (typeof window.XyRequirePro === 'function') {
+        if (!window.XyRequirePro('Adaptive Roadmap')) return;
+    }
+    
+    const knob = document.getElementById('adaptive-toggle-knob');
+    const toggle = document.getElementById('adaptive-toggle');
+    const isAdaptive = toggle.dataset.active === 'true';
+    
+    if (isAdaptive) {
+        // Turn off
+        toggle.dataset.active = 'false';
+        toggle.style.background = 'var(--border)';
+        knob.style.left = '2px';
+        if (typeof window.XySuccess === 'function') {
+            window.XySuccess('Standard Mode', 'Switched to standard learning pathway.');
+        }
+    } else {
+        // Turn on
+        toggle.dataset.active = 'true';
+        toggle.style.background = '#10B981';
+        knob.style.left = '18px';
+        if (typeof window.XySuccess === 'function') {
+            window.XySuccess('Adaptive Mode', 'A.I. is now optimizing your roadmap based on progress.');
+        }
+    }
+};

@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * ============================================================ */
     const getUsed = () => parseInt(localStorage.getItem(LS.used) || '0', 10) || 0;
     const setUsed = (n) => localStorage.setItem(LS.used, String(n));
-    const isSubscribed = () => localStorage.getItem(LS.sub) === 'true';
+    const isSubscribed = () => localStorage.getItem(LS.sub) === 'true' || (typeof window.XyIsPro === 'function' && window.XyIsPro());
 
     const loadHistory = () => {
         try { return JSON.parse(localStorage.getItem(LS.history)) || []; }
@@ -430,8 +430,16 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ============================================================
      * CLEAR HISTORY
      * ============================================================ */
-    const clearHistory = () => {
-        if (!confirm('Clear your entire chat history?')) return;
+    const clearHistory = async () => {
+        const ok = await (window.XyConfirm ? window.XyConfirm({
+            title: 'Clear History',
+            message: 'Are you sure you want to clear your entire chat history?',
+            confirmText: 'Clear',
+            cancelText: 'Cancel',
+            type: 'warning',
+            dangerous: true
+        }) : Promise.resolve(confirm('Clear your entire chat history?')));
+        if (!ok) return;
         localStorage.removeItem(LS.history);
         localStorage.removeItem(LS.lastTopic);
         if (suggestedPrompts) suggestedPrompts.style.display = 'flex';

@@ -258,6 +258,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (data.user.onboardingCompleted) localStorage.setItem('xyverra_onboarded', 'true');
             localStorage.setItem('xyverra_email_verified', data.user.emailVerified ? 'true' : 'false');
             if (data.user.chatSubscriptionActive) localStorage.setItem('chatSubscriptionActive', 'true');
+            localStorage.setItem('xyverra_is_pro', data.user.isPro ? 'true' : 'false');
 
             // Hide loader, show brief success state on button
             if (premiumLoader) premiumLoader.classList.remove("active");

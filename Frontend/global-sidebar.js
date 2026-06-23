@@ -4,6 +4,16 @@
    TODO: Replace localStorage reads with GET /api/user/me
    ========================================================== */
 
+// ── Dynamically load notifications.js so the bell appears on every page ──
+(function() {
+    if (!document.getElementById('notif-script') && localStorage.getItem('token')) {
+        const s = document.createElement('script');
+        s.id  = 'notif-script';
+        s.src = 'notifications.js';
+        document.head.appendChild(s);
+    }
+})();
+
 // Early-execution hook: if mandatory quiz is active, restrict navigation and redirect
 (function() {
     const currentFile = window.location.pathname.split('/').pop() || './dashboard.html';
@@ -139,9 +149,27 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.overflow = '';
     }
 
-    // ── 1.5 Dynamically inject Admin and Upgrade links ──
+    // ── 1.5 Dynamically inject New Pro Links and Admin/Upgrade links ──
     const navMenus = document.querySelectorAll('.nav-menu');
     navMenus.forEach(nav => {
+        // Career Analytics link
+        if (!nav.querySelector('[href="career-analytics.html"]')) {
+            const analyticsLink = document.createElement('a');
+            analyticsLink.href = 'career-analytics.html';
+            analyticsLink.className = 'nav-item nav-analytics';
+            analyticsLink.innerHTML = '<i class="fas fa-chart-bar"></i> Career Analytics';
+            nav.appendChild(analyticsLink);
+        }
+
+        // Interview Prep link
+        if (!nav.querySelector('[href="interview-prep.html"]')) {
+            const interviewLink = document.createElement('a');
+            interviewLink.href = 'interview-prep.html';
+            interviewLink.className = 'nav-item nav-interview';
+            interviewLink.innerHTML = '<i class="fas fa-comments"></i> Interview Prep';
+            nav.appendChild(interviewLink);
+        }
+
         // Upgrade Pro link
         if (!nav.querySelector('[href="subscription.html"]')) {
             const upgLink = document.createElement('a');

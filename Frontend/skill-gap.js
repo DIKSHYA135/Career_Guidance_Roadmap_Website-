@@ -16,6 +16,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    // Pro Check
+    if (typeof window.XyRequirePro === 'function') {
+        if (!window.XyRequirePro('Advanced Skill Gap Analysis')) return;
+    }
+
     document.getElementById('sg-career-goal').textContent = targetCareer;
     const today = new Date();
     document.getElementById('sg-last-updated').textContent = today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });

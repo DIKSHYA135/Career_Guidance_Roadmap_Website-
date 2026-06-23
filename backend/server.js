@@ -12,6 +12,12 @@ const jwt = require('jsonwebtoken');
 const { Resend } = require('resend');
 const nodemailer = require('nodemailer');
 const { body, validationResult } = require('express-validator');
+const testRoutes = require('./routes/testRoutes');
+const interviewRoutes = require('./routes/interviewRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+const Notification = require('./models/Notification');
+const emailService = require('./services/emailService');
 const User = require('./models/User');
 const Lead = require('./models/Lead');
 const Subscription = require('./models/Subscription');
@@ -165,9 +171,17 @@ const apiLimiter = rateLimit({
 
 app.use('/api/', apiLimiter);
 
-// Mount custom routes
+// ==========================
+// ROUTES
+// ==========================
 app.use('/api/subscription', require('./routes/subscriptionRoutes'));
 app.use('/api/progress', require('./routes/progressRoutes'));
+app.use('/api/interview', interviewRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/notifications', notificationRoutes);
+
+// Dev/Test route to reset a user's subscription back to free tier.
+app.use('/api/test', testRoutes);
 
 
 // ==========================
@@ -240,6 +254,18 @@ function computeStreak(currentStreak, lastLoginDate, now) {
     return newStreak;
 }
 
+// Returns true if the user currently has an active (non-expired) chat subscription.
+function isSubscriptionActive(user) {
+    const hasLegacySub = user.chatSubscriptionActive && 
+        (!user.chatSubscriptionExpiry || new Date(user.chatSubscriptionExpiry).getTime() > Date.now());
+        
+    const hasNewSub = user.activeSubscription && 
+        user.activeSubscription.status === 'active' && 
+        new Date(user.activeSubscription.endDate).getTime() > Date.now();
+
+    return hasLegacySub || hasNewSub;
+}
+
 // Build the standard user payload returned to clients (never includes password).
 function buildUserPayload(user) {
     return {
@@ -264,6 +290,7 @@ function buildUserPayload(user) {
         careerInterests: user.careerInterests || [],
         chatMessagesUsed: user.chatMessagesUsed || 0,
         chatSubscriptionActive: user.chatSubscriptionActive || false,
+        isPro: isSubscriptionActive(user),
         isAdmin: user.isAdmin || false
     };
 }
@@ -462,14 +489,7 @@ async function sendResetEmail(email, resetUrl) {
     console.error('❌ No email provider configured. Reset URL for manual testing:', resetUrl);
 }
 
-// Returns true if the user currently has an active (non-expired) chat subscription.
-function isSubscriptionActive(user) {
-    if (!user.chatSubscriptionActive) return false;
-    if (user.chatSubscriptionExpiry && new Date(user.chatSubscriptionExpiry).getTime() < Date.now()) {
-        return false;
-    }
-    return true;
-}
+
 
 // ==========================
 // PUBLIC ROUTES
@@ -603,7 +623,7 @@ app.post(
         try {
             const { email, password } = req.body;
 
-            const user = await User.findOne({ email });
+            const user = await User.findOne({ email }).populate('activeSubscription');
 
             // Use a generic message and always run a compare to reduce user enumeration
             // and timing differences between "no user" and "wrong password".
@@ -876,7 +896,9 @@ app.post(
 // ==========================
 app.get('/api/chat/usage', authMiddleware, async (req, res) => {
     try {
-        const user = await User.findById(req.user.userId).select('chatMessagesUsed chatSubscriptionActive chatSubscriptionExpiry');
+        const user = await User.findById(req.user.userId)
+            .select('chatMessagesUsed chatSubscriptionActive chatSubscriptionExpiry activeSubscription')
+            .populate('activeSubscription');
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
@@ -990,7 +1012,7 @@ Keep responses concise (2-4 paragraphs max). Be warm, encouraging, and practical
 
 app.post('/api/chat/message', authMiddleware, async (req, res) => {
     try {
-        const user = await User.findById(req.user.userId);
+        const user = await User.findById(req.user.userId).populate('activeSubscription');
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
@@ -1099,6 +1121,17 @@ app.post('/api/chat/subscribe', authMiddleware, async (req, res) => {
         user.chatMessagesUsed = 0; // Reset usage counter on subscription
         await user.save();
 
+        // 🔔 Send a welcome Pro notification
+        try {
+            const { createNotification } = require('./routes/notificationRoutes');
+            await createNotification(req.user.userId, {
+                title: '🎉 You are now a Pro member!',
+                message: 'Welcome to XYVERRA Pro! You now have unlimited AI counselor messages, advanced analytics, mock interviews, and more.',
+                type: 'success',
+                actionLink: 'dashboard.html'
+            });
+        } catch (ne) { console.warn('Notification error:', ne); }
+
         return res.json({
             success: true,
             message: 'Premium subscription activated! Enjoy unlimited conversations.',
@@ -1133,6 +1166,17 @@ app.post('/api/user/save-path', authMiddleware, async (req, res) => {
         if (!updatedUser) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
+
+        // 🔔 Notify user of path selection
+        try {
+            const { createNotification } = require('./routes/notificationRoutes');
+            await createNotification(req.user.userId, {
+                title: `🎯 Career path set: ${selectedPath}`,
+                message: `Your personalized roadmap and skill gap analysis for ${selectedPath} are ready. Time to start learning!`,
+                type: 'info',
+                actionLink: 'roadmap.html'
+            });
+        } catch (ne) { console.warn('Notification error:', ne); }
 
         return res.json({
             success: true,
@@ -1796,6 +1840,17 @@ app.post('/api/payment/esewa/verify', authMiddleware, async (req, res) => {
             chatSubscriptionExpiry: endDate
         });
 
+        // 🔔 Notify user of successful subscription
+        try {
+            const { createNotification } = require('./routes/notificationRoutes');
+            await createNotification(req.user.userId, {
+                title: '✅ Pro Subscription Activated!',
+                message: `Your XYVERRA Pro plan is active until ${endDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}. Enjoy all premium features!`,
+                type: 'success',
+                actionLink: 'dashboard.html'
+            });
+        } catch (ne) { console.warn('Notification error:', ne); }
+
         res.json({
             success: true,
             message: 'Payment verified. Subscription activated!',
@@ -2239,5 +2294,6 @@ app.use((err, req, res, next) => {
 // START SERVER
 // ==========================
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
+        emailService.initEmailService();
+        console.log(`🚀 Server running in ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'} mode on port ${PORT}`);
 });

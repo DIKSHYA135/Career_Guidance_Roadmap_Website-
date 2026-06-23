@@ -189,6 +189,25 @@ const userSchema = new mongoose.Schema({
         default: []
     },
 
+    // ==========================
+    // Pro Features
+    // ==========================
+    emailReportsEnabled: {
+        type: Boolean,
+        default: false
+    },
+
+    interviewPrepStats: {
+        type: Map,
+        of: mongoose.Schema.Types.Mixed,
+        default: {}
+    },
+
+    analyticsData: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {}
+    }
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
