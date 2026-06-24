@@ -11,6 +11,14 @@
 </head>
 <body>
 
+<!-- HAMBURGER BUTTON (mobile only) -->
+<button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle Menu">
+    <i class="fas fa-bars"></i>
+</button>
+
+<!-- SIDEBAR OVERLAY (mobile) -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
 <!-- ═══════════════════════════════════
      SIDEBAR
 ══════════════════════════════════════ -->
@@ -144,10 +152,10 @@
             </div>
             <div class="glass-card stat-card">
                 <div class="stat-icon" style="background:var(--color-green-bg);color:#059669;">
-                    <i class="fas fa-dollar-sign"></i>
+                    <i class="fas fa-coins"></i>
                 </div>
                 <div class="stat-details">
-                    <h3>Revenue</h3>
+                    <h3>Revenue (NPR)</h3>
                     <p class="val" id="stat-revenue">—</p>
                 </div>
             </div>
@@ -165,6 +173,37 @@
                 <div class="chart-container">
                     <canvas id="careerChart"></canvas>
                 </div>
+            </div>
+        </div>
+
+        <!-- Real-time User Activity Overview -->
+        <div class="glass-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:0.75rem;">
+                <p class="chart-title" style="margin:0;"><i class="fas fa-table-list"></i> User Activity Overview</p>
+                <div class="search-box" style="width:220px;">
+                    <i class="fas fa-magnifying-glass"></i>
+                    <input type="text" id="dash-user-search" placeholder="Search users…">
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table" id="dash-users-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Career Path</th>
+                            <th>Modules Done</th>
+                            <th>Lessons Studied</th>
+                            <th>Quizzes Taken</th>
+                            <th>AI Chats</th>
+                            <th>Last Active</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dash-users-tbody">
+                        <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted);">
+                            <i class="fas fa-spinner fa-spin"></i>&nbsp; Loading…
+                        </td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -201,7 +240,7 @@
                         </tr>
                     </thead>
                     <tbody id="users-management-tbody">
-                        <tr><td colspan="7" style="text-align:center;padding:2.5rem;color:var(--text-muted);">
+                        <tr><td colspan="9" style="text-align:center;padding:2.5rem;color:var(--text-muted);">
                             <i class="fas fa-spinner fa-spin"></i>&nbsp; Loading users…
                         </td></tr>
                     </tbody>
@@ -240,6 +279,112 @@
         </div>
     </div>
 
+    <!-- ── COURSE MANAGEMENT ── -->
+    <div id="panel-courses" class="admin-panel">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Course Management</h1>
+                <p class="page-subtitle">All modules across career paths. Total: <span id="stat-total-courses">—</span> modules.</p>
+            </div>
+        </div>
+        <div class="glass-card">
+            <div class="table-container">
+                <table class="data-table" id="courses-table">
+                    <thead>
+                        <tr>
+                            <th>Module Title</th>
+                            <th>Career Path</th>
+                            <th>Difficulty</th>
+                            <th>Completions</th>
+                            <th>Completion Rate</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="6" style="text-align:center;padding:2.5rem;color:var(--text-muted);">
+                            <i class="fas fa-spinner fa-spin"></i>&nbsp; Loading modules…
+                        </td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── ROADMAP MANAGEMENT ── -->
+    <div id="panel-roadmaps" class="admin-panel">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Roadmap Management</h1>
+                <p class="page-subtitle">Career path roadmaps, their modules, and enrollment stats.</p>
+            </div>
+        </div>
+        <div class="glass-card">
+            <div class="table-container">
+                <table class="data-table" id="roadmaps-table">
+                    <thead>
+                        <tr>
+                            <th>Career Path</th>
+                            <th>Modules</th>
+                            <th>Courses</th>
+                            <th>Enrollment</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="5" style="text-align:center;padding:2.5rem;color:var(--text-muted);">
+                            <i class="fas fa-spinner fa-spin"></i>&nbsp; Loading roadmaps…
+                        </td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── LEARNING ANALYTICS ── -->
+    <div id="panel-learning-analytics" class="admin-panel">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Learning Analytics</h1>
+                <p class="page-subtitle">Course completion rates and roadmap drop-off analysis.</p>
+            </div>
+        </div>
+        <div class="charts-grid" style="margin-bottom:1.75rem;">
+            <div class="glass-card">
+                <p class="chart-title"><i class="fas fa-trophy"></i> Top Completed Modules</p>
+                <div class="chart-container">
+                    <canvas id="courseCompletionChart"></canvas>
+                </div>
+            </div>
+            <div class="glass-card">
+                <p class="chart-title"><i class="fas fa-arrow-trend-down"></i> Roadmap Stage Drop-off</p>
+                <div class="chart-container">
+                    <canvas id="roadmapDropoffChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="glass-card">
+            <p class="chart-title"><i class="fas fa-list-check"></i> User Progress Overview</p>
+            <div class="table-container">
+                <table class="data-table" id="user-progress-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Career Path</th>
+                            <th>Current Stage</th>
+                            <th>Progress</th>
+                            <th>Modules Done</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="5" style="text-align:center;padding:2.5rem;color:var(--text-muted);">
+                            <i class="fas fa-spinner fa-spin"></i>&nbsp; Loading progress data…
+                        </td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- ── CAREER ANALYTICS ── -->
     <div id="panel-career" class="admin-panel">
         <div class="page-header">
@@ -248,10 +393,18 @@
                 <p class="page-subtitle">Career choices, assessment completions, and top paths.</p>
             </div>
         </div>
-        <div class="glass-card">
-            <div class="empty-panel">
-                <div class="empty-icon"><i class="fas fa-chart-pie"></i></div>
-                <p>Career distribution charts will appear here once users complete assessments.</p>
+        <div class="charts-grid">
+            <div class="glass-card">
+                <p class="chart-title"><i class="fas fa-chart-pie"></i> Career Interest Distribution</p>
+                <div class="chart-container">
+                    <canvas id="careerDetailChart"></canvas>
+                </div>
+            </div>
+            <div class="glass-card">
+                <p class="chart-title"><i class="fas fa-ranking-star"></i> Top Career Paths by Enrollment</p>
+                <div id="career-paths-list" style="padding:0.5rem 0;">
+                    <p style="color:var(--text-muted);font-size:0.875rem;text-align:center;padding:2rem;">Loading career data…</p>
+                </div>
             </div>
         </div>
     </div>
@@ -264,26 +417,75 @@
                 <p class="page-subtitle">Usage stats for the AI Career Counselor.</p>
             </div>
         </div>
+        <div class="dashboard-grid" style="margin-bottom:1.75rem;">
+            <div class="glass-card stat-card">
+                <div class="stat-icon" style="background:var(--brand-cyan-bg);color:var(--brand-cyan);">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>Total AI Chats</h3>
+                    <p class="val" id="ai-stat-chats">—</p>
+                </div>
+            </div>
+            <div class="glass-card stat-card">
+                <div class="stat-icon" style="background:var(--brand-blue-bg);color:var(--brand-blue);">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>Total Users</h3>
+                    <p class="val" id="ai-stat-users">—</p>
+                </div>
+            </div>
+            <div class="glass-card stat-card">
+                <div class="stat-icon" style="background:var(--color-green-bg);color:var(--color-green);">
+                    <i class="fas fa-message"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>Avg Msgs / User</h3>
+                    <p class="val" id="ai-stat-avg">—</p>
+                </div>
+            </div>
+        </div>
         <div class="glass-card">
-            <div class="empty-panel">
-                <div class="empty-icon"><i class="fas fa-robot"></i></div>
-                <p>AI conversation metrics and top questions will be displayed here.</p>
+            <p class="chart-title"><i class="fas fa-wave-square"></i> Recent AI Chat Activity</p>
+            <div id="ai-activity-list">
+                <p style="color:var(--text-muted);font-size:0.875rem;text-align:center;padding:2rem;">Loading AI activity…</p>
             </div>
         </div>
     </div>
 
-    <!-- ── MOCK INTERVIEW ── -->
+    <!-- ── MOCK INTERVIEWS ── -->
     <div id="panel-mock" class="admin-panel">
         <div class="page-header">
             <div>
                 <h1 class="page-title">Mock Interview Analytics</h1>
-                <p class="page-subtitle">Performance scores and improvement trends.</p>
+                <p class="page-subtitle">Session counts and activity trends.</p>
+            </div>
+        </div>
+        <div class="dashboard-grid" style="margin-bottom:1.75rem;">
+            <div class="glass-card stat-card">
+                <div class="stat-icon" style="background:var(--color-purple-bg);color:var(--color-purple);">
+                    <i class="fas fa-video"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>Total Interviews</h3>
+                    <p class="val" id="mock-stat-total">—</p>
+                </div>
+            </div>
+            <div class="glass-card stat-card">
+                <div class="stat-icon" style="background:var(--color-green-bg);color:var(--color-green);">
+                    <i class="fas fa-circle-dot"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>Sessions Today</h3>
+                    <p class="val" id="mock-stat-today">—</p>
+                </div>
             </div>
         </div>
         <div class="glass-card">
-            <div class="empty-panel">
-                <div class="empty-icon"><i class="fas fa-video"></i></div>
-                <p>Interview score distributions and weak-area breakdowns will appear here.</p>
+            <p class="chart-title"><i class="fas fa-clock-rotate-left"></i> Recent Interview Sessions</p>
+            <div id="mock-activity-list">
+                <p style="color:var(--text-muted);font-size:0.875rem;text-align:center;padding:2rem;">Loading interview data…</p>
             </div>
         </div>
     </div>
@@ -296,10 +498,39 @@
                 <p class="page-subtitle">Subscription growth and revenue tracking.</p>
             </div>
         </div>
+        <div class="dashboard-grid" style="margin-bottom:1.75rem;">
+            <div class="glass-card stat-card">
+                <div class="stat-icon" style="background:var(--color-yellow-bg);color:var(--color-yellow);">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>Active Subscriptions</h3>
+                    <p class="val" id="premium-stat-subs">—</p>
+                </div>
+            </div>
+            <div class="glass-card stat-card">
+                <div class="stat-icon" style="background:var(--color-green-bg);color:#059669;">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>Total Revenue</h3>
+                    <p class="val" id="premium-stat-revenue">—</p>
+                </div>
+            </div>
+            <div class="glass-card stat-card">
+                <div class="stat-icon" style="background:var(--brand-blue-bg);color:var(--brand-blue);">
+                    <i class="fas fa-percent"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>Conversion Rate</h3>
+                    <p class="val" id="premium-stat-conversion">—</p>
+                </div>
+            </div>
+        </div>
         <div class="glass-card">
-            <div class="empty-panel">
-                <div class="empty-icon"><i class="fas fa-crown"></i></div>
-                <p>Revenue charts and subscription conversion rates will be displayed here.</p>
+            <p class="chart-title"><i class="fas fa-clock-rotate-left"></i> Recent Premium Activity</p>
+            <div id="premium-activity-list">
+                <p style="color:var(--text-muted);font-size:0.875rem;text-align:center;padding:2rem;">Loading subscription data…</p>
             </div>
         </div>
     </div>
@@ -319,24 +550,24 @@
                 <h3 style="margin-top:0; margin-bottom:1.5rem; font-size:1.1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem;">
                     <i class="fas fa-user-circle" style="color:var(--brand-blue); margin-right:0.5rem;"></i> Admin Profile
                 </h3>
-                
+
                 <div class="form-group">
                     <label class="form-label">Display Name</label>
                     <input type="text" id="setting-admin-name" class="form-control" placeholder="e.g., Admin User">
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Email Address</label>
                     <input type="email" id="setting-admin-email" class="form-control" disabled style="background:var(--bg-main); cursor:not-allowed;" title="Email cannot be changed here">
                 </div>
 
                 <h4 style="margin-top:1.5rem; margin-bottom:1rem; font-size:0.95rem; color:var(--text-secondary);">Change Password</h4>
-                
+
                 <div class="form-group">
                     <label class="form-label">New Password</label>
                     <input type="password" id="setting-new-password" class="form-control" placeholder="Leave blank to keep current">
                 </div>
-                
+
                 <div style="margin-top:1.5rem;">
                     <button class="btn btn-primary" id="btn-save-profile">Save Profile Changes</button>
                 </div>
@@ -396,8 +627,8 @@
         <button class="modal-close" onclick="closeUserModal()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b;"><i class="fas fa-times"></i></button>
         <h2 id="ud-name" style="margin-bottom: 5px; font-family: 'Plus Jakarta Sans'; color: #0f172a;">User Name</h2>
         <p id="ud-email" style="color: #64748b; margin-bottom: 20px;">user@example.com</p>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+
+        <div class="modal-grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
             <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
                 <p style="font-size: 0.85rem; color: #64748b; font-weight: 600; text-transform: uppercase;">Selected Roadmap</p>
                 <p id="ud-roadmap" style="font-size: 1.1rem; font-weight: 700; color: #0f172a;">None</p>
@@ -428,6 +659,6 @@
 <script src="auth-guard.js"></script>
 <script src="toast.js"></script>
 <script src="roadmap-data.js"></script>
-<script src="admin.js?v=3"></script>
+<script src="admin.js?v=4"></script>
 </body>
 </html>

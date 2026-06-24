@@ -5,6 +5,7 @@ const Progress = require('../models/Progress');
 const ActivityLog = require('../models/ActivityLog');
 const InterviewSession = require('../models/InterviewSession');
 const Subscription = require('../models/Subscription');
+const Transaction = require('../models/Transaction');
 
 // GET /api/admin/dashboard-stats
 router.get('/dashboard-stats', async (req, res) => {
@@ -16,7 +17,7 @@ router.get('/dashboard-stats', async (req, res) => {
 
         const premiumSubs = await Subscription.countDocuments({ status: 'active', endDate: { $gt: new Date() } });
 
-        const totalInterviews = await InterviewSession.countDocuments();
+        const totalInterviews = await InterviewSession.countDocuments({ completed: true });
 
         const chatAggregation = await User.aggregate([{ $group: { _id: null, totalChats: { $sum: "$chatMessagesUsed" } } }]);
         const totalAiChats = chatAggregation.length > 0 ? chatAggregation[0].totalChats : 0;
@@ -43,7 +44,11 @@ router.get('/dashboard-stats', async (req, res) => {
             { $limit: 5 }
         ]);
 
-        const revenue = 14500; // placeholder
+        const revenueAgg = await Transaction.aggregate([
+            { $match: { status: 'success' } },
+            { $group: { _id: null, total: { $sum: '$amountNPR' } } }
+        ]);
+        const revenue = revenueAgg.length > 0 ? revenueAgg[0].total : 0;
 
         res.json({
             success: true,
@@ -71,7 +76,7 @@ router.get('/activity-logs', async (req, res) => {
 router.get('/users', async (req, res) => {
     try {
         const users = await User.find()
-            .select('name email isAdmin createdAt emailVerified selectedPath completedModules')
+            .select('name email isAdmin createdAt emailVerified selectedPath completedModules quizScores studiedLessons lastLoginDate chatMessagesUsed')
             .lean();
 
         // Fetch ALL progress records in one query, then group by userId (much faster than N queries)
@@ -111,10 +116,16 @@ router.get('/users', async (req, res) => {
                     quizScoresFromProgress[p.moduleId] = p.highestQuizScore;
                 });
 
+            // quizScores and studiedLessons are Maps stored as objects after .lean()
+            const quizCount = u.quizScores ? Object.keys(u.quizScores).length : 0;
+            const studiedLessonsCount = u.studiedLessons ? Object.keys(u.studiedLessons).length : 0;
+
             return {
                 ...u,
                 progressRecords,
-                quizScoresFromProgress
+                quizScoresFromProgress,
+                quizCount,
+                studiedLessonsCount
             };
         });
 

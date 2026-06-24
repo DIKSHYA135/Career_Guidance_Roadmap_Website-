@@ -1,8 +1,5 @@
 /* admin.js - Logic for XYVERRA Admin Panel */
 
-// Initialize
-document.addEventListener('DOMContentLoaded', fetchDashboardStats);
-
 // Modal functions for User Details
 window.openUserModal = function(index) {
     const user = window.adminUsersData[index];
@@ -123,9 +120,51 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Mobile hamburger toggle
+    const adminSidebar = document.querySelector('.admin-sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    hamburgerBtn?.addEventListener('click', () => {
+        adminSidebar.classList.toggle('open');
+        sidebarOverlay.classList.toggle('active');
+    });
+    sidebarOverlay?.addEventListener('click', () => {
+        adminSidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('active');
+    });
+
+    // Close sidebar on nav click (mobile)
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                adminSidebar.classList.remove('open');
+                sidebarOverlay.classList.remove('active');
+            }
+        });
+    });
+
+    // User management search filter
+    const userSearchInput = document.getElementById('user-search-input');
+    userSearchInput?.addEventListener('input', () => {
+        const q = userSearchInput.value.toLowerCase();
+        document.querySelectorAll('#users-management-tbody tr').forEach(row => {
+            row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+        });
+    });
+
+    // Dashboard user activity search filter
+    const dashUserSearch = document.getElementById('dash-user-search');
+    dashUserSearch?.addEventListener('input', () => {
+        const q = dashUserSearch.value.toLowerCase();
+        document.querySelectorAll('#dash-users-tbody tr').forEach(row => {
+            row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+        });
+    });
+
     // --- REAL-TIME DATA FETCHING ---
     let regChart = null;
     let careerChart = null;
+    let careerDetailChart = null;
 
     async function fetchDashboardStats() {
         try {
@@ -145,9 +184,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const elInterviews = document.getElementById('stat-interviews');
                 if (elInterviews) elInterviews.textContent = stats.totalInterviews.toLocaleString();
                 const elRevenue = document.getElementById('stat-revenue');
-                if (elRevenue) elRevenue.textContent = '$' + stats.revenue.toLocaleString();
+                if (elRevenue) elRevenue.textContent = 'Rs. ' + stats.revenue.toLocaleString();
 
                 updateCharts(stats.registrationTrend, stats.careerInterests);
+                populateCareerPanel(stats.careerInterests, stats.totalUsers);
+                populateAiPanel(stats.totalAiChats, stats.totalUsers);
+                populateMockPanel(stats.totalInterviews);
+                populatePremiumPanel(stats.premiumSubs, stats.revenue, stats.totalUsers);
             }
         } catch (error) {
             console.error('Error fetching dashboard stats:', error);
@@ -185,6 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <td style="color:var(--text-muted);font-size:0.82rem;white-space:nowrap;">${new Date(log.timestamp).toLocaleString()}</td>
                         </tr>
                     `).join('');
+                    populateAnalyticsActivityLists(data.logs);
                 }
             }
         } catch (error) {
@@ -211,8 +255,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.adminUsersData = data.users;
                     usersTbody.innerHTML = data.users.map((u, i) => {
                         const completedCount = u.completedModules ? u.completedModules.length : 0;
-                        const studiedCount   = u.progressRecords ? u.progressRecords.length : 0;
-                        const quizCount      = u.quizScoresFromProgress ? Object.keys(u.quizScoresFromProgress).length : 0;
+                        const studiedCount   = u.studiedLessonsCount !== undefined ? u.studiedLessonsCount : (u.progressRecords ? u.progressRecords.length : 0);
+                        const quizCount      = u.quizCount !== undefined ? u.quizCount : (u.quizScoresFromProgress ? Object.keys(u.quizScoresFromProgress).length : 0);
                         return `
                         <tr>
                             <td><strong>${u.name || '—'}</strong></td>
@@ -231,6 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </tr>`;
                     }).join('');
                 }
+                renderDashboardUserTable(data.users);
             }
                 // --- Populate real Course & Roadmap & Progress tables ---
                 renderRoadmapData(data.users);
@@ -245,6 +290,130 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.clear();
         sessionStorage.clear();
         window.location.replace('login.html');
+    }
+
+    // ── Analytics panel population helpers ─────────────────────────
+
+    function populateCareerPanel(careerInterests, totalUsers) {
+        if (!careerInterests) return;
+        if (careerDetailChart && careerInterests.length > 0) {
+            careerDetailChart.data.labels = careerInterests.map(c => c._id || 'Undecided');
+            careerDetailChart.data.datasets[0].data = careerInterests.map(c => c.count);
+            careerDetailChart.update();
+        }
+        const listEl = document.getElementById('career-paths-list');
+        if (!listEl) return;
+        if (!careerInterests.length) {
+            listEl.innerHTML = `<p style="color:var(--text-muted);font-size:0.875rem;text-align:center;padding:2rem;">No career path selections yet.</p>`;
+            return;
+        }
+        const maxCount = careerInterests[0].count || 1;
+        const colors = ['#2563eb', '#06b6d4', '#10b981', '#f59e0b', '#8b5cf6'];
+        listEl.innerHTML = careerInterests.map((c, i) => {
+            const pct = Math.round((c.count / (totalUsers || 1)) * 100);
+            const barW = Math.round((c.count / maxCount) * 100);
+            const col = colors[i % colors.length];
+            return `
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-light);">
+                <div style="width:26px;height:26px;background:${col}22;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:800;color:${col};flex-shrink:0;">${i + 1}</div>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-weight:600;font-size:0.875rem;color:var(--text-main);margin-bottom:4px;">${c._id || 'Undecided'}</div>
+                    <div style="height:5px;background:#e2e8f0;border-radius:4px;overflow:hidden;"><div style="width:${barW}%;height:100%;background:${col};border-radius:4px;"></div></div>
+                </div>
+                <div style="text-align:right;flex-shrink:0;">
+                    <div style="font-weight:700;font-size:0.875rem;color:var(--text-main);">${c.count}</div>
+                    <div style="font-size:0.7rem;color:var(--text-muted);">${pct}%</div>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function populateAiPanel(totalChats, totalUsers) {
+        const el = document.getElementById('ai-stat-chats');
+        const elU = document.getElementById('ai-stat-users');
+        const elA = document.getElementById('ai-stat-avg');
+        if (el) el.textContent = (totalChats || 0).toLocaleString();
+        if (elU) elU.textContent = (totalUsers || 0).toLocaleString();
+        if (elA) elA.textContent = totalUsers ? (totalChats / totalUsers).toFixed(1) : '0';
+    }
+
+    function populateMockPanel(totalInterviews) {
+        const el = document.getElementById('mock-stat-total');
+        if (el) el.textContent = (totalInterviews || 0).toLocaleString();
+    }
+
+    function populatePremiumPanel(premiumSubs, revenue, totalUsers) {
+        const elS = document.getElementById('premium-stat-subs');
+        const elR = document.getElementById('premium-stat-revenue');
+        const elC = document.getElementById('premium-stat-conversion');
+        if (elS) elS.textContent = (premiumSubs || 0).toLocaleString();
+        if (elR) elR.textContent = 'Rs. ' + (revenue || 0).toLocaleString();
+        if (elC) elC.textContent = totalUsers ? Math.round((premiumSubs / totalUsers) * 100) + '%' : '0%';
+    }
+
+    function renderDashboardUserTable(users) {
+        const tbody = document.getElementById('dash-users-tbody');
+        if (!tbody) return;
+
+        const rows = users.filter(u => !u.isAdmin);
+        if (!rows.length) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted);">No users registered yet.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = rows.map(u => {
+            const completedCount = u.completedModules ? u.completedModules.length : 0;
+            const studiedCount   = u.studiedLessonsCount !== undefined ? u.studiedLessonsCount : (u.progressRecords ? u.progressRecords.length : 0);
+            const quizCount      = u.quizCount !== undefined ? u.quizCount : (u.quizScoresFromProgress ? Object.keys(u.quizScoresFromProgress).length : 0);
+            const lastActive     = u.lastLoginDate ? new Date(u.lastLoginDate).toLocaleDateString() : '—';
+            const pathLabel      = u.selectedPath
+                ? `<span class="badge badge-blue" style="font-size:0.7rem;max-width:130px;overflow:hidden;text-overflow:ellipsis;display:inline-block;">${u.selectedPath}</span>`
+                : `<span style="color:var(--text-muted);font-size:0.82rem;font-style:italic;">Not chosen</span>`;
+
+            const completedColor = completedCount > 0 ? 'badge-green' : '';
+            const completedStyle = completedCount === 0 ? 'background:#f1f5f9;color:#94a3b8;' : '';
+
+            return `<tr>
+                <td>
+                    <strong style="font-size:0.9rem;">${u.name || '—'}</strong><br>
+                    <small style="color:var(--text-muted)">${u.email}</small>
+                </td>
+                <td>${pathLabel}</td>
+                <td><span class="badge ${completedColor}" style="${completedStyle}padding:3px 10px;">${completedCount}</span></td>
+                <td><span class="badge" style="background:#eff6ff;color:#2563eb;padding:3px 10px;">${studiedCount}</span></td>
+                <td><span class="badge badge-purple" style="padding:3px 10px;">${quizCount}</span></td>
+                <td style="color:var(--text-muted);font-size:0.875rem;">${(u.chatMessagesUsed || 0).toLocaleString()}</td>
+                <td style="color:var(--text-muted);font-size:0.82rem;white-space:nowrap;">${lastActive}</td>
+            </tr>`;
+        }).join('');
+    }
+
+    function populateAnalyticsActivityLists(logs) {
+        const renderTable = (items) => {
+            if (!items.length) return `<p style="color:var(--text-muted);font-size:0.875rem;text-align:center;padding:2rem;">No activity logged yet.</p>`;
+            return `<div class="table-container"><table class="data-table"><thead><tr><th>User</th><th>Details</th><th>Time</th></tr></thead><tbody>` +
+                items.map(l => `<tr>
+                    <td><strong>${l.userName}</strong><br><small style="color:var(--text-muted)">${l.userEmail}</small></td>
+                    <td style="color:var(--text-muted);font-size:0.85rem;">${l.details || '—'}</td>
+                    <td style="color:var(--text-muted);font-size:0.82rem;white-space:nowrap;">${new Date(l.timestamp).toLocaleString()}</td>
+                </tr>`).join('') + `</tbody></table></div>`;
+        };
+
+        const aiList = document.getElementById('ai-activity-list');
+        const aiLogs = logs.filter(l => l.actionType === 'AI Chat Usage');
+        if (aiList) aiList.innerHTML = renderTable(aiLogs);
+
+        const mockLogs = logs.filter(l => l.actionType && l.actionType.toLowerCase().includes('interview'));
+        const mockList = document.getElementById('mock-activity-list');
+        if (mockList) mockList.innerHTML = renderTable(mockLogs);
+
+        const today = new Date().toDateString();
+        const mockTodayEl = document.getElementById('mock-stat-today');
+        if (mockTodayEl) mockTodayEl.textContent = mockLogs.filter(l => new Date(l.timestamp).toDateString() === today).length;
+
+        const premiumLogs = logs.filter(l => l.actionType && l.actionType.toLowerCase().includes('premium'));
+        const premiumList = document.getElementById('premium-activity-list');
+        if (premiumList) premiumList.innerHTML = renderTable(premiumLogs);
     }
 
     function initCharts() {
@@ -318,16 +487,16 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // --- NEW: Learning Analytics Charts ---
+        // --- Learning Analytics Charts (start empty, filled by renderRoadmapData) ---
         const ctxCourseComp = document.getElementById('courseCompletionChart');
         if (ctxCourseComp) {
             ctxCourseComp._chartInstance = new Chart(ctxCourseComp, {
                 type: 'bar',
                 data: {
-                    labels: ['Intro to HTML5', 'JS Basics', 'React Patterns', 'Node.js Core', 'Python Data'],
+                    labels: [],
                     datasets: [{
-                        label: 'Completion Rate (%)',
-                        data: [85, 78, 62, 55, 70],
+                        label: 'Completions',
+                        data: [],
                         backgroundColor: '#10b981',
                         borderRadius: 4
                     }]
@@ -335,7 +504,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true, max: 100 } }
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0, color: '#94a3b8' }, grid: { color: '#eef2fb' } },
+                        x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+                    }
                 }
             });
         }
@@ -345,20 +518,57 @@ document.addEventListener('DOMContentLoaded', () => {
             ctxDropoff._chartInstance = new Chart(ctxDropoff, {
                 type: 'line',
                 data: {
-                    labels: ['Stage 1', 'Stage 2', 'Stage 3', 'Stage 4', 'Stage 5'],
+                    labels: ['Stage 1', 'Stage 2', 'Stage 3', 'Stage 4', 'Stage 5', 'Stage 6'],
                     datasets: [{
-                        label: 'Active Users',
-                        data: [1000, 850, 600, 400, 250],
+                        label: 'Users Completed Stage',
+                        data: [0, 0, 0, 0, 0, 0],
                         borderColor: '#f43f5e',
-                        backgroundColor: 'rgba(244, 63, 94, 0.1)',
+                        backgroundColor: 'rgba(244, 63, 94, 0.08)',
                         fill: true,
-                        tension: 0.3
+                        tension: 0.3,
+                        pointBackgroundColor: '#f43f5e',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true } }
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0, color: '#94a3b8' }, grid: { color: '#eef2fb' } },
+                        x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // Career Detail Chart (Career Analytics panel)
+        const ctxCareerDetail = document.getElementById('careerDetailChart');
+        if (ctxCareerDetail) {
+            careerDetailChart = new Chart(ctxCareerDetail, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: ['#2563eb', '#06b6d4', '#10b981', '#f59e0b', '#8b5cf6', '#f43f5e'],
+                        borderWidth: 3,
+                        borderColor: '#ffffff',
+                        hoverBorderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { color: '#334155', font: { size: 12, weight: '600' }, padding: 16, boxWidth: 11, borderRadius: 3 }
+                        }
+                    }
                 }
             });
         }
