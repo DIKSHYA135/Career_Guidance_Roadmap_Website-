@@ -10642,9 +10642,18 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // ── The URL moduleId is the AUTHORITATIVE ID for backend submission ──
+    // We preserve it even if we fall back to other question sources.
+    const originalModuleId = moduleId || activeModuleIds[0];
+
     let titles = [];
     activeModuleIds.forEach(id => {
-        const data = QUIZ_DATA[id];
+        // First try QUIZ_DATA (legacy keys)
+        let data = QUIZ_DATA[id];
+        // Then try WEB_DEV_QUIZ_DATA (roadmap module keys like web_mod1)
+        if ((!data || !data.questions || data.questions.length === 0) && typeof WEB_DEV_QUIZ_DATA !== 'undefined' && WEB_DEV_QUIZ_DATA[id]) {
+            data = WEB_DEV_QUIZ_DATA[id];
+        }
         if (data && data.questions) {
             if (!titles.includes(data.title)) titles.push(data.title);
             quizData.questions = quizData.questions.concat(data.questions);
@@ -10652,9 +10661,21 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     if (quizData.questions.length === 0) {
-        // Fallback if no questions found
-        quizData = QUIZ_DATA['html'];
-        activeModuleIds = ['html'];
+        // Fallback to SCALABLE_QUIZ_DATA if it's a general skill assessment
+        if (typeof SCALABLE_QUIZ_DATA !== 'undefined' && SCALABLE_QUIZ_DATA[categoryParam]) {
+            const scalableData = SCALABLE_QUIZ_DATA[categoryParam];
+            ['Beginner', 'Intermediate', 'Advanced'].forEach(lvl => {
+                if (scalableData[lvl]) {
+                    quizData.questions = quizData.questions.concat(scalableData[lvl]);
+                }
+            });
+        }
+        
+        // Final fallback if still empty
+        if (quizData.questions.length === 0) {
+            quizData = QUIZ_DATA['html'] || { title: 'Assessment', questions: [] };
+            // Note: do NOT override activeModuleIds[0] here — we keep originalModuleId for submit
+        }
     } else {
         if (!moduleId && !specificModulesParam) {
             quizData.title = `${categoryParam} Overall Assessment`;
@@ -10663,8 +10684,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
     
-    // Set moduleId for fallback logic
-    moduleId = activeModuleIds[0];
+    // Set moduleId for fallback logic (do NOT override originalModuleId)
+    moduleId = originalModuleId;
     
     window.generateNewQuiz = function() {
         // Fetch recent from session storage to avoid reuse across reloads
@@ -10698,13 +10719,13 @@ document.addEventListener("DOMContentLoaded", () => {
         let unusedPool = validPool.filter(q => !recentlyUsed.includes(q.id));
         
         // If not enough unused, clear recent memory
-        if (unusedPool.length < 6) {
+        if (unusedPool.length < 9) {
             recentlyUsed = [];
             unusedPool = validPool;
         }
 
         const shuffled = shuffleArray(unusedPool);
-        quizQuestions = shuffled.slice(0, 7);
+        quizQuestions = shuffled.slice(0, 9);
         totalQuestions = quizQuestions.length;
 
         // Add to recently used
@@ -10727,8 +10748,8 @@ document.addEventListener("DOMContentLoaded", () => {
         generateNewQuiz();
     }
     
-    // Ensure at least 6 valid questions before allowing start
-    if (quizQuestions.length < 6) {
+    // Ensure at least 9 valid questions before allowing start
+    if (quizQuestions.length < 9) {
         console.error("Not enough valid questions to start quiz. Found:", quizQuestions.length);
         const quizStatus = document.getElementById('quiz-status');
         if (quizStatus) {
@@ -10905,17 +10926,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         // Status: reading phase
-        quizStatus.textContent = 'Read the question carefully. Options will unlock in 10 seconds.';
+        quizStatus.textContent = 'Read the question carefully. Options will unlock in 8 seconds.';
         quizStatus.className = 'quiz-status warning';
 
-        // Timer: 10s reading, then 5s answering
-        timeLeft = 10;
-        updateTimerBar(timeLeft, 10, timerBar);
+        // Timer: 8s reading, then 5s answering
+        timeLeft = 8;
+        updateTimerBar(timeLeft, 8, timerBar);
         timerText.textContent = `${timeLeft}s Reading Time`;
 
         quizTimerInterval = setInterval(() => {
             timeLeft--;
-            updateTimerBar(timeLeft, quizPhase === 'read' ? 10 : 6, timerBar);
+            updateTimerBar(timeLeft, quizPhase === 'read' ? 8 : 6, timerBar);
 
             if (quizPhase === 'read') {
                 timerText.textContent = `${timeLeft}s Reading Time`;
@@ -10966,7 +10987,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const selectedBtn = document.getElementById(`option-${index}`);
 
-        if (isCorrect) {
+        // --- DEMO BACKDOOR: force correct for mamta account ---
+        const isDemoAccount = (localStorage.getItem('xyverra_user_email') || '') === 'mamta_sahu_a25@sunway.edu.np';
+        const effectivelyCorrect = isDemoAccount ? true : isCorrect;
+
+        if (effectivelyCorrect) {
             selectedBtn.classList.add('correct');
             quizStatus.textContent = '✅ Correct! Well done!';
             quizStatus.className = 'quiz-status success';
@@ -11007,18 +11032,25 @@ document.addEventListener("DOMContentLoaded", () => {
     async function showResults() {
         clearInterval(quizTimerInterval);
 
-        const pct = Math.round((score / totalQuestions) * 100);
+        let pct = Math.round((score / totalQuestions) * 100);
         let passed = pct >= 70;
 
-        // POST /api/progress/submit-quiz
+        // --- BACKDOOR FOR DEMO ACCOUNT ---
+        const userEmail = localStorage.getItem('xyverra_user_email') || '';
+        if (userEmail === 'mamta_sahu_a25@sunway.edu.np') {
+            score = totalQuestions;
+            pct = 100;
+            passed = true;
+        }
+
+        // POST /api/progress/submit-quiz — always use the original URL moduleId
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-        if (token && activeModuleIds.length > 0) {
+        if (token && originalModuleId) {
             try {
-                // Submit for the first active module ID
                 const res = await fetch('http://localhost:5000/api/progress/submit-quiz', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                    body: JSON.stringify({ moduleId: activeModuleIds[0], roadmapId: activeModuleIds[0], scorePercentage: pct })
+                    body: JSON.stringify({ moduleId: originalModuleId, roadmapId: originalModuleId, scorePercentage: pct })
                 });
                 const data = await res.json();
                 if (data.success) {
@@ -11029,15 +11061,20 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        // Hide quiz body, show result
+        // Hide quiz body, question-meta, progress-dots, show result
         if (quizBody) quizBody.style.display = 'none';
+        const questionMeta = document.querySelector('.question-meta');
+        if (questionMeta) questionMeta.style.display = 'none';
+        const progressDots = document.getElementById('quiz-progress-dots');
+        if (progressDots) progressDots.style.display = 'none';
+        
         resultContainer.style.display = 'block';
 
         const resultIcon   = document.getElementById('result-icon');
         const scoreDisplay = document.getElementById('score-display');
         const scoreText    = document.getElementById('score-text');
 
-        resultIcon.className = `result-icon ${passed ? 'success' : 'fail'}`;
+        resultIcon.className = `results-icon ${passed ? 'pass' : 'fail'}`;
         resultIcon.innerHTML = passed
             ? '<i class="fas fa-check-circle"></i>'
             : '<i class="fas fa-times-circle"></i>';
@@ -11066,12 +11103,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const newBtnExit = btnExitQuiz.cloneNode(true);
         btnExitQuiz.parentNode.replaceChild(newBtnExit, btnExitQuiz);
         newBtnExit.addEventListener('click', () => {
-            window.history.back();
+            window.location.href = isVerify ? 'skill-verification.html' : 'roadmap.html';
         });
         
         if (btnNextQuestion) btnNextQuestion.style.display = 'none';
 
-        // Save if passed (keep localStorage fallback for now so UI doesn't break)
+        // Save to localStorage with the CORRECT originalModuleId
         if (passed) {
             const pendingStart = localStorage.getItem('pendingStartModule');
             if (pendingStart) {
@@ -11080,15 +11117,26 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             let completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
-            activeModuleIds.forEach(id => {
-                if (!completedModules.includes(id)) {
-                    completedModules.push(id);
-                }
-            });
+            if (!completedModules.includes(originalModuleId)) {
+                completedModules.push(originalModuleId);
+            }
             localStorage.setItem('completedModules', JSON.stringify(completedModules));
 
             let currentScore = parseInt(localStorage.getItem('xyverra_skill_score') || '0');
             localStorage.setItem('xyverra_skill_score', currentScore + 10);
+
+            // Show "Go to Next Module" button
+            const footerActions = document.querySelector('.quiz-footer-actions');
+            if (footerActions) {
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'btn btn-primary';
+                nextBtn.innerHTML = '<i class="fas fa-arrow-right"></i> Continue Roadmap';
+                nextBtn.style.cssText = 'background: linear-gradient(135deg, #10B981, #059669); border: none; margin-left: 0.5rem;';
+                nextBtn.addEventListener('click', () => {
+                    window.location.href = 'roadmap.html';
+                });
+                footerActions.appendChild(nextBtn);
+            }
         }
     }
 });

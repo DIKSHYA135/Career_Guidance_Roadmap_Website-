@@ -371,6 +371,20 @@
     box-shadow: none;
 }
 
+.btn-take-quiz.btn-quiz-locked {
+    background: var(--bg-surface-hover);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    cursor: not-allowed;
+    box-shadow: none;
+}
+.btn-take-quiz.btn-quiz-locked:hover {
+    background: var(--bg-surface-hover);
+    color: var(--text-muted);
+    transform: none;
+    box-shadow: none;
+}
+
 .quiz-unlock-hint {
     font-size: 0.8125rem;
     color: var(--text-muted);

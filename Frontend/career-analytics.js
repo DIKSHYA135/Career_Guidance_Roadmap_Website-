@@ -24,11 +24,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (data.success) {
             renderDashboard(data.data, targetCareer);
         } else {
-            window.XyError ? window.XyError('Analytics Error', data.message || 'Failed to load analytics.') : alert(data.message);
+            window.XyError ? window.XyError('Analytics Error', data.message || 'Failed to load analytics.') : window.XyModal ? window.XyModal({ title: 'Analytics Error', message: data.message, type: 'error' }) : console.error(data.message);
         }
     } catch (e) {
         console.error(e);
-        window.XyNetworkError ? window.XyNetworkError() : alert('Server connection error.');
+        window.XyNetworkError ? window.XyNetworkError() : window.XyError ? window.XyError('Network Error', 'Server connection error.') : console.error('Server connection error.');
     }
 });
 

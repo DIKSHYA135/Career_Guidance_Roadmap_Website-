@@ -166,9 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
         params.set('returnTo', returnTo);
         if (completed && courseId) params.set('completed', courseId);
         if (moduleId) params.set('moduleId', moduleId);
-        if (completed) {
-            return 'quiz.html?' + params.toString() + '&title=' + encodeURIComponent(courseTitle);
-        }
         return 'roadmap.html?' + params.toString();
     }
 

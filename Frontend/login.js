@@ -266,8 +266,13 @@ document.addEventListener("DOMContentLoaded", () => {
             setSuccessState();
 
             const redirect = () => {
-                const onboardingDone = data.user.onboardingCompleted || !!data.user.selectedPath || localStorage.getItem('xyverra_onboarded') === 'true';
-                window.location.href = onboardingDone ? 'dashboard.html' : 'career-discovery.html';
+                const isAdmin = data.user.role === 'admin' || data.user.isAdmin;
+                if (isAdmin) {
+                    window.location.href = 'admin.html';
+                } else {
+                    const onboardingDone = data.user.onboardingCompleted || !!data.user.selectedPath || localStorage.getItem('xyverra_onboarded') === 'true';
+                    window.location.href = onboardingDone ? 'dashboard.html' : 'career-discovery.html';
+                }
             };
 
             // Success feedback then redirect (brief delay so success state is visible)

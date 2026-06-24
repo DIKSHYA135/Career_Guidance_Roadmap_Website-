@@ -8,13 +8,11 @@ const progressSchema = new mongoose.Schema({
         index: true
     },
     moduleId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Module',
+        type: String,
         required: true
     },
     roadmapId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Roadmap',
+        type: String,
         required: true
     },
     status: {

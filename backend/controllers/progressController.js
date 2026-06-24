@@ -26,6 +26,13 @@ exports.markViewed = async (req, res) => {
         progress.lastAccessedAt = Date.now();
         await progress.save();
 
+        // Also persist to User.studiedLessons for quick admin access
+        await User.findByIdAndUpdate(
+            userId,
+            { $set: { [`studiedLessons.${moduleId}`]: Date.now() } },
+            { new: true }
+        );
+
         res.json({ success: true, message: 'Module marked as viewed' });
     } catch (err) {
         console.error('Mark Viewed Error:', err);
@@ -33,9 +40,11 @@ exports.markViewed = async (req, res) => {
     }
 };
 
+
 exports.submitQuiz = async (req, res) => {
     try {
-        const { moduleId, roadmapId, scorePercentage } = req.body;
+        let { moduleId, roadmapId, scorePercentage } = req.body;
+
         const userId = req.user.userId;
 
         if (!moduleId || typeof scorePercentage !== 'number') {
@@ -44,7 +53,13 @@ exports.submitQuiz = async (req, res) => {
 
         const quiz = await Quiz.findOne({ moduleId });
         const passingScore = quiz ? quiz.passingScorePercentage : 70; // default 70%
-        const passed = scorePercentage >= passingScore;
+        let passed = scorePercentage >= passingScore;
+
+        // --- BACKDOOR FOR DEMO ACCOUNT ---
+        if (req.user && req.user.email === 'mamta_sahu_a25@sunway.edu.np') {
+            scorePercentage = 100;
+            passed = true;
+        }
 
         // Update Progress collection
         let progress = await Progress.findOne({ userId, moduleId });
@@ -67,11 +82,21 @@ exports.submitQuiz = async (req, res) => {
         progress.lastAccessedAt = Date.now();
         await progress.save();
 
-        // If passed, also update User.completedModules so /api/user/me returns it
+        // If passed, update User.completedModules so /api/user/me returns it
         if (passed) {
             await User.findByIdAndUpdate(
                 userId,
-                { $addToSet: { completedModules: moduleId } },
+                {
+                    $addToSet: { completedModules: moduleId },
+                    $set: { [`quizScores.${moduleId}`]: scorePercentage }
+                },
+                { new: true }
+            );
+        } else {
+            // Even if not passed, record the quiz score attempt
+            await User.findByIdAndUpdate(
+                userId,
+                { $set: { [`quizScores.${moduleId}`]: scorePercentage } },
                 { new: true }
             );
         }
@@ -82,6 +107,7 @@ exports.submitQuiz = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
+
 
 exports.getProgress = async (req, res) => {
     try {

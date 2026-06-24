@@ -713,6 +713,24 @@
         return;
     }
 
+    // ── Role-Based Access Control (RBAC) ──
+    const isAdminUser = localStorage.getItem('xyverra_is_admin') === 'true';
+    const ADMIN_ROUTES = ['admin.html'];
+
+    if (ADMIN_ROUTES.includes(currentPage)) {
+        if (!isAdminUser) {
+            console.warn('[AuthGuard] Access Denied. User is not an admin.');
+            window.location.replace('dashboard.html');
+            return;
+        }
+    } else {
+        if (isAdminUser) {
+            console.warn('[AuthGuard] Admin accessing user route. Redirecting to admin dashboard.');
+            window.location.replace('admin.html');
+            return;
+        }
+    }
+
 
     // ── Check 3: Onboarding guard for specific protected pages ──
     if (ONBOARDING_REQUIRED.includes(currentPage)) {

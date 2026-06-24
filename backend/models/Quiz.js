@@ -2,8 +2,7 @@ const mongoose = require('mongoose');
 
 const quizSchema = new mongoose.Schema({
     moduleId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Module',
+        type: String,
         required: true,
         index: true
     },

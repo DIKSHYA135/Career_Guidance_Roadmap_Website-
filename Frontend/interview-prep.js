@@ -110,12 +110,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 showQuestion();
             } else {
                 if (window.XyError) window.XyError('Interview Error', data.message || 'Failed to start interview');
-                else alert(data.message || 'Failed to start interview');
+                else window.XyModal ? window.XyModal({ title: 'Interview Error', message: data.message || 'Failed to start interview', type: 'error' }) : console.error(data.message);
             }
         } catch (e) {
             console.error(e);
             if (window.XyNetworkError) window.XyNetworkError();
-            else alert('Server error. Please try again.');
+            else window.XyError ? window.XyError('Network Error', 'Server error. Please try again.') : console.error('Server error. Please try again.');
         } finally {
             startBtn.innerHTML = btnOriginalText;
             startBtn.disabled = false;
@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const answer = answerInput.value.trim();
         if (!answer) {
             if (window.XyWarning) window.XyWarning('Answer Required', 'Please type your answer before continuing.');
-            else alert('Please provide an answer before continuing.');
+            else window.XyModal ? window.XyModal({ title: 'Answer Required', message: 'Please provide an answer before continuing.', type: 'warning' }) : console.error('Please provide an answer before continuing.');
             return;
         }
 
@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
             console.error(e);
             if (window.XyNetworkError) window.XyNetworkError('Error submitting answer.');
-            else alert('Server error while submitting answer.');
+            else window.XyError ? window.XyError('Submission Error', 'Server error while submitting answer.') : console.error('Server error while submitting answer.');
         } finally {
             nextBtn.innerHTML = btnText;
             nextBtn.disabled = false;
@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
             console.error(e);
             if (window.XyError) window.XyError('Session Error', 'Failed to complete the session. Please try again.');
-            else alert('Failed to complete session.');
+            else window.XyModal ? window.XyModal({ title: 'Session Error', message: 'Failed to complete session.', type: 'error' }) : console.error('Failed to complete session.');
         }
     };
 

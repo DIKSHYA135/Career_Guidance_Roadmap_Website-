@@ -22,7 +22,9 @@ const User = require('./models/User');
 const Lead = require('./models/Lead');
 const Subscription = require('./models/Subscription');
 const Transaction = require('./models/Transaction');
+const ActivityLog = require('./models/ActivityLog');
 const authMiddleware = require('./middleware/authMiddleware');
+const adminRoutes = require('./routes/adminRoutes');
 
 // Admin middleware — only allows users with isAdmin flag
 const adminMiddleware = async (req, res, next) => {
@@ -179,6 +181,7 @@ app.use('/api/progress', require('./routes/progressRoutes'));
 app.use('/api/interview', interviewRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/admin', authMiddleware, adminMiddleware, adminRoutes);
 
 // Dev/Test route to reset a user's subscription back to free tier.
 app.use('/api/test', testRoutes);
@@ -595,6 +598,15 @@ app.post(
 
             const token = signToken(newUser);
 
+            await ActivityLog.create({
+                userId: newUser._id,
+                userName: newUser.name,
+                userEmail: newUser.email,
+                actionType: 'Registration',
+                details: 'User registered a new account',
+                badgeColor: 'badge-green'
+            }).catch(e => console.error('ActivityLog Error:', e));
+
             res.status(201).json({
                 success: true,
                 message: 'User registered successfully',
@@ -651,6 +663,15 @@ app.post(
             await user.save();
 
             const token = signToken(user);
+
+            await ActivityLog.create({
+                userId: user._id,
+                userName: user.name,
+                userEmail: user.email,
+                actionType: 'Login',
+                details: 'User logged in successfully',
+                badgeColor: 'badge-blue'
+            }).catch(e => console.error('ActivityLog Error:', e));
 
             res.json({
                 success: true,
