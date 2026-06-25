@@ -11047,10 +11047,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (token && originalModuleId) {
             try {
+                const userPath = localStorage.getItem('xyverra_selected_path') || originalModuleId;
                 const res = await fetch('http://localhost:5000/api/progress/submit-quiz', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                    body: JSON.stringify({ moduleId: originalModuleId, roadmapId: originalModuleId, scorePercentage: pct })
+                    body: JSON.stringify({ moduleId: originalModuleId, roadmapId: userPath, scorePercentage: pct })
                 });
                 const data = await res.json();
                 if (data.success) {

@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     if (u.selectedPath)  localStorage.setItem('xyverra_selected_path', u.selectedPath);
                     if (Array.isArray(u.completedModules)) localStorage.setItem('completedModules', JSON.stringify(u.completedModules));
                     if (typeof u.dailyStreak === 'number') localStorage.setItem('xyverra_user_streak', String(u.dailyStreak));
+                    if (u.quizScores) localStorage.setItem('quizScores', JSON.stringify(u.quizScores));
                 }
             }
         } catch (e) {
@@ -186,24 +187,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     // ── 6. Recent Activity ────────────────────────────────────────
     const historyList = document.getElementById("history-list");
     if (historyList) {
+        let quizScores = {};
+        try { quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}'); } catch(_) {}
+
         const done = pathData.filter(m => completedModules.includes(m.id)).reverse();
         if (done.length === 0) {
             historyList.innerHTML = `<p style="text-align:center;color:var(--text-muted);padding:1.5rem;">
                 No activity yet. Complete a module to see it here! 🚀</p>`;
         } else {
-            historyList.innerHTML = done.map(module => `
+            historyList.innerHTML = done.map(module => {
+                const score = quizScores[module.id];
+                const scoreText = (score !== undefined && score !== null) ? `Score: ${Math.round(score)}%` : 'Score: —';
+                return `
                 <div class="history-item">
                     <div class="item-icon success"><i class="fas fa-check"></i></div>
                     <div class="item-details">
                         <h4>${module.title} Quiz</h4>
                         <div class="item-meta">
                             <span><i class="far fa-calendar-check"></i> Completed</span>
-                            <span class="meta-score">Score: 100%</span>
+                            <span class="meta-score">${scoreText}</span>
                         </div>
                     </div>
                     <div class="item-badge completed">Verified</div>
-                </div>
-            `).join("");
+                </div>`;
+            }).join("");
         }
     }
 });

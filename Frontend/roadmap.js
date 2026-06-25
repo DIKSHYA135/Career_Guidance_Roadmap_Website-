@@ -190,7 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         ${isLocked ? `
                         <div class="module-locked-overlay">
                             <div class="lock-icon-big">🔒</div>
-                            <p>Complete the previous module's quiz with <strong>75% or higher</strong> to unlock this module.</p>
+                            <p>Complete the previous module's quiz with <strong>70% or higher</strong> to unlock this module.</p>
                         </div>` : `
                         <p class="module-desc">${module.desc}</p>
                         <div class="course-list">

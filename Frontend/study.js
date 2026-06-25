@@ -122,11 +122,12 @@ document.addEventListener('DOMContentLoaded', () => {
     async function reportLessonStudied(id, mod, secs) {
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (!id || !token) return;
+        const userPath = localStorage.getItem('xyverra_selected_path') || mod || id;
         try {
             await fetch('http://localhost:5000/api/progress/mark-viewed', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                body: JSON.stringify({ moduleId: mod || id, roadmapId: id, timeSpentSeconds: secs || 0 })
+                body: JSON.stringify({ moduleId: mod || id, roadmapId: userPath, timeSpentSeconds: secs || 0 })
             });
         } catch (e) {
             console.error('Failed to mark viewed:', e);
@@ -204,4 +205,5 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = buildReturnUrl(false);
         }
     });
+} // end if (courseId)
 });
