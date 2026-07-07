@@ -1,0 +1,395 @@
+/* ==========================================================
+   skill-gap.css — Modern AI-Powered Skill Gap Dashboard
+   ========================================================== */
+
+/* Layout & Containers */
+.sg-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Header */
+.sg-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.sg-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.sg-meta {
+    display: flex;
+    gap: 1.5rem;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.sg-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sg-meta-item strong {
+    color: var(--primary);
+}
+
+/* Cards (Glassmorphism & Light Shadows) */
+.sg-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.sg-card h2, .sg-card h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 1.25rem;
+}
+
+/* Grid Layouts */
+.sg-grid-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+}
+
+.sg-grid-middle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+/* Hero Score Card */
+.sg-hero-card {
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+    border-left: 4px solid var(--primary);
+}
+
+.sg-hero-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sg-hero-text {
+    flex: 1;
+    padding-right: 2rem;
+}
+
+.sg-hero-summary {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+}
+
+.sg-hero-progress {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Circular Progress */
+.circular-progress {
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+
+.circular-progress svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.circular-progress circle {
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: round;
+}
+
+.circular-progress .bg {
+    stroke: #e2e8f0;
+}
+
+.circular-progress .meter {
+    stroke: var(--primary);
+    stroke-dasharray: 283;
+    stroke-dashoffset: 283; /* Will be updated by JS */
+    transition: stroke-dashoffset 1s ease-out, stroke 0.5s ease;
+}
+
+.circular-progress .inner-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-dark);
+}
+
+.sg-status-badge {
+    padding: 0.35rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: #e2e8f0;
+    color: #475569;
+}
+
+/* Career Readiness Meter */
+.sg-readiness-card {
+    text-align: center;
+}
+
+.readiness-meter-wrapper {
+    margin: 1rem 0;
+}
+
+.readiness-score {
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.readiness-bar-container {
+    width: 100%;
+    height: 10px;
+    background: #e2e8f0;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.readiness-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981);
+    transition: width 1s ease-out;
+}
+
+.readiness-text {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+/* Strengths Badges */
+.sg-badges-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.sg-strength-badge {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Skill Gaps Table */
+.sg-gaps-table-wrapper {
+    overflow-x: auto;
+}
+
+.sg-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.sg-table th, .sg-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.sg-table th {
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.sg-table td {
+    color: var(--text-dark);
+    font-weight: 500;
+}
+
+.sg-gap-level {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.gap-critical { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+.gap-high { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+.gap-moderate { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+.gap-strong { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+
+/* Personalized Roadmap Stepper */
+.sg-stepper {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.sg-step {
+    display: flex;
+    gap: 1rem;
+}
+
+.sg-step-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.sg-step-content {
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 8px;
+    flex: 1;
+    border: 1px solid #e2e8f0;
+}
+
+.sg-step-content h4 {
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+}
+
+.sg-step-meta {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+}
+
+/* AI Action Plan Checklist */
+.sg-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.sg-check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.sg-check-item i {
+    color: var(--primary);
+    margin-top: 2px;
+}
+
+/* Recommended Courses Grid */
+.sg-courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.sg-course-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.sg-course-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.sg-course-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.sg-course-meta {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+/* Chart Container */
+.sg-chart-container {
+    height: 300px;
+    width: 100%;
+}
+
+/* Actions Footer */
+.sg-actions-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .sg-grid-top, .sg-grid-middle {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .sg-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .sg-hero-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+    
+    .sg-hero-text {
+        padding-right: 0;
+    }
+}

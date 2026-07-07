@@ -1,0 +1,265 @@
+/* =========================================================
+   career-recommendation.css  – Premium recommendations UI
+   ========================================================= */
+
+/* —— Page header area —— */
+.reco-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.reco-header-row h1 { 
+    margin-bottom: 0.5rem; 
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #0F172A;
+    letter-spacing: -0.02em;
+}
+.reco-header-row p  { 
+    color: #64748B; 
+    margin: 0; 
+    font-size: 1.1rem;
+}
+
+/* —— Recommendation list container —— */
+.recommendations-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* —— Individual card —— */
+.recommendation-card {
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 40px -10px rgba(0,0,0,0.1), 0 4px 6px -1px rgba(0,0,0,0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+.recommendation-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 50px -15px rgba(0,0,0,0.15), 0 8px 12px -2px rgba(0,0,0,0.1);
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+/* Rank Header Bar */
+.card-rank-header {
+    padding: 12px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.rank-title {
+    color: white;
+    font-weight: 800;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.match-badge {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(8px);
+    color: white;
+    padding: 4px 14px;
+    border-radius: 100px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* Card Body */
+.card-body {
+    padding: 2.25rem 2.5rem;
+}
+
+/* Info Section */
+.rec-info-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 1.75rem;
+}
+
+.rec-icon {
+    font-size: 3.2rem;
+    line-height: 1;
+    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.1));
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+    100% { transform: translateY(0px); }
+}
+
+.rec-title-block h2 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #0F172A;
+    margin: 0 0 0.4rem;
+    letter-spacing: -0.02em;
+}
+
+.rec-desc {
+    color: #475569;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin: 0;
+    max-width: 680px;
+}
+
+/* Stats Row */
+.rec-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    background: #F8FAFC;
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.75rem;
+    border: 1px solid #E2E8F0;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #64748B;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stat-value {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #0F172A;
+}
+
+.stat-value.demand-vhigh {
+    color: #059669;
+}
+
+.stat-value.demand-high {
+    color: #2563EB;
+}
+
+/* Skill Chips */
+.rec-skill-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 2rem;
+}
+
+.chip {
+    background: #EFF6FF;
+    color: #1D4ED8;
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border: 1px solid #BFDBFE;
+    transition: all 0.2s ease;
+}
+
+.chip:hover {
+    background: #DBEAFE;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37,99,235,0.1);
+}
+
+/* Action Button */
+.rec-actions {
+    margin-top: auto;
+}
+
+.choose-path-btn {
+    width: 100%;
+    padding: 16px 24px;
+    border: none;
+    border-radius: 16px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.choose-path-btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: all 0.5s ease;
+}
+
+.choose-path-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+}
+
+.choose-path-btn:hover::after {
+    left: 100%;
+}
+
+.choose-path-btn:active {
+    transform: translateY(1px);
+}
+
+/* —— Bottom action row —— */
+.reco-footer {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2.5rem;
+    flex-wrap: wrap;
+}
+
+/* —— Responsive —— */
+@media (max-width: 820px) {
+    .rec-stats {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    .card-body {
+        padding: 1.75rem 1.5rem;
+    }
+    .reco-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .reco-header-row h1 {
+        font-size: 1.8rem;
+    }
+    .rec-info-top {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}

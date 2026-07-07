@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress Tracker - Xyverra</title>
+    <meta name="description" content="Track your learning progress, career readiness, and course completions.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="progress.css">
+    <script src="auth-guard.js?v=2"></script>
+</head>
+<body>
+<div class="app-layout">
+    <!-- Mobile Header -->
+    <div class="mobile-nav-toggle">
+        <div class="sidebar-brand" style="margin-bottom:0;padding:0;">
+            <img src="xyverra_logo.jpeg" alt="Xyverra Logo" class="sidebar-logo"> Xyverra
+        </div>
+        <button id="sidebar-toggle-btn" class="btn" style="padding:5px;background:transparent;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+    </div>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar-menu">
+        <div class="sidebar-brand">
+            <img src="xyverra_logo.jpeg" alt="Xyverra Logo" class="sidebar-logo">
+            <span>Xyverra</span>
+        </div>
+        <nav class="nav-menu">
+            <a href="dashboard.html" class="nav-item nav-dashboard">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                Dashboard
+            </a>
+            <a href="career-discovery.html" class="nav-item nav-career-discovery">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+                Career Discovery
+            </a>
+            <a href="counselor.html" class="nav-item nav-counselor">
+                <i class="fas fa-robot"></i> AI Counselor
+            </a>
+            <a href="skill-gap.html" class="nav-item nav-skill-gap">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg>
+                Skill Gap Analysis
+            </a>
+            <a href="roadmap.html" class="nav-item nav-roadmap">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                My Roadmap
+            </a>
+            <a href="progress.html" class="nav-item active nav-progress">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                Progress Tracker
+            </a>
+        </nav>
+        <div style="flex:1;"></div>
+        <div class="user-profile">
+            <div class="profile-click-area" title="View Profile">
+                <div class="avatar" id="user-avatar"></div>
+                <div class="profile-text">
+                    <h4 id="user-display-name">Loading...</h4>
+                    <p></p>
+                </div>
+            </div>
+            <button class="signout-btn" title="Sign Out" style="background:none;border:none;color:var(--text-muted);cursor:pointer;">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="dashboard-container">
+
+            <div class="dashboard-header">
+                <div class="dashboard-header-text">
+                    <h1>Progress Tracker</h1>
+                    <p>Track your learning journey and job readiness.</p>
+                </div>
+                <div class="dashboard-actions">
+                    <a href="roadmap.html" class="btn btn-primary"><i class="fas fa-play"></i> Resume Path</a>
+                </div>
+            </div>
+
+            <!-- Top Summary Grid -->
+            <div class="progress-summary-grid">
+                <!-- Score -->
+                <div class="summary-card">
+                    <div class="summary-icon icon-purple"><i class="fas fa-star"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-label">Competency</span>
+                        <span class="summary-value" id="score-value">0</span>
+                        <span class="summary-sublabel text-purple">Out of 100</span>
+                    </div>
+                </div>
+
+                <!-- Readiness -->
+                <div class="summary-card">
+                    <div class="summary-icon icon-green"><i class="fas fa-rocket"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-label">Readiness</span>
+                        <span class="summary-value" id="job-readiness-value">0%</span>
+                        <span class="summary-sublabel text-green" id="job-readiness-label">Beginner</span>
+                    </div>
+                </div>
+
+                <!-- Streak -->
+                <div class="summary-card">
+                    <div class="summary-icon icon-orange"><i class="fas fa-fire"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-label">Streak</span>
+                        <span class="summary-value" id="streak-value">0 Days</span>
+                        <span class="summary-sublabel text-orange">Keep it up!</span>
+                    </div>
+                </div>
+
+                <!-- Modules -->
+                <div class="summary-card">
+                    <div class="summary-icon icon-blue"><i class="fas fa-check-circle"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-label">Modules</span>
+                        <span class="summary-value" id="steps-value">0 / 0</span>
+                        <span class="summary-sublabel text-blue">Completed</span>
+                    </div>
+                </div>
+
+                <!-- Level -->
+                <div class="summary-card">
+                    <div class="summary-icon icon-teal"><i class="fas fa-layer-group"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-label">Your Level</span>
+                        <span class="summary-value" id="skill-level-value">Beginner</span>
+                        <span class="summary-sublabel text-teal">Current Standing</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="progress-content-grid">
+                
+                <!-- Main Roadmap Journey Column -->
+                <div class="pg-col-main">
+                    <div class="content-card roadmap-progress-card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-map" style="color:var(--primary); margin-right:8px;"></i> Roadmap Journey</h2>
+                            <span class="badge" id="roadmap-path-badge">Loading Path</span>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="pg-bar-wrap">
+                            <div class="pg-bar-header">
+                                <span class="pg-bar-title">Overall Completion</span>
+                                <span class="pg-bar-pct" id="progress-label">0%</span>
+                            </div>
+                            <div class="progress-bar-container large">
+                                <div class="progress-bar" id="main-progress-bar" style="width:0%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Roadmap Path Visuals -->
+                        <div class="roadmap-steps-track" id="roadmap-track-container">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity / History -->
+                <div class="pg-col-side">
+                    <div class="history-card">
+                        <div class="history-header">
+                            <i class="fas fa-history" style="color:var(--primary);"></i> Recent Activity
+                        </div>
+                        <div class="history-list" id="history-list">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /progress-content-grid -->
+
+        </div>
+    </main>
+</div>
+
+<script src="app-data.js"></script>
+<script src="roadmap-data.js"></script>
+<script src="progress.js"></script>
+<script src="global-sidebar.js"></script>
+<script src="back-nav.js"></script>
+</body>
+</html>

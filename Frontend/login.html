@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Sign in to Xyverra - your AI-powered career roadmap platform." />
+  <title>Login - Xyverra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="global.css">
+  <link rel="stylesheet" href="login.css" />
+  <style>
+  /* iOS zoom prevention and mobile responsiveness */
+  @media (max-width: 480px) {
+    .login-form input[type="email"],
+    .login-form input[type="password"],
+    .login-form input[type="text"] {
+      font-size: 16px !important;
+    }
+    .btn-login, .btn-signup {
+      min-height: 44px;
+    }
+    .login-card {
+      width: 100%;
+    }
+  }
+  </style>
+</head>
+
+<body>
+  <!-- Toast Container -->
+  <div id="xv-toast-container" class="xv-toast-container"></div>
+
+  <!-- Premium Loading Overlay -->
+  <div id="premium-loader" class="premium-loader-overlay">
+    <div class="loader-content">
+      <div class="loader-logo-wrapper">
+        <img src="xyverra_logo.jpeg" alt="Xyverra Logo"
+          style="width:100%; height:100%; border-radius:18px; object-fit:cover;">
+      </div>
+      <div class="loader-status">Initializing Career Intelligence...</div>
+      <div class="loader-progress-track">
+        <div class="loader-progress-bar" id="loader-progress-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Centered Login Card -->
+  <div class="login-page">
+    <div class="login-card">
+
+      <!-- Brand Header -->
+      <div class="login-brand">
+        <img src="xyverra_logo.jpeg" alt="Xyverra Logo" class="brand-logo-img">
+        <span class="brand-name">Xyverra</span>
+      </div>
+
+      <div class="login-heading">
+        <h1>Welcome back</h1>
+        <p>Sign in to continue your AI-powered career journey</p>
+      </div>
+
+      <!-- Form -->
+      <form id="auth-form" class="login-form" novalidate autocomplete="off">
+
+        <!-- Hidden decoy fields to absorb aggressive browser autofill -->
+        <input type="text" name="username" id="xv-decoy-user" autocomplete="off"
+          style="display:none" tabindex="-1" aria-hidden="true" />
+        <input type="password" name="password" id="xv-decoy-pass" autocomplete="off"
+          style="display:none" tabindex="-1" aria-hidden="true" />
+
+        <!-- General error card -->
+        <div id="login-general-error" class="inline-error-card" role="alert" aria-live="polite">
+            <span class="err-icon">⚠</span>
+            <span id="login-error-text"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="login-email">Email address</label>
+          <div class="input-wrapper">
+            <i class="far fa-envelope input-icon"></i>
+            <input type="email" id="login-email" name="xv-login-email" placeholder="name@company.com"
+              autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false" required />
+          </div>
+          <div id="email-error" class="inline-field-error" role="alert"></div>
+          
+        </div>
+
+        <div class="form-group">
+          <div class="label-row">
+            <label for="login-password">Password</label>
+            <a href="forgot-password.html" id="forgot-password-link" class="forgot-link">Forgot password?</a>
+          </div>
+          <div class="input-wrapper">
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" id="login-password" name="xv-secret-field" placeholder="Min. 8 characters"
+              autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false"
+              data-lpignore="true" data-1p-ignore data-form-type="other" required />
+            <i class="far fa-eye eye-icon" id="toggle-password" title="Show password" role="button" tabindex="0"></i>
+          </div>
+          <div id="password-error" class="inline-field-error" role="alert"></div>
+        </div>
+
+        <!-- Remember me -->
+        <div class="form-options">
+          <label class="remember-me">
+            <input type="checkbox" id="remember-me" name="xv-remember" />
+            <span>Remember me</span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn-login" id="login-btn">
+          <span id="btn-label">Sign in to Dashboard</span>
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <!-- Divider -->
+      <div class="login-divider"><span>New to Xyverra?</span></div>
+
+      <!-- Sign Up Link -->
+      <a href="signup.html" class="btn-signup">
+        <i class="fas fa-rocket"></i>
+        Create your free account
+      </a>
+
+
+
+    </div>
+
+    <!-- Footer -->
+    <p class="login-footer">
+      By signing in, you agree to our <a href="javascript:void(0)" id="terms-link-login">Terms</a> and <a href="javascript:void(0)" id="privacy-link-login">Privacy Policy</a>
+    </p>
+  </div>
+  <script src="toast.js"></script>
+  <script src="login.js"></script>
+</body>
+
+</html>
+

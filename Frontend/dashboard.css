@@ -1,0 +1,417 @@
+/* ==========================================================================
+   PATH BLUEPRINT - DASHBOARD LAYOUT & STYLING
+   ========================================================================== */
+@import url('global.css');
+
+/* Main App Shell Floating Layout */
+.app-layout {
+    display: flex;
+    height: 100vh;
+    background-color: var(--bg-base);
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   SIDEBAR NAVIGATION (Clean & Compact)
+   ========================================================================== */
+.sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    max-width: var(--sidebar-width);
+    flex-shrink: 0;
+    background: var(--bg-surface);
+    color: var(--text-body);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 50;
+    transition: var(--transition);
+    border-right: 1px solid var(--border);
+}
+
+.sidebar::-webkit-scrollbar { width: 0; }
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 1.5rem;
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: var(--text-dark);
+    letter-spacing: -0.03em;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.sidebar-brand .brand-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--accent), var(--cyan));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.sidebar-logo {
+    display: block;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.15);
+}
+/* Menu Items */
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 1.5rem 1rem;
+    flex: 1;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: var(--transition-xs);
+    position: relative;
+}
+
+.nav-item svg, .nav-item i {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    transition: var(--transition-xs);
+}
+
+.nav-item:hover {
+    background: var(--bg-surface-hover);
+    color: var(--text-dark);
+}
+
+.nav-item:hover svg, .nav-item:hover i {
+    color: var(--text-dark);
+}
+
+.nav-item.active {
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.nav-item.active svg, .nav-item.active i {
+    color: var(--accent);
+}
+
+/* User Account Section */
+.user-profile {
+    padding: 1rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    overflow: hidden;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.profile-click-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    padding: 8px;
+    transition: var(--transition-xs);
+}
+
+.profile-click-area:hover {
+    background: var(--bg-surface-hover);
+}
+
+.avatar {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, var(--accent), var(--cyan)) !important;
+    color: white !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 700 !important;
+    font-size: 0.8125rem !important;
+    flex-shrink: 0 !important;
+}
+
+.profile-text { min-width: 0; flex: 1; }
+
+.profile-text h4 {
+    font-size: 0.875rem !important;
+    color: var(--text-dark) !important;
+    margin-bottom: 2px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.profile-text p {
+    font-size: 0.75rem !important;
+    color: var(--text-muted) !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.signout-btn {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 8px !important;
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-muted) !important;
+    cursor: pointer !important;
+    transition: var(--transition-sm) !important;
+    flex-shrink: 0;
+}
+
+.signout-btn:hover {
+    background: rgba(239, 68, 68, 0.1) !important;
+    color: #EF4444 !important;
+}
+
+/* ==========================================================================
+   MAIN DASHBOARD SURFACE
+   ========================================================================= */
+.main-content {
+    flex: 1;
+    min-width: 0;
+    padding: 3.5rem 4.5rem; /* Increased padding */
+    overflow-y: auto;
+    position: relative;
+    background: transparent;
+}
+
+.dashboard-container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+}
+
+/* Header */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 3.5rem;
+}
+
+.dashboard-header-text h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-header-text p {
+    color: var(--text-muted);
+    font-size: 1rem;
+}
+
+.dashboard-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+/* ==========================================================================
+   BENTO BOXES METRICS GRID
+   ========================================================================= */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.metric-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-sm);
+}
+.metric-card:hover {
+    box-shadow: var(--shadow-lg);
+    border-color: var(--border-strong);
+    transform: translateY(-4px);
+}
+
+.metric-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.metric-title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.metric-icon-box {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #F4F4F5;
+    color: var(--text-dark);
+}
+.metric-icon-box.blue { background: rgba(37, 99, 235, 0.1); color: var(--accent); }
+.metric-icon-box.green { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+.metric-icon-box.orange { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+
+.metric-value-box {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    line-height: 1;
+}
+
+.metric-total {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.metric-subtitle {
+    margin-top: 0.75rem;
+    font-size: 0.8125rem;
+    color: var(--success);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ==========================================================================
+   LOWER CONTENT GRID
+   ========================================================================= */
+.content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2.5rem;
+}
+
+.content-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 2.5rem;
+    box-shadow: var(--shadow-premium);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.card-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--bg-base);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dark);
+}
+
+.card-header h2 {
+    font-size: 1.125rem;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+/* Activity Items */
+.milestone-content {
+    padding-left: 1rem;
+    border-left: 2px solid var(--accent);
+    margin-bottom: 1.5rem;
+}
+
+.milestone-content p {
+    color: var(--text-body);
+    font-size: 0.9375rem;
+    margin-bottom: 0.5rem;
+}
+
+.terminal-log {
+    background: #FAFAFA;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8125rem;
+    color: var(--text-dark);
+    height: 150px;
+    overflow-y: auto;
+}
+
+.terminal-log span { color: var(--success); }
+
+/* ==========================================================================
+   RESPONSIVE LAYOUT FOR MOBILE
+   ========================================================================= */
+.mobile-nav-toggle { display: none; }
+.sidebar-overlay { display: none; }
+
+@media (max-width: 1024px) {
+    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+    .content-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+    .mobile-nav-toggle {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: var(--bg-surface);
+        color: var(--text-dark);
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .app-layout { flex-direction: column; }
+    .sidebar {
+        position: fixed;
+        left: -100%;
+        top: 0;
+        bottom: 0;
+        z-index: 200;
+    }
+    .sidebar.active { left: 0; }
+    .main-content { padding: 1.5rem; }
+    .metrics-grid { grid-template-columns: 1fr; }
+}

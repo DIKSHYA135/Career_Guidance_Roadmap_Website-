@@ -1,0 +1,322 @@
+/* =========================================================
+   QUIZ.CSS — Xyverra Assessment Page (Premium SaaS)
+   ========================================================= */
+@import url('global.css');
+
+/* ── Container ── */
+.quiz-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 0 4rem;
+}
+
+/* ── Page Header ── */
+.quiz-header {
+    margin-bottom: 2rem;
+    animation: fadeInDown 0.5s var(--ease) both;
+}
+
+.quiz-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    transition: var(--transition-xs);
+}
+.quiz-back-link:hover { color: var(--accent); }
+
+.quiz-header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.quiz-header p { color: var(--text-muted); font-size: 1rem; font-weight: 500; }
+
+/* ── Quiz Card ── */
+.quiz-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-premium);
+    overflow: hidden;
+    animation: fadeInUp 0.5s var(--ease) both;
+    position: relative;
+}
+
+/* ── Timer Bar ── */
+.timer-container {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--bg-surface-hover);
+    z-index: 10;
+}
+
+.timer-bar {
+    height: 100%;
+    background: var(--accent);
+    transition: width 1s linear, background 0.5s;
+}
+
+/* ── Question Meta ── */
+.question-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 2.5rem 0;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.timer-badge {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--accent);
+    border: 1px solid rgba(37, 99, 235, 0.2);
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    transition: var(--transition-xs);
+}
+
+/* ── Quiz Body ── */
+#quiz-body { padding: 2rem 2.5rem 0; }
+
+/* ── Question Text ── */
+.question-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    line-height: 1.4;
+    margin-bottom: 2rem;
+    letter-spacing: -0.02em;
+}
+
+/* ── Options List / Grid (both class names used) ── */
+.options-list,
+.options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    margin-bottom: 2rem;
+}
+
+/* Disabled state — block clicks but keep visible */
+.options-grid.disabled,
+.options-list.disabled {
+    pointer-events: none;
+    opacity: 0.75;
+}
+
+/* Option letter badge (A B C D) */
+.option-letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    background: var(--bg-surface-hover);
+    color: var(--text-muted);
+    margin-right: 0.875rem;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.option-btn {
+    width: 100%;
+    text-align: left;
+    padding: 1rem 1.25rem;
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    font-size: 0.9375rem;
+    font-family: inherit;
+    font-weight: 500;
+    color: var(--text-body);
+    cursor: pointer;
+    transition: var(--transition-sm);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow-xs);
+}
+
+.option-text { flex: 1; }
+.option-icon { font-size: 1.2rem; margin-left: 1rem; opacity: 0; transform: scale(0.5); transition: var(--transition-sm); }
+
+/* Hover */
+.option-btn:hover:not(.selected):not([disabled]) {
+    background: var(--bg-surface-hover);
+    border-color: var(--border-strong);
+    transform: translateY(-1px);
+}
+
+/* Selected State */
+.option-btn.selected {
+    background: rgba(37, 99, 235, 0.05);
+    border-color: var(--accent);
+    color: var(--text-dark);
+    box-shadow: 0 0 0 1px var(--accent);
+}
+
+.option-btn.selected .option-icon {
+    opacity: 1;
+    transform: scale(1);
+    color: var(--accent);
+}
+
+/* Result States */
+.option-btn.correct {
+    background: rgba(16, 185, 129, 0.06);
+    border-color: var(--success);
+    color: var(--success);
+    box-shadow: 0 0 0 2px rgba(16,185,129,0.15);
+}
+.option-btn.correct .option-letter { background: rgba(16,185,129,0.15); color: var(--success); }
+.option-btn.correct .option-icon { color: var(--success); opacity: 1; transform: scale(1); }
+
+.option-btn.incorrect,
+.option-btn.wrong {
+    background: rgba(239, 68, 68, 0.06);
+    border-color: var(--danger);
+    color: var(--danger);
+    box-shadow: 0 0 0 2px rgba(239,68,68,0.12);
+}
+.option-btn.wrong .option-letter,
+.option-btn.incorrect .option-letter { background: rgba(239,68,68,0.12); color: var(--danger); }
+.option-btn.incorrect .option-icon { color: var(--danger); opacity: 1; transform: scale(1); }
+
+/* ── Footer / Controls ── */
+.quiz-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1.25rem 2rem 1.75rem;
+    border-top: 1px solid var(--border);
+}
+
+.quiz-footer-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-left: auto;
+}
+
+.quiz-status {
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: var(--radius-full);
+}
+.quiz-status.info    { background: rgba(37,99,235,0.08);  color: var(--accent); }
+.quiz-status.warning { background: rgba(245,158,11,0.1);  color: #B45309; }
+.quiz-status.success { background: rgba(16,185,129,0.1);  color: #059669; }
+.quiz-status.error   { background: rgba(239,68,68,0.1);   color: var(--danger); }
+
+/* Progress Dots */
+.quiz-progress-dots {
+    display: flex;
+    gap: 6px;
+    padding: 1.25rem 2rem 0;
+}
+.quiz-progress-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.3s;
+}
+.quiz-progress-dot.active    { background: var(--accent); transform: scale(1.3); }
+.quiz-progress-dot.completed { background: var(--success); }
+
+#next-btn {
+    padding: 10px 24px;
+    font-size: 0.9rem;
+    border-radius: var(--radius-full);
+}
+
+/* fullscreen-quiz: hide sidebar during quiz */
+body.fullscreen-quiz .sidebar { display: none; }
+body.fullscreen-quiz .main-content { padding: 2rem; }
+
+
+
+/* ── Results Screen ── */
+.results-screen {
+    text-align: center;
+    padding: 3rem 2.5rem;
+    display: none;
+    animation: fadeIn 0.6s var(--ease);
+}
+
+.results-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+}
+.results-icon.pass { color: var(--success); filter: drop-shadow(0 4px 12px rgba(16,185,129,0.3)); }
+.results-icon.fail { color: var(--danger); filter: drop-shadow(0 4px 12px rgba(239,68,68,0.3)); }
+
+.results-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.03em;
+}
+
+.results-score {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin: 1rem 0;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: -0.05em;
+}
+.results-score.pass { color: var(--success); }
+.results-score.fail { color: var(--danger); }
+
+.results-desc {
+    color: var(--text-muted);
+    font-size: 1.125rem;
+    margin-bottom: 2.5rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.results-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.results-actions .btn {
+    padding: 14px 28px;
+    font-size: 1rem;
+    border-radius: var(--radius-full);
+}
+
+@keyframes fadeInDown {
+    0% { opacity: 0; transform: translateY(-15px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+    .quiz-container { padding: 1rem; }
+    .question-meta, #quiz-body, .quiz-footer { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .results-screen { padding: 2rem 1.5rem; }
+    .results-actions { flex-direction: column; }
+}

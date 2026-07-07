@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Gap Analysis - XYVERRA</title>
+    <meta name="description" content="AI-Powered Skill Gap Analysis">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="skill-gap.css">
+    <!-- Chart.js for progress tracking graph -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="auth-guard.js?v=2"></script>
+</head>
+<body>
+<div class="app-layout">
+    <!-- Mobile Header -->
+    <div class="mobile-nav-toggle">
+        <div class="sidebar-brand" style="margin-bottom:0;padding:0;">
+            <img src="xyverra_logo.jpeg" alt="XYVERRA Logo" class="sidebar-logo"> XYVERRA
+        </div>
+        <button id="sidebar-toggle-btn" class="btn" style="padding:5px;background:transparent;">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar-menu">
+        <div class="sidebar-brand">
+            <img src="xyverra_logo.jpeg" alt="XYVERRA Logo" class="sidebar-logo">
+            <span>XYVERRA</span>
+        </div>
+        <nav class="nav-menu">
+            <a href="dashboard.html" class="nav-item nav-dashboard"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="career-discovery.html" class="nav-item nav-career-discovery"><i class="fas fa-compass"></i> Career Discovery</a>
+            <a href="counselor.html" class="nav-item nav-counselor"><i class="fas fa-robot"></i> AI Counselor</a>
+            <a href="skill-gap.html" class="nav-item active nav-skill-gap"><i class="fas fa-chart-line"></i> Skill Gap Analysis</a>
+            <a href="roadmap.html" class="nav-item nav-roadmap"><i class="fas fa-map"></i> My Roadmap</a>
+            <a href="progress.html" class="nav-item nav-progress"><i class="fas fa-tasks"></i> Progress Tracker</a>
+        </nav>
+        <div style="flex:1;"></div>
+        <div class="user-profile">
+            <div class="profile-click-area" title="View Profile">
+                <div class="avatar" id="user-avatar"></div>
+                <div class="profile-text">
+                    <h4 id="user-display-name">Loading...</h4>
+                    <p></p>
+                </div>
+            </div>
+            <button class="signout-btn" title="Sign Out" style="background:none;border:none;color:var(--text-muted);cursor:pointer;"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="dashboard-container sg-container">
+
+            <!-- 1. Header Section -->
+            <header class="sg-header">
+                <div>
+                    <h1 class="sg-title">Skill Gap Analysis</h1>
+                    <div class="sg-meta">
+                        <span class="sg-meta-item"><i class="fas fa-bullseye"></i> Goal: <strong id="sg-career-goal">Loading...</strong></span>
+                        <span class="sg-meta-item"><i class="fas fa-calendar-alt"></i> Last Updated: <span id="sg-last-updated">Just now</span></span>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="window.location.href='career-discovery.html'"><i class="fas fa-sync-alt"></i> Retake Assessment</button>
+            </header>
+
+            <div class="sg-grid-top">
+                <!-- 2. Overall Skill Match Score (Hero Card) -->
+                <div class="sg-card sg-hero-card">
+                    <div class="sg-hero-content">
+                        <div class="sg-hero-text">
+                            <h2>Overall Match Score</h2>
+                            <p class="sg-hero-summary" id="sg-hero-summary">Analyzing your progress...</p>
+                        </div>
+                        <div class="sg-hero-progress">
+                            <div class="circular-progress" id="sg-circular-progress">
+                                <svg viewBox="0 0 100 100">
+                                    <circle class="bg" cx="50" cy="50" r="45"></circle>
+                                    <circle class="meter" id="sg-circle-meter" cx="50" cy="50" r="45"></circle>
+                                </svg>
+                                <div class="inner-text">
+                                    <span class="percent" id="sg-match-pct">0%</span>
+                                </div>
+                            </div>
+                            <div class="sg-status-badge" id="sg-match-status">Calculating</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. Career Readiness Meter -->
+                <div class="sg-card sg-readiness-card">
+                    <h2>Career Readiness</h2>
+                    <div class="readiness-meter-wrapper">
+                        <div class="readiness-score" id="sg-readiness-score">0%</div>
+                        <div class="readiness-bar-container">
+                            <div class="readiness-bar" id="sg-readiness-bar"></div>
+                        </div>
+                    </div>
+                    <p class="readiness-text" id="sg-readiness-text">Analyzing your career readiness...</p>
+                </div>
+            </div>
+
+            <!-- 4. Strengths Section -->
+            <div class="sg-card sg-strengths-section">
+                <h3>Your Strengths</h3>
+                <div class="sg-badges-container" id="sg-strengths-container">
+                    <div class="sg-empty-state"><i class="fas fa-spinner fa-spin"></i> Loading strengths...</div>
+                </div>
+            </div>
+
+            <!-- 5. Skill Gaps Section (Most Important) -->
+            <div class="sg-card">
+                <h3>Skill Gaps Breakdown</h3>
+                <div class="sg-gaps-table-wrapper">
+                    <table class="sg-table">
+                        <thead>
+                            <tr>
+                                <th>Skill Area</th>
+                                <th>Required Level</th>
+                                <th>Current Level</th>
+                                <th>Gap Level</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sg-gaps-table-body">
+                            <tr><td colspan="4" class="sg-empty-state"><i class="fas fa-spinner fa-spin"></i> Analyzing gaps...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="sg-grid-middle">
+                <!-- 6. Personalized Learning Roadmap -->
+                <div class="sg-card sg-roadmap-section">
+                    <h3>Personalized Roadmap</h3>
+                    <div class="sg-stepper" id="sg-roadmap-container">
+                        <div class="sg-empty-state"><i class="fas fa-spinner fa-spin"></i> Generating roadmap...</div>
+                    </div>
+                </div>
+
+                <!-- 9. AI Action Plan -->
+                <div class="sg-card sg-action-plan">
+                    <h3>AI Action Plan</h3>
+                    <div class="sg-checklist" id="sg-checklist-container">
+                        <div class="sg-empty-state"><i class="fas fa-spinner fa-spin"></i> Generating action plan...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. Recommended Courses -->
+            <div class="sg-card">
+                <h3>Recommended Courses</h3>
+                <div class="sg-courses-grid" id="sg-courses-container">
+                    <div class="sg-empty-state" style="grid-column: 1 / -1;"><i class="fas fa-spinner fa-spin"></i> Finding courses...</div>
+                </div>
+            </div>
+
+            <!-- 10. Progress Tracking -->
+            <div class="sg-card">
+                <h3>Historical Progress</h3>
+                <div class="sg-chart-container">
+                    <canvas id="sg-progress-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- 11. Download Report Actions -->
+            <div class="sg-actions-footer">
+                <button class="btn btn-outline" onclick="window.print()"><i class="fas fa-download"></i> Download PDF Report</button>
+                <button class="btn btn-outline"><i class="fas fa-save"></i> Save Progress</button>
+                <button class="btn btn-primary"><i class="fas fa-share-alt"></i> Share Results</button>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script src="app-data.js"></script>
+<script src="skill-gap.js"></script>
+<script src="global-sidebar.js"></script>
+<script src="back-nav.js"></script>
+</body>
+</html>
