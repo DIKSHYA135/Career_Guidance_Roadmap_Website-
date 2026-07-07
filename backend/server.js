@@ -48,16 +48,9 @@ const FREE_CHAT_LIMIT = 3;
 const OTP_TTL_MS = 10 * 60 * 1000;          // 10 minutes
 const SUBSCRIPTION_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
-// Request Logger - Improved for debugging
-app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-    if (req.method !== 'GET') {
-        console.log('Request Body:', JSON.stringify(req.body, null, 2));
-    }
-    next();
-});
-
-// MongoDB Connection
+// ==========================
+// REQUIRED ENVIRONMENT VARS
+// ==========================
 if (!process.env.MONGO_URI) {
     console.error('❌ Error: MONGO_URI is not defined in the .env file.');
     process.exit(1);
@@ -505,7 +498,7 @@ async function sendResetEmail(email, resetUrl) {
 // PUBLIC ROUTES
 // ==========================
 app.get('/', (req, res) => {
-    res.json({ message: "Xyverra API is running" });
+    res.json({ message: 'Xyverra API is running' });
 });
 
 app.get('/health', (req, res) => {
@@ -516,21 +509,6 @@ app.get('/health', (req, res) => {
         dbName: mongoose.connection.name
     });
 });
-// Auth Middleware
-const authMiddleware = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ message: 'No token provided' });
-    }
-    const token = authHeader.split(' ')[1];
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret');
-        req.user = decoded;
-        next();
-    } catch (err) {
-        return res.status(401).json({ message: 'Invalid token' });
-    }
-};
 
 // ==========================
 // LEAD CAPTURE ROUTE (Landing Page Waitlist/Newsletter)
@@ -604,8 +582,7 @@ app.post(
                 });
             }
 
-    } catch (error) {
-        console.error('❌ Registration Error:', error);
+            const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
             const newUser = await User.create({
                 email,
