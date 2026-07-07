@@ -3,18 +3,316 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Xyvvera</title>
+    <title>Dashboard - Xyverra</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard.css">
+
+    <!-- ============================================================
+         PREMIUM DASHBOARD REDESIGN — scoped enhancement styles
+         (Uses global.css design tokens; keeps all JS hooks intact)
+         ============================================================ -->
+    <style>
+        :root {
+            --dash-gap: 1.25rem;
+            --indigo: #4F46E5;
+            --indigo-soft: rgba(79, 70, 229, 0.10);
+            --cyan-soft: rgba(6, 182, 212, 0.12);
+            --purple: #8B5CF6;
+            --purple-soft: rgba(139, 92, 246, 0.12);
+            --emerald-soft: rgba(16, 185, 129, 0.12);
+        }
+
+        .main-content { overflow-y: auto; }
+
+        .dashboard-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 2.25rem 4rem;
+            animation: dashFade 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes dashFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+        /* ---------- Header ---------- */
+        .dashboard-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.75rem;
+        }
+        .dashboard-header h1 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.9rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--text-dark);
+            margin: 0 0 0.35rem;
+        }
+        .dashboard-header p { font-size: 0.95rem; color: var(--text-muted); margin: 0; }
+        .header-date-pill {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: var(--radius-full); padding: 0.55rem 1rem;
+            font-size: 0.82rem; font-weight: 600; color: var(--text-muted);
+            box-shadow: var(--shadow-xs);
+        }
+        .header-date-pill i { color: var(--primary); }
+
+        /* ---------- Metrics Bento Grid ---------- */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--dash-gap);
+            margin-bottom: 1.75rem;
+        }
+        .metric-card {
+            position: relative;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 1.4rem;
+            box-shadow: var(--shadow-premium);
+            overflow: hidden;
+            transition: var(--transition-sm);
+        }
+        .metric-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--border-strong); }
+        .card-glow-element {
+            position: absolute; inset: 0; pointer-events: none;
+            opacity: 0.9;
+        }
+        .metric-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+        .metric-title {
+            font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em;
+            text-transform: uppercase; color: var(--text-muted);
+        }
+        .metric-icon-box {
+            width: 34px; height: 34px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .metric-icon-box.cyan-text { color: var(--cyan); background: var(--cyan-soft); }
+        .metric-icon-box.blue-text { color: var(--primary); background: var(--indigo-soft); }
+        .metric-icon-box.purple-text { color: var(--purple); background: var(--purple-soft); }
+
+        .metric-value-box { display: flex; align-items: baseline; gap: 0.5rem; }
+        .metric-value {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 2rem; font-weight: 800; line-height: 1;
+            color: var(--text-dark); letter-spacing: -0.03em;
+        }
+        .metric-total { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+        .metric-subtitle { font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin: 0.6rem 0 0; }
+
+        .metric-trend {
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.5rem;
+            border-radius: var(--radius-full); margin-left: auto;
+        }
+        .metric-trend.up { color: var(--success); background: var(--emerald-soft); }
+        .metric-value-box .metric-trend { align-self: center; }
+
+        /* Progress bars */
+        .progress-bar-container {
+            width: 100%; height: 7px; background: var(--bg-surface-hover);
+            border-radius: var(--radius-full); overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%; border-radius: var(--radius-full);
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            box-shadow: 0 0 10px var(--accent-glow);
+            transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+        .progress-bar::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2.4s infinite;
+        }
+        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+        /* Circular readiness ring */
+        .readiness-ring-wrap { display: flex; align-items: center; gap: 1rem; }
+        .readiness-ring { position: relative; width: 84px; height: 84px; flex-shrink: 0; }
+        .readiness-ring svg { transform: rotate(-90deg); width: 84px; height: 84px; }
+        .readiness-ring .ring-bg { fill: none; stroke: var(--bg-surface-hover); stroke-width: 8; }
+        .readiness-ring .ring-fg {
+            fill: none; stroke: url(#ringGrad); stroke-width: 8; stroke-linecap: round;
+            stroke-dasharray: 226; stroke-dashoffset: 226;
+            transition: stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .readiness-ring .ring-label {
+            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800;
+            font-size: 1.15rem; color: var(--text-dark);
+        }
+
+        /* Daily habit tracker */
+        .highlight-card { background: linear-gradient(160deg, var(--bg-surface), #FAFAFF); }
+        .pt-milestone { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; }
+        .pt-dot {
+            width: 14px; height: 14px; border-radius: 50%;
+            background: var(--bg-surface-hover); border: 2px solid var(--border-strong);
+            transition: var(--transition-sm);
+        }
+        .pt-milestone.done .pt-dot {
+            background: var(--primary); border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--indigo-soft);
+        }
+        .pt-milestone span { color: var(--text-muted); font-weight: 600; }
+        .pt-milestone.today span { color: var(--primary); font-weight: 800; }
+        .pt-milestone.today .pt-dot {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(79,70,229,0.25);
+        }
+        .pt-milestone.done.today .pt-dot {
+            background: var(--primary); border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79,70,229,0.25);
+        }
+        .pt-view-link {
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            font-size: 0.78rem; font-weight: 700; color: var(--primary);
+            text-decoration: none; transition: var(--transition-xs);
+        }
+        .pt-view-link:hover { gap: 0.55rem; }
+        @keyframes pulseDot {
+            0%, 100% { box-shadow: 0 0 0 3px var(--indigo-soft); }
+            50% { box-shadow: 0 0 0 6px rgba(79,70,229,0.18); }
+        }
+
+        /* ---------- Quick Actions ---------- */
+        .section-label {
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;
+            text-transform: uppercase; color: var(--text-muted);
+            margin: 0 0 0.85rem;
+        }
+        .quick-actions-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--dash-gap);
+            margin-bottom: 2rem;
+        }
+        .quick-action-card {
+            display: flex; align-items: center; gap: 0.9rem;
+            background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 1.1rem 1.2rem;
+            cursor: pointer; text-align: left; width: 100%;
+            box-shadow: var(--shadow-xs); transition: var(--transition-sm);
+            font-family: inherit;
+        }
+        .quick-action-card:hover { transform: translateY(-2px); border-color: var(--primary); box-shadow: var(--shadow-md); }
+        .qa-icon {
+            width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center; font-size: 1.05rem;
+        }
+        .qa-icon.indigo { background: var(--indigo-soft); color: var(--primary); }
+        .qa-icon.cyan { background: var(--cyan-soft); color: var(--cyan); }
+        .qa-icon.purple { background: var(--purple-soft); color: var(--purple); }
+        .qa-icon.emerald { background: var(--emerald-soft); color: var(--success); }
+        .qa-text strong { display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-dark); }
+        .qa-text span { font-size: 0.74rem; color: var(--text-muted); }
+
+        /* ---------- Content Grid ---------- */
+        .content-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--dash-gap);
+        }
+        .content-card {
+            background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: var(--radius-xl); padding: 1.5rem;
+            box-shadow: var(--shadow-premium); transition: var(--transition-sm);
+        }
+        .content-card:hover { box-shadow: var(--shadow-lg); }
+        .card-header { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.1rem; }
+        .card-icon {
+            width: 38px; height: 38px; border-radius: 11px;
+            display: flex; align-items: center; justify-content: center; font-size: 1rem;
+        }
+        .card-icon.blue-text { color: var(--primary); background: var(--indigo-soft); }
+        .card-icon.cyan-text { color: var(--cyan); background: var(--cyan-soft); }
+        .card-icon.purple-text { color: var(--purple); background: var(--purple-soft); }
+        .card-header h2 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.05rem; font-weight: 700; color: var(--text-dark); margin: 0;
+        }
+
+        .badge {
+            display: inline-block; font-size: 0.68rem; font-weight: 700;
+            letter-spacing: 0.04em; text-transform: uppercase;
+            color: var(--primary); background: var(--indigo-soft);
+            padding: 0.3rem 0.7rem; border-radius: var(--radius-full);
+        }
+
+        /* Milestone card highlight */
+        .milestone-card {
+            grid-column: span 1;
+            background: linear-gradient(160deg, var(--bg-surface), #F8F8FF);
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .milestone-content { margin-bottom: 1.3rem; }
+
+        /* Resource link cards */
+        .resource-link-card {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0.85rem 1rem; background: var(--bg-surface-hover);
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            text-decoration: none; color: var(--text-dark); transition: var(--transition-sm);
+        }
+        .resource-link-card:hover { border-color: var(--primary); transform: translateX(4px); box-shadow: var(--shadow-sm); }
+
+        /* Activity timeline */
+        .timeline { position: relative; padding-left: 1.4rem; margin-top: 1rem; }
+        .timeline::before {
+            content: ''; position: absolute; left: 5px; top: 4px; bottom: 4px;
+            width: 2px; background: linear-gradient(var(--primary), var(--border));
+        }
+        .timeline-item { position: relative; padding-bottom: 1.4rem; }
+        .timeline-item:last-child { padding-bottom: 0; }
+        .timeline-dot {
+            position: absolute; left: -1.4rem; top: 2px; width: 12px; height: 12px;
+            border-radius: 50%; border: 2px solid var(--bg-surface);
+            box-shadow: 0 0 0 2px var(--primary); background: var(--primary);
+        }
+        .timeline-dot.success { box-shadow: 0 0 0 2px var(--success); background: var(--success); }
+        .timeline-dot.muted { background: var(--text-muted); box-shadow: 0 0 0 2px var(--border); }
+        .timeline-item h4 { font-size: 0.92rem; font-weight: 700; color: var(--text-dark); margin: 0 0 0.2rem; }
+        .timeline-item p { font-size: 0.82rem; color: var(--text-muted); margin: 0; }
+
+        .full-width { grid-column: 1 / -1; }
+
+        /* Milestone celebration modal */
+        .celebrate-overlay {
+            position: fixed; inset: 0; z-index: 9999; display: none;
+            align-items: center; justify-content: center;
+            background: rgba(11, 25, 44, 0.55); backdrop-filter: blur(6px);
+            animation: dashFade 0.3s ease;
+        }
+        .celebrate-overlay.show { display: flex; }
+        .celebrate-card {
+            background: var(--bg-surface); border-radius: var(--radius-2xl);
+            padding: 2.5rem; max-width: 380px; text-align: center;
+            box-shadow: var(--shadow-lg); animation: pop 0.5s cubic-bezier(0.16, 1.4, 0.3, 1);
+        }
+        @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .celebrate-card .emoji { font-size: 3.5rem; margin-bottom: 0.5rem; }
+        .celebrate-card h2 { font-family: 'Plus Jakarta Sans'; font-size: 1.4rem; color: var(--text-dark); margin: 0 0 0.5rem; }
+        .celebrate-card p { color: var(--text-muted); font-size: 0.9rem; margin: 0 0 1.5rem; }
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 1100px) {
+            .metrics-grid, .quick-actions-grid { grid-template-columns: repeat(2, 1fr); }
+            .content-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 640px) {
+            .dashboard-container { padding: 1.25rem 1rem 3rem; }
+            .metrics-grid, .quick-actions-grid, .content-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+    <script src="auth-guard.js?v=2"></script>
 </head>
 <body>
 
-
     <div class="app-layout" style="position: relative; z-index: 10; background: transparent;">
-        
+
         <!-- Mobile Header Toggle -->
         <div class="mobile-nav-toggle">
             <div class="sidebar-brand" style="margin-bottom: 0; padding: 0;">
@@ -29,7 +327,7 @@
         <!-- Sidebar Overlay -->
         <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-        <!-- Glassmorphic Sidebar Navigation -->
+        <!-- Sidebar Navigation -->
         <aside class="sidebar" id="sidebar-menu">
             <div class="sidebar-brand">
                 <img src="xyverra_logo.jpeg" alt="Xyverra Logo" class="sidebar-logo">
@@ -44,32 +342,31 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
                     Career Discovery
                 </a>
-            <a href="counselor.html" class="nav-item nav-counselor">
-                <i class="fas fa-robot"></i> AI Counselor
-            </a>
-
+                <a href="counselor.html" class="nav-item nav-counselor">
+                    <i class="fas fa-robot"></i> AI Counselor
+                </a>
                 <a href="skill-gap.html" class="nav-item nav-skill-gap">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg>
                     Skill Gap Analysis
                 </a>
-                <a href="skill-input.html" class="nav-item nav-skill-input">
+                <a href="roadmap.html" class="nav-item nav-roadmap">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                    Create Roadmap
+                    My Roadmap
                 </a>
                 <a href="progress.html" class="nav-item nav-progress">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
                     Progress Tracker
                 </a>
             </nav>
-            
+
             <div style="flex: 1;"></div>
-            
+
             <div class="user-profile">
                 <div class="profile-click-area" title="View Profile">
                     <div class="avatar" id="user-avatar"></div>
                     <div class="profile-text">
                         <h4 id="user-display-name">Loading Candidate...</h4>
-                        <p>Platform Architect</p>
+                        <p></p>
                     </div>
                 </div>
                 <button class="signout-btn" title="Sign Out" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">
@@ -78,48 +375,66 @@
             </div>
         </aside>
 
-        <!-- Main Dashboard Content Workspace -->
+        <!-- Main Workspace -->
         <main class="main-content">
             <div class="dashboard-container">
 
-                <!-- Dynamic Welcome Header -->
+                <!-- Welcome Header -->
                 <header class="dashboard-header">
-                    <h1>Dashboard</h1>
-                    <p>Welcome back, <strong id="user-welcome-name" style="color: var(--primary);">User</strong>. Targeting active competency milestones.</p>
+                    <div>
+                        <h1>Welcome back, <span id="user-welcome-name" style="color: var(--primary);">User</span></h1>
+                        <p>Here's your career progress snapshot. Keep targeting those competency milestones.</p>
+                    </div>
+                    <div class="header-date-pill">
+                        <i class="far fa-calendar"></i>
+                        <span id="header-date">Today</span>
+                    </div>
                 </header>
 
-                <!-- High-End Glassmorphic Bento Metrics Grid -->
+                <!-- Metrics Bento Grid -->
                 <div class="metrics-grid">
-                    
-                    <!-- Bento Box 1: Career Readiness Score Widget -->
+
+                    <!-- Career Readiness (circular ring) -->
                     <div class="metric-card card-box">
-                        <div class="card-glow-element" style="background: radial-gradient(circle, rgba(37, 99, 235, 0.05) 0%, transparent 70%);"></div>
+                        <div class="card-glow-element" style="background: radial-gradient(circle at 70% 0%, rgba(79, 70, 229, 0.06) 0%, transparent 60%);"></div>
                         <div class="metric-header">
-                            <span class="metric-title">CAREER READINESS</span>
-                            <div class="metric-icon-box cyan-text">
+                            <span class="metric-title">Career Readiness</span>
+                            <div class="metric-icon-box blue-text">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
                             </div>
                         </div>
-                        <div class="metric-value-box">
-                            <span class="metric-value" id="user-score-display">10%</span>
+                        <div class="readiness-ring-wrap">
+                            <div class="readiness-ring">
+                                <svg viewBox="0 0 84 84">
+                                    <defs>
+                                        <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+                                            <stop offset="0%" stop-color="#4F46E5"/>
+                                            <stop offset="100%" stop-color="#06B6D4"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <circle class="ring-bg" cx="42" cy="42" r="36"/>
+                                    <circle class="ring-fg" id="readiness-ring-fg" cx="42" cy="42" r="36"/>
+                                </svg>
+                                <div class="ring-label" id="user-score-display">10%</div>
+                            </div>
+                            <p class="metric-subtitle" style="margin:0;">Aggregate index from roadmap items, quizzes, and XP earned.</p>
                         </div>
-                        <p class="metric-subtitle">Aggregate index based on completed roadmap items, quizzes, and XP</p>
-                        <div class="progress-bar-container" style="margin-top: 1rem;">
-                            <div class="progress-bar" id="score-progress-bar" style="width: 10%;"></div>
-                        </div>
+                        <!-- hidden bar kept for JS compatibility -->
+                        <div class="progress-bar-container" style="display:none;"><div class="progress-bar" id="score-progress-bar" style="width:10%;"></div></div>
                     </div>
 
-                    <!-- Bento Box 2: Roadmap Progress Widget -->
+                    <!-- Roadmap Progress -->
                     <div class="metric-card card-box">
-                        <div class="card-glow-element" style="background: radial-gradient(circle, rgba(37, 99, 235, 0.05) 0%, transparent 70%);"></div>
+                        <div class="card-glow-element" style="background: radial-gradient(circle at 70% 0%, rgba(79, 70, 229, 0.06) 0%, transparent 60%);"></div>
                         <div class="metric-header">
-                            <span class="metric-title">ROADMAP PROGRESS</span>
+                            <span class="metric-title">Roadmap Progress</span>
                             <div class="metric-icon-box blue-text">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10M5 4h14v4a7 7 0 0 1-14 0V4z"></path></svg>
                             </div>
                         </div>
                         <div class="metric-value-box">
                             <span class="metric-value" id="roadmap-pct-display">0%</span>
+                            <span class="metric-trend up"><i class="fas fa-arrow-up"></i> on track</span>
                         </div>
                         <p class="metric-subtitle" id="roadmap-steps-label">0 of 8 steps completed</p>
                         <div class="progress-bar-container" style="margin-top: 1rem;">
@@ -127,86 +442,89 @@
                         </div>
                     </div>
 
-                    <!-- Bento Box 3: Job Ready Level Widget -->
+                    <!-- Job Ready Level -->
                     <div class="metric-card card-box">
-                        <div class="card-glow-element" style="background: radial-gradient(circle, rgba(139, 92, 246, 0.05) 0%, transparent 70%);"></div>
+                        <div class="card-glow-element" style="background: radial-gradient(circle at 70% 0%, rgba(139, 92, 246, 0.07) 0%, transparent 60%);"></div>
                         <div class="metric-header">
-                            <span class="metric-title">JOB READY LEVEL</span>
+                            <span class="metric-title">Job Ready Level</span>
                             <div class="metric-icon-box purple-text">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                             </div>
                         </div>
                         <div class="metric-value-box">
-                            <span class="metric-value" style="color: #8B5CF6; font-size: 1.4rem;" id="user-rank-title">Beginner</span>
+                            <span class="metric-value" style="color: #8B5CF6; font-size: 1.5rem;" id="user-rank-title">Beginner</span>
                         </div>
-                        <p class="metric-subtitle">Current Experience: <strong style="color:#8B5CF6;" id="xp-display-val">1,240 XP</strong></p>
+                        <p class="metric-subtitle">Experience: <strong style="color:#8B5CF6;" id="xp-display-val">1,240 XP</strong></p>
                         <div class="progress-bar-container" style="margin-top: 1rem;">
-                            <div class="progress-bar" style="width: 62%; background: linear-gradient(90deg, #8B5CF6, #A78BFA); box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);"></div>
+                            <div class="progress-bar" id="rank-progress-bar" style="width: 62%; background: linear-gradient(90deg, #8B5CF6, #A78BFA); box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);"></div>
                         </div>
                     </div>
 
-                    <!-- Bento Box 4: Daily learning tracker widget -->
+                    <!-- Daily Habit Tracker -->
                     <div class="metric-card card-box highlight-card progress-tracker-card">
                         <div class="metric-header">
-                            <span class="metric-title">DAILY HABIT TRACKER</span>
+                            <span class="metric-title">Daily Habit Tracker</span>
                             <div class="metric-icon-box cyan-text">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
                             </div>
                         </div>
                         <div class="metric-value-box" style="margin-bottom: 0.4rem;">
-                            <span class="metric-value" style="color: var(--primary);" id="streak-val-display">5 Days</span>
-                            <span class="metric-total" style="font-size:0.75rem; text-transform:none;">learning streak</span>
+                            <span class="metric-value" style="color: var(--primary); font-size: 1.6rem;" id="streak-val-display">5 Days</span>
+                            <span class="metric-total" style="text-transform:none;">streak 🔥</span>
                         </div>
-                        
-                        <!-- Daily checklist checks -->
-                        <div class="progress-tracker-milestones" style="display:flex; justify-content:space-between; margin-top: 0.8rem; margin-bottom: 0.8rem;">
-                            <div class="pt-milestone done" title="Monday Completed">
-                                <div class="pt-dot"></div>
-                                <span style="font-size:0.6rem;">Mon</span>
-                            </div>
-                            <div class="pt-milestone done" title="Tuesday Completed">
-                                <div class="pt-dot"></div>
-                                <span style="font-size:0.6rem;">Tue</span>
-                            </div>
-                            <div class="pt-milestone done" title="Wednesday Completed">
-                                <div class="pt-dot"></div>
-                                <span style="font-size:0.6rem;">Wed</span>
-                            </div>
-                            <div class="pt-milestone done" title="Thursday Completed">
-                                <div class="pt-dot"></div>
-                                <span style="font-size:0.6rem;">Thu</span>
-                            </div>
-                            <div class="pt-milestone done" title="Friday Completed (Today)">
-                                <div class="pt-dot" style="animation: pulseDot 2s infinite;"></div>
-                                <span style="font-size:0.6rem; color:var(--text-dark); font-weight:700;">Fri</span>
-                            </div>
+                        <div class="progress-tracker-milestones" id="pt-milestones-row" style="display:flex; justify-content:space-between; margin-top: 0.9rem; margin-bottom: 0.9rem;">
+                            <!-- Populated dynamically by dashboard.js based on today's real date -->
                         </div>
-                        <a href="progress.html" class="pt-view-link">Analyze learning velocity &rarr;</a>
+                        <a href="progress.html" class="pt-view-link">Analyze learning velocity <i class="fas fa-arrow-right"></i></a>
                     </div>
                 </div>
 
-                <!-- Bottom grids content area -->
+                <!-- Quick Action Cards -->
+                <p class="section-label">Quick Actions</p>
+                <div class="quick-actions-grid">
+                    <button class="quick-action-card" onclick="window.location.href='roadmap.html'">
+                        <div class="qa-icon indigo"><i class="fas fa-play"></i></div>
+                        <div class="qa-text"><strong>Continue Learning</strong><span>Resume your roadmap</span></div>
+                    </button>
+                    <button class="quick-action-card" onclick="window.location.href='quiz.html'">
+                        <div class="qa-icon emerald"><i class="fas fa-bolt"></i></div>
+                        <div class="qa-text"><strong>Take Assessment</strong><span>Earn XP and rank up</span></div>
+                    </button>
+                    <button class="quick-action-card" onclick="window.location.href='counselor.html'">
+                        <div class="qa-icon purple"><i class="fas fa-robot"></i></div>
+                        <div class="qa-text"><strong>Ask AI Counselor</strong><span>Get guidance instantly</span></div>
+                    </button>
+                    <button class="quick-action-card" onclick="window.location.href='skill-gap.html'">
+                        <div class="qa-icon cyan"><i class="fas fa-chart-line"></i></div>
+                        <div class="qa-text"><strong>View Insights</strong><span>Inspect skill gaps</span></div>
+                    </button>
+                </div>
+
+                <!-- Content Grid -->
+                <p class="section-label">Your Journey</p>
                 <div class="content-grid">
-                    
-                    <!-- Bento Card 1: Next Milestone / Active Pathway Goal -->
-                    <div class="content-card card-box">
-                        <div class="card-header">
-                            <div class="card-icon blue-text">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+
+                    <!-- Active Milestone -->
+                    <div class="content-card card-box milestone-card">
+                        <div>
+                            <div class="card-header">
+                                <div class="card-icon blue-text">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+                                </div>
+                                <h2>Active Milestone</h2>
                             </div>
-                            <h2>Active Milestone</h2>
-                        </div>
-                        <div class="milestone-content">
-                            <span class="badge" style="margin-bottom: 0.6rem;">Step 1 In Progress</span>
-                            <h3 style="font-size:1.15rem; font-weight:800; color:var(--text-dark); margin-bottom:0.4rem;" id="active-milestone-title">HTML Fundamentals</h3>
-                            <p style="font-size:0.82rem; color:var(--text-body); line-height:1.5;">Acquire complete familiarity with DOM nodes, structural parsing, metadata definitions, and high-end semantic markup standards.</p>
+                            <div class="milestone-content">
+                                <span class="badge" style="margin-bottom: 0.7rem;">Step 1 In Progress</span>
+                                <h3 style="font-size:1.2rem; font-weight:800; color:var(--text-dark); margin:0.5rem 0 0.4rem;" id="active-milestone-title">HTML Fundamentals</h3>
+                                <p style="font-size:0.84rem; color:var(--text-body); line-height:1.5; margin:0;">Master DOM nodes, structural parsing, metadata definitions, and high-end semantic markup standards.</p>
+                            </div>
                         </div>
                         <button class="btn btn-primary" style="width: 100%;" onclick="window.location.href = 'roadmap.html'">
-                            Resume Blueprint Path &rarr;
+                            Resume Blueprint Path <i class="fas fa-arrow-right" style="margin-left:6px;"></i>
                         </button>
                     </div>
 
-                    <!-- Bento Card 2: Skill Growth Chart -->
+                    <!-- Skill Projection -->
                     <div class="content-card card-box">
                         <div class="card-header">
                             <div class="card-icon cyan-text">
@@ -214,59 +532,83 @@
                             </div>
                             <h2>Skill Projection</h2>
                         </div>
-                        <div class="chart-box" style="height: 100px; position:relative; margin: 1.2rem 0; background:var(--bg-surface-solid); border: 1px solid var(--border); border-radius:var(--radius-md); overflow:hidden;">
+                        <div class="chart-box" style="height: 110px; position:relative; margin: 0.5rem 0 1.2rem; background:var(--bg-surface-hover); border: 1px solid var(--border); border-radius:var(--radius-md); overflow:hidden;">
                             <svg viewBox="0 0 100 45" fill="none" style="width:100%; height:100%;">
                                 <defs>
                                     <linearGradient id="chartGrad" x1="0" y1="45" x2="0" y2="0">
-                                        <stop offset="0%" stop-color="#2563EB" stop-opacity="0"/>
-                                        <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.15"/>
+                                        <stop offset="0%" stop-color="#4F46E5" stop-opacity="0"/>
+                                        <stop offset="100%" stop-color="#6366F1" stop-opacity="0.18"/>
                                     </linearGradient>
                                 </defs>
                                 <path d="M0 40 Q25 36, 45 22 T85 10 T100 4 L100 45 L0 45 Z" fill="url('#chartGrad')" />
                                 <path d="M0 40 Q25 36, 45 22 T85 10 T100 4" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" />
-                                <circle cx="45" cy="22" r="2" fill="var(--primary)" />
-                                <circle cx="100" cy="4" r="2" fill="var(--primary)" />
+                                <circle cx="45" cy="22" r="2.2" fill="var(--primary)" />
+                                <circle cx="100" cy="4" r="2.2" fill="var(--cyan)" />
                             </svg>
                         </div>
-                        
                         <div class="stats-list" style="display:flex; flex-direction:column; gap:0.6rem;">
-                            <div class="stat-item" style="display:flex; justify-content:space-between; font-size:0.8rem; border-bottom:1px solid var(--border); padding-bottom:0.4rem;">
-                                <span style="color:var(--text-body);">Ready for Match</span>
+                            <div class="stat-item" style="display:flex; justify-content:space-between; font-size:0.82rem; border-bottom:1px solid var(--border); padding-bottom:0.5rem;">
+                                <span style="color:var(--text-muted);">Ready for Match</span>
                                 <span style="color:var(--text-dark); font-weight:700;" id="readiness-pct-display">5%</span>
                             </div>
-                            <div class="stat-item" style="display:flex; justify-content:space-between; font-size:0.8rem; padding-bottom:0.4rem;">
-                                <span style="color:var(--text-body);">Target Profile</span>
+                            <div class="stat-item" style="display:flex; justify-content:space-between; font-size:0.82rem;">
+                                <span style="color:var(--text-muted);">Target Profile</span>
                                 <span style="color:var(--primary); font-weight:700;" id="user-role-display">Frontend Developer</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Bento Card 3: Skill Gap Analysis -->
+                    <!-- Skill Gap Analysis -->
                     <div class="content-card card-box" style="display:flex; flex-direction:column; justify-content:space-between;">
-                        <div class="card-header">
-                            <div class="card-icon purple-text">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg>
+                        <div>
+                            <div class="card-header">
+                                <div class="card-icon purple-text">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg>
+                                </div>
+                                <h2>Skill Gap Analysis</h2>
                             </div>
-                            <h2>Skill Gap Analysis</h2>
-                        </div>
-                        
-                        <div class="skill-gap-info">
-                            <p style="font-size:0.9rem; color:var(--text-body); margin-bottom: 1rem;">Based on your target role, we've identified missing competencies.</p>
+                            <p style="font-size:0.86rem; color:var(--text-muted); margin-bottom: 1rem;">Based on your target role, we've identified missing competencies.</p>
                             <div class="stats-list" style="display:flex; flex-direction:column; gap:0.6rem;">
-                                <div class="stat-item" style="display:flex; justify-content:space-between; font-size:0.8rem; border-bottom:1px solid var(--border); padding-bottom:0.4rem;">
-                                    <span style="color:var(--text-body);">Skills Validated</span>
+                                <div class="stat-item" style="display:flex; justify-content:space-between; font-size:0.82rem; border-bottom:1px solid var(--border); padding-bottom:0.5rem;">
+                                    <span style="color:var(--text-muted);">Skills Validated</span>
                                     <span style="color:var(--success); font-weight:700;" id="skills-validated-display">0</span>
                                 </div>
-                                <div class="stat-item" style="display:flex; justify-content:space-between; font-size:0.8rem; padding-bottom:0.4rem;">
-                                    <span style="color:var(--text-body);">Gaps Detected</span>
+                                <div class="stat-item" style="display:flex; justify-content:space-between; font-size:0.82rem;">
+                                    <span style="color:var(--text-muted);">Gaps Detected</span>
                                     <span style="color:var(--danger, #EF4444); font-weight:700;" id="skills-gap-display">0</span>
                                 </div>
                             </div>
                         </div>
-                        
-                        <button class="btn btn-outline" style="width: 100%; margin-top: 1rem;" onclick="window.location.href = 'skill-gap.html'">
-                            Inspect Gap Diagnostics &rarr;
+                        <button class="btn btn-outline" style="width: 100%; margin-top: 1.2rem;" onclick="window.location.href = 'skill-gap.html'">
+                            Inspect Gap Diagnostics <i class="fas fa-arrow-right" style="margin-left:6px;"></i>
                         </button>
+                    </div>
+
+                    <!-- Recommended Resources -->
+                    <div class="content-card card-box full-width">
+                        <div class="card-header">
+                            <div class="card-icon blue-text"><i class="fas fa-book-open"></i></div>
+                            <h2>Recommended Resources</h2>
+                        </div>
+                        <p style="font-size:0.86rem; color:var(--text-muted); margin-bottom: 1rem;">Curated learning materials for your current active milestone.</p>
+                        <div id="recommended-links-container" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:0.8rem;">
+                            <!-- Injected by dashboard.js -->
+                        </div>
+                    </div>
+
+                    <!-- Activity Timeline -->
+                    <div class="content-card card-box full-width">
+                        <div class="card-header">
+                            <div class="card-icon cyan-text"><i class="fas fa-history"></i></div>
+                            <h2>Recent Activity</h2>
+                        </div>
+                        <div class="timeline" id="activity-timeline-container">
+                            <div class="timeline-item">
+                                <div class="timeline-dot success"></div>
+                                <h4>Path Selected: <span id="timeline-path-name">Loading...</span></h4>
+                                <p>You generated your customized AI roadmap.</p>
+                            </div>
+                        </div>
                     </div>
 
                 </div>
@@ -274,10 +616,21 @@
         </main>
     </div>
 
+    <!-- Milestone Celebration Modal -->
+    <div class="celebrate-overlay" id="celebrate-overlay">
+        <div class="celebrate-card">
+            <div class="emoji">🎉</div>
+            <h2 id="celebrate-title">Milestone Complete!</h2>
+            <p id="celebrate-msg">You leveled up your skills. Keep up the momentum!</p>
+            <button class="btn btn-primary" style="width:100%;" onclick="document.getElementById('celebrate-overlay').classList.remove('show')">Keep Going</button>
+        </div>
+    </div>
+
     <script src="toast.js"></script>
     <script src="app-data.js"></script>
     <script src="global-sidebar.js"></script>
     <script src="roadmap.js"></script>
     <script src="dashboard.js"></script>
+    <script src="back-nav.js"></script>
 </body>
 </html>

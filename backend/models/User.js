@@ -11,13 +11,23 @@ const userSchema = new mongoose.Schema({
 
     password: {
         type: String,
-        required: true,
-        minlength: 6
+        required: true
     },
 
     name: {
         type: String,
         trim: true
+    },
+
+    isAdmin: {
+        type: Boolean,
+        default: false
+    },
+
+    activeSubscription: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Subscription',
+        default: null
     },
 
     selectedPath: {
@@ -76,10 +86,128 @@ const userSchema = new mongoose.Schema({
         default: {}
     },
 
-    createdAt: {
+    // Onboarding questionnaire answers
+    interests: {
+        type: [String],
+        default: []
+    },
+
+
+    timeline: {
+        type: String,
+        default: null
+    },
+
+    weeklyHours: {
+        type: String,
+        default: null
+    },
+
+    onboardingCompleted: {
+        type: Boolean,
+        default: false
+    },
+
+    // ==========================
+    // Email verification (OTP)
+    // ==========================
+    emailVerified: {
+        type: Boolean,
+        default: false
+    },
+
+    emailVerificationOTP: {
+        type: String,
+        default: null
+    },
+
+    emailVerificationExpiry: {
         type: Date,
-        default: Date.now
+        default: null
+    },
+
+    // ==========================
+    // Password Reset
+    // ==========================
+    resetPasswordToken: {
+        type: String,
+        default: null
+    },
+
+    resetPasswordExpire: {
+        type: Date,
+        default: null
+    },
+
+    // ==========================
+    // Chat usage / subscription
+    // ==========================
+    chatMessagesUsed: {
+        type: Number,
+        default: 0
+    },
+
+    chatSubscriptionActive: {
+        type: Boolean,
+        default: false
+    },
+
+    chatSubscriptionExpiry: {
+        type: Date,
+        default: null
+    },
+
+    // ==========================
+    // Extended profile fields
+    // ==========================
+
+    profilePicture: {
+        type: String, // base64 string or URL
+        default: null
+    },
+
+
+    careerInterests: {
+        type: [String],
+        default: []
+    },
+
+    // Persisted lesson study records (courseId -> Unix timestamp of last study)
+    studiedLessons: {
+        type: Map,
+        of: Number,
+        default: {}
+    },
+
+    // Persisted AI chat history (array of {role, content, timestamp})
+    chatHistory: {
+        type: [{
+            role: { type: String, enum: ['user', 'assistant'], required: true },
+            content: { type: String, required: true },
+            timestamp: { type: Number, default: Date.now }
+        }],
+        default: []
+    },
+
+    // ==========================
+    // Pro Features
+    // ==========================
+    emailReportsEnabled: {
+        type: Boolean,
+        default: false
+    },
+
+    interviewPrepStats: {
+        type: Map,
+        of: mongoose.Schema.Types.Mixed,
+        default: {}
+    },
+
+    analyticsData: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {}
     }
-});
+
+}, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

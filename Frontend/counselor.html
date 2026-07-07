@@ -12,6 +12,170 @@
     <link rel="stylesheet" href="global.css">
     <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="counselor.css">
+    <style>
+        /* ===== Question Counter / Usage Bar ===== */
+        .usage-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.7rem 2rem;
+            background: var(--bg-surface-solid);
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-body);
+            flex-wrap: wrap;
+        }
+        .usage-bar .usage-left { display: flex; align-items: center; gap: 0.6rem; }
+        .usage-counter { display: flex; align-items: center; gap: 0.5rem; }
+        .usage-dots { display: flex; gap: 4px; }
+        .usage-dot {
+            width: 9px; height: 9px; border-radius: 50%;
+            background: var(--border); transition: background 0.3s ease;
+        }
+        .usage-dot.filled { background: var(--primary); }
+        .usage-bar.warning .usage-dot.filled { background: #F59E0B; }
+        .usage-bar.warning .usage-text { color: #B45309; }
+        .usage-bar.blocked .usage-dot.filled { background: #EF4444; }
+        .usage-bar.blocked .usage-text { color: #B91C1C; }
+
+        .premium-badge {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            background: linear-gradient(135deg, #F59E0B, #F97316);
+            color: white; padding: 0.35rem 0.8rem; border-radius: 20px;
+            font-size: 0.8rem; font-weight: 700;
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.25);
+        }
+        .clear-history-btn {
+            background: transparent; border: 1px solid var(--border);
+            color: var(--text-body); border-radius: 20px;
+            padding: 0.35rem 0.9rem; font-size: 0.8rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s ease; font-family: inherit;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+        }
+        .clear-history-btn:hover { border-color: #EF4444; color: #EF4444; }
+
+        /* timestamps */
+        .message-time {
+            display: block; font-size: 0.7rem; color: #94A3B8;
+            margin-top: 0.4rem; font-weight: 500;
+        }
+        .user-message .message-time { color: rgba(255,255,255,0.7); text-align: right; }
+
+        .upgrade-inline {
+            margin: 0 2rem 1rem; padding: 0.9rem 1.2rem;
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: var(--radius-md); color: #B45309;
+            font-size: 0.88rem; font-weight: 600;
+            display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+        }
+        .upgrade-inline button {
+            background: linear-gradient(135deg, #F59E0B, #F97316); color: white;
+            border: none; border-radius: 20px; padding: 0.5rem 1.1rem;
+            font-weight: 700; font-size: 0.82rem; cursor: pointer; flex-shrink: 0;
+            font-family: inherit;
+        }
+        .chat-input-area input:disabled { opacity: 0.5; cursor: not-allowed; }
+        .chat-input-area button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Typing animation */
+        .typing-dots { display: flex; align-items: center; gap: 5px; padding: 8px 4px; }
+        .typing-dots span {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--primary); opacity: 0.5;
+            animation: typingBounce 1.2s infinite ease-in-out;
+        }
+        .typing-dots span:nth-child(1) { animation-delay: 0s; }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typingBounce {
+            0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+            30% { opacity: 1; transform: translateY(-5px); }
+        }
+
+        /* AI message text formatting */
+        .message-text ul { margin: 0.5rem 0; padding-left: 1.2rem; }
+        .message-text li { margin-bottom: 0.3rem; }
+        .message-text p { margin: 0 0 0.5rem; }
+        .message-text p:last-child { margin-bottom: 0; }
+        .message-text strong { font-weight: 700; }
+
+
+        /* ===== Subscription Modal ===== */
+        .sub-overlay {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(4px); display: none;
+            align-items: center; justify-content: center; z-index: 1000;
+            padding: 1rem; animation: subFadeIn 0.25s ease;
+        }
+        .sub-overlay.open { display: flex; }
+        @keyframes subFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .sub-modal {
+            background: var(--bg-surface-solid); border-radius: var(--radius-lg);
+            max-width: 440px; width: 100%; overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            animation: subPop 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        }
+        @keyframes subPop { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+        .sub-modal-header {
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            padding: 2rem 2rem 1.6rem; text-align: center; color: white;
+            position: relative;
+        }
+        .sub-modal-header .crown {
+            font-size: 2.6rem; line-height: 1; margin-bottom: 0.6rem; display: block;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+        .sub-modal-header h2 { margin: 0 0 0.3rem; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+        .sub-modal-header p { margin: 0; font-size: 0.9rem; opacity: 0.9; }
+        .sub-close {
+            position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.2);
+            border: none; color: white; width: 32px; height: 32px; border-radius: 50%;
+            cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center;
+        }
+        .sub-close:hover { background: rgba(255,255,255,0.35); }
+
+        .sub-modal-body { padding: 1.8rem 2rem 2rem; }
+        .sub-benefits { list-style: none; padding: 0; margin: 0 0 1.6rem; display: flex; flex-direction: column; gap: 0.9rem; }
+        .sub-benefits li { display: flex; align-items: center; gap: 0.8rem; font-size: 0.95rem; color: var(--text-dark); font-weight: 500; }
+        .sub-benefits li i {
+            color: #10B981; background: rgba(16,185,129,0.12); width: 28px; height: 28px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .sub-price { text-align: center; margin-bottom: 1.4rem; }
+        .sub-price .amount { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.03em; }
+        .sub-price .period { font-size: 1rem; color: var(--text-body); font-weight: 600; }
+        .sub-price .free-note { display: block; margin-top: 0.3rem; font-size: 0.85rem; color: #10B981; font-weight: 700; }
+
+        .sub-actions { display: flex; flex-direction: column; gap: 0.7rem; }
+        .sub-subscribe-btn {
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6); color: white; border: none;
+            border-radius: var(--radius-md); padding: 0.9rem; font-size: 1rem; font-weight: 700;
+            cursor: pointer; transition: all 0.2s ease; font-family: inherit;
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+        }
+        .sub-subscribe-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(59,130,246,0.3); }
+        .sub-subscribe-btn:disabled { opacity: 0.7; cursor: wait; transform: none; }
+        .sub-later-btn {
+            background: transparent; color: var(--text-body); border: none;
+            padding: 0.6rem; font-size: 0.9rem; font-weight: 600; cursor: pointer; font-family: inherit;
+        }
+        .sub-later-btn:hover { color: var(--text-dark); }
+
+        .sub-success { text-align: center; padding: 2.5rem 2rem; }
+        .sub-success .check-circle {
+            width: 70px; height: 70px; border-radius: 50%; background: rgba(16,185,129,0.12);
+            color: #10B981; font-size: 2rem; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.2rem; animation: subPop 0.4s ease;
+        }
+        .sub-success h2 { margin: 0 0 0.5rem; font-size: 1.4rem; font-weight: 800; color: var(--text-dark); }
+        .sub-success p { margin: 0 0 1.5rem; color: var(--text-body); font-size: 0.95rem; }
+    </style>
+    <script src="auth-guard.js?v=2"></script>
 </head>
 <body>
 
@@ -46,7 +210,7 @@
             <a href="skill-gap.html" class="nav-item nav-skill-gap">
                 <i class="fas fa-chart-line"></i> Skill Gap Analysis
             </a>
-            <a href="skill-input.html" class="nav-item nav-skill-input">
+            <a href="roadmap.html" class="nav-item nav-roadmap">
                 <i class="fas fa-road"></i> My Roadmap
             </a>
             <a href="progress.html" class="nav-item nav-progress">
@@ -79,21 +243,38 @@
 
             <!-- Chat Interface -->
             <div class="chat-card">
-                <div class="chat-history" id="chat-history">
-                    <div class="chat-message ai-message">
-                        <div class="message-avatar"><i class="fas fa-robot"></i></div>
-                        <div class="message-content">
-                            <p>Hello! I'm your AI Career Counselor. How can I help you shape your future today?</p>
-                        </div>
+                <!-- Usage / Status Bar -->
+                <div class="usage-bar" id="usage-bar">
+                    <div class="usage-left">
+                        <span class="usage-counter" id="usage-counter">
+                            <span class="usage-dots" id="usage-dots"></span>
+                            <span class="usage-text" id="usage-text">0 of 3 free questions used</span>
+                        </span>
+                        <span class="premium-badge" id="premium-badge" style="display:none;">
+                            <i class="fas fa-crown"></i> Premium
+                        </span>
                     </div>
+                    <button class="clear-history-btn" id="clear-history-btn">
+                        <i class="fas fa-trash-alt"></i> Clear History
+                    </button>
+                </div>
+
+                <div class="chat-history" id="chat-history">
+                    <!-- messages injected by JS -->
+                </div>
+
+                <!-- Inline upgrade banner (shown when blocked) -->
+                <div class="upgrade-inline" id="upgrade-inline" style="display:none;">
+                    <span><i class="fas fa-lock"></i> You've used all 3 free questions. Upgrade for unlimited mentoring.</span>
+                    <button id="upgrade-inline-btn">Upgrade</button>
                 </div>
 
                 <div class="suggested-prompts" id="suggested-prompts">
-                    <button class="prompt-chip">Which career suits me?</button>
-                    <button class="prompt-chip">What should I learn?</button>
-                    <button class="prompt-chip">What jobs are in demand?</button>
-                    <button class="prompt-chip">Is AI Engineering right for me?</button>
-                    <button class="prompt-chip">What skills do I need?</button>
+                    <button class="prompt-chip" data-prompt="Which career suits me?">Which career suits me?</button>
+                    <button class="prompt-chip" data-prompt="What should I learn first?">What should I learn first?</button>
+                    <button class="prompt-chip" data-prompt="What tech jobs are in demand?">What tech jobs are in demand?</button>
+                    <button class="prompt-chip" data-prompt="How do I prepare for coding interviews?">How do I prepare for coding interviews?</button>
+                    <button class="prompt-chip" data-prompt="How long to learn full stack development?">How long to learn full stack development?</button>
                 </div>
 
                 <div class="chat-input-area">
@@ -105,7 +286,49 @@
     </main>
 </div>
 
+<!-- Subscription Modal -->
+<div class="sub-overlay" id="sub-overlay">
+    <div class="sub-modal" id="sub-modal" role="dialog" aria-modal="true" aria-labelledby="sub-title">
+        <!-- Offer view -->
+        <div id="sub-offer-view">
+            <div class="sub-modal-header">
+                <button class="sub-close" id="sub-close" aria-label="Close">&times;</button>
+                <span class="crown">👑</span>
+                <h2 id="sub-title">Upgrade to Premium</h2>
+                <p>You've reached your free question limit.</p>
+            </div>
+            <div class="sub-modal-body">
+                <ul class="sub-benefits">
+                    <li><i class="fas fa-check"></i> Unlimited AI mentoring</li>
+                    <li><i class="fas fa-check"></i> Personalized career advice</li>
+                    <li><i class="fas fa-check"></i> 24/7 access</li>
+                </ul>
+                <div class="sub-price">
+                    <span class="amount">$9.99</span><span class="period">/month</span>
+                    <span class="free-note">âœ¨ Free with Premium</span>
+                </div>
+                <div class="sub-actions">
+                    <button class="sub-subscribe-btn" id="sub-subscribe-btn">
+                        <i class="fas fa-bolt"></i> Subscribe Now
+                    </button>
+                    <button class="sub-later-btn" id="sub-later-btn">Maybe Later</button>
+                </div>
+            </div>
+        </div>
+        <!-- Success view -->
+        <div id="sub-success-view" style="display:none;">
+            <div class="sub-success">
+                <div class="check-circle"><i class="fas fa-check"></i></div>
+                <h2>You're Premium! 🎉</h2>
+                <p>Unlimited AI mentoring is now unlocked. Ask away!</p>
+                <button class="sub-subscribe-btn" id="sub-done-btn">Start Chatting</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="global-sidebar.js"></script>
 <script src="counselor.js"></script>
+<script src="back-nav.js"></script>
 </body>
 </html>

@@ -319,6 +319,33 @@ const SCALABLE_QUIZ_DATA = {
                         "correct": false
                     }
                 ]
+            },
+            {
+                "q": "You have a flex container with 'justify-content: center' and 'align-items: center'. The child element has a fixed width, but it's overflowing the container vertically. What CSS property on the child can prevent it from shrinking?",
+                "opts": [
+                    { "text": "flex-shrink: 0;", "correct": true },
+                    { "text": "flex-grow: 1;", "correct": false },
+                    { "text": "overflow: hidden;", "correct": false },
+                    { "text": "display: inline-block;", "correct": false }
+                ]
+            },
+            {
+                "q": "If a user submits a form and the page reloads unexpectedly, what JavaScript function was likely omitted in the event listener?",
+                "opts": [
+                    { "text": "event.preventDefault()", "correct": true },
+                    { "text": "event.stopPropagation()", "correct": false },
+                    { "text": "form.submit()", "correct": false },
+                    { "text": "return false", "correct": false }
+                ]
+            },
+            {
+                "q": "Why is it considered bad practice to use inline styles (e.g., style='color: red;') directly in HTML elements?",
+                "opts": [
+                    { "text": "It makes maintenance harder and overrides external CSS stylesheets due to high specificity", "correct": true },
+                    { "text": "It causes the browser to render the page slower", "correct": false },
+                    { "text": "It is not supported in modern browsers like Chrome or Firefox", "correct": false },
+                    { "text": "It requires JavaScript to function properly", "correct": false }
+                ]
             }
         ],
         "Intermediate": [
@@ -635,6 +662,33 @@ const SCALABLE_QUIZ_DATA = {
                         "text": "To handle DOM events",
                         "correct": false
                     }
+                ]
+            },
+            {
+                "q": "You are building a React application and notice a child component is re-rendering even though its props haven't changed. Which of the following is the most efficient way to prevent these unnecessary re-renders?",
+                "opts": [
+                    { "text": "Wrap the child component in React.memo()", "correct": true },
+                    { "text": "Move the state to a global Redux store", "correct": false },
+                    { "text": "Use the useEffect hook with an empty dependency array", "correct": false },
+                    { "text": "Force an update using this.forceUpdate()", "correct": false }
+                ]
+            },
+            {
+                "q": "When designing a RESTful API, a client needs to update ONLY the 'email' field of a user resource without sending the entire payload. Which HTTP method is structurally most appropriate for this partial update?",
+                "opts": [
+                    { "text": "PATCH", "correct": true },
+                    { "text": "PUT", "correct": false },
+                    { "text": "POST", "correct": false },
+                    { "text": "UPDATE", "correct": false }
+                ]
+            },
+            {
+                "q": "In a Node.js Express application, you place a middleware function after all your route definitions. What is the most likely purpose of this middleware?",
+                "opts": [
+                    { "text": "To act as a global error handler or 404 fallback", "correct": true },
+                    { "text": "To parse incoming JSON request bodies", "correct": false },
+                    { "text": "To authenticate user tokens before routing", "correct": false },
+                    { "text": "To serve static files like images and CSS", "correct": false }
                 ]
             }
         ],

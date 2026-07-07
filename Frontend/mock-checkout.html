@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>eSewa Payment — Sandbox</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f4f8;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* eSewa-style top bar */
+        .esewa-header {
+            width: 100%;
+            background: #60bb46;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .esewa-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+        }
+        .esewa-logo .logo-icon {
+            width: 36px; height: 36px;
+            background: #fff;
+            border-radius: 8px;
+            display: grid; place-items: center;
+            color: #60bb46;
+            font-weight: 900;
+            font-size: 1rem;
+        }
+        .sandbox-badge {
+            background: rgba(0,0,0,0.25);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .secure-indicator {
+            display: flex; align-items: center; gap: 6px;
+            color: rgba(255,255,255,0.9);
+            font-size: 0.82rem;
+        }
+
+        .page-wrap {
+            width: 100%;
+            max-width: 480px;
+            padding: 32px 16px;
+        }
+
+        .merchant-bar {
+            background: #fff;
+            border-radius: 16px 16px 0 0;
+            border-bottom: 2px solid #f0f4f8;
+            padding: 20px 28px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .merchant-icon {
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, #6366f1, #818cf8);
+            border-radius: 12px;
+            display: grid; place-items: center;
+            color: #fff;
+            font-size: 1.3rem;
+        }
+        .merchant-info .name { font-weight: 700; font-size: 1rem; color: #1e293b; }
+        .merchant-info .desc { font-size: 0.8rem; color: #64748b; margin-top: 2px; }
+
+        .card {
+            background: #fff;
+            border-radius: 0;
+            overflow: hidden;
+        }
+
+        .amount-section {
+            padding: 24px 28px;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-bottom: 1px solid #e2e8f0;
+            text-align: center;
+        }
+        .amount-label { font-size: 0.8rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .amount-value { font-size: 2.4rem; font-weight: 800; color: #1e293b; }
+        .amount-value .currency { font-size: 1.2rem; font-weight: 600; color: #64748b; margin-right: 4px; }
+        .amount-detail {
+            margin-top: 12px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 0.78rem;
+            color: #64748b;
+        }
+
+        .payment-form { padding: 24px 28px; }
+
+        .form-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-group { margin-bottom: 18px; }
+        .input-wrap {
+            position: relative;
+        }
+        .input-wrap .inp-icon {
+            position: absolute;
+            left: 14px; top: 50%; transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px 14px 12px 40px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+            background: #fafafa;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+        .form-input:focus {
+            border-color: #60bb46;
+            box-shadow: 0 0 0 3px rgba(96, 187, 70, 0.15);
+            background: #fff;
+        }
+        .form-input.pin-input {
+            letter-spacing: 8px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-align: center;
+            padding-left: 14px;
+        }
+
+        .balance-check {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .balance-check .bal-icon { color: #16a34a; font-size: 1.1rem; }
+        .balance-check .bal-text { font-size: 0.85rem; color: #15803d; }
+        .balance-check .bal-text strong { font-weight: 700; }
+
+        .esewa-hint {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 0.78rem;
+            color: #92400e;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .pay-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #60bb46, #4da334);
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            letter-spacing: 0.3px;
+        }
+        .pay-btn:hover { opacity: 0.92; }
+        .pay-btn:active { transform: scale(0.98); }
+        .pay-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .btn-cancel {
+            width: 100%;
+            margin-top: 10px;
+            padding: 12px;
+            background: transparent;
+            color: #64748b;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-cancel:hover { background: #f1f5f9; }
+
+        .card-footer {
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            border-radius: 0 0 16px 16px;
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        /* Processing Overlay */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            place-items: center;
+        }
+        .overlay.active { display: grid; }
+        .overlay-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 40px 32px;
+            text-align: center;
+            max-width: 340px;
+            width: 90%;
+        }
+        .spinner {
+            width: 60px; height: 60px;
+            border: 5px solid #e2e8f0;
+            border-top-color: #60bb46;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .overlay-title { font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
+        .overlay-sub { font-size: 0.85rem; color: #64748b; }
+
+        /* Error overlay */
+        .error-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            place-items: center;
+        }
+        .error-overlay.active { display: grid; }
+        .error-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 40px 32px;
+            text-align: center;
+            max-width: 340px;
+            width: 90%;
+        }
+        .error-icon { font-size: 3rem; color: #ef4444; margin-bottom: 16px; }
+        .error-title { font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
+        .error-sub { font-size: 0.85rem; color: #64748b; margin-bottom: 20px; }
+        .error-btn {
+            padding: 12px 24px;
+            background: #ef4444;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<!-- eSewa Header -->
+<div class="esewa-header">
+    <div class="esewa-logo">
+        <div class="logo-icon">e</div>
+        eSewa
+    </div>
+    <div class="sandbox-badge">🧪 Sandbox Mode</div>
+    <div class="secure-indicator"><i class="fas fa-lock"></i> Secure Checkout</div>
+</div>
+
+<div class="page-wrap">
+    <div class="merchant-bar">
+        <div class="merchant-icon"><i class="fas fa-crown"></i></div>
+        <div class="merchant-info">
+            <div class="name" id="merchant-name">Xyverra — Pro Subscription</div>
+            <div class="desc">One month subscription · Xyverra Pro Monthly</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="amount-section">
+            <div class="amount-label">Total Payable Amount</div>
+            <div class="amount-value"><span class="currency">NPR</span><span id="amount-display">500</span></div>
+            <div class="amount-detail">
+                <span><i class="fas fa-shield-alt" style="color:#60bb46"></i> Secured by eSewa</span>
+                <span><i class="fas fa-redo" style="color:#60bb46"></i> 30-day access</span>
+            </div>
+        </div>
+
+        <div class="payment-form">
+            <div class="balance-check">
+                <i class="fas fa-wallet bal-icon"></i>
+                <div class="bal-text">Sandbox Balance: <strong>NPR 10,000.00</strong> available</div>
+            </div>
+
+
+
+            <!-- Sandbox test credentials hint -->
+            <div style="
+                background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(79,70,229,0.06));
+                border: 1px dashed rgba(16,185,129,0.45);
+                border-radius: 12px;
+                padding: 0.9rem 1.1rem;
+                margin-bottom: 1.1rem;
+                font-size: 0.82rem;
+            ">
+                <div style="display:flex; align-items:center; gap:0.5rem; font-weight:700; color:#10b981; margin-bottom:0.55rem;">
+                    <i class="fas fa-info-circle"></i> Sandbox Test Credentials
+                </div>
+                <div style="display:grid; grid-template-columns:auto 1fr; gap:0.25rem 0.75rem; color:#334155;">
+                    <span style="font-weight:600; color:#64748b;">eSewa ID:</span>
+                    <span style="font-family:monospace; font-weight:700; color:#0f172a; letter-spacing:0.03em;">9806800001</span>
+                    <span style="font-weight:600; color:#64748b;">Password:</span>
+                    <span style="font-family:monospace; font-weight:700; color:#0f172a; letter-spacing:0.03em;">Nepal@123</span>
+                    <span style="font-weight:600; color:#64748b;">MPIN:</span>
+                    <span style="font-family:monospace; font-weight:700; color:#0f172a; letter-spacing:0.03em;">1122</span>
+                </div>
+            </div>
+
+            <form id="mock-esewa-form" autocomplete="off" onsubmit="event.preventDefault(); handlePay();">
+                <!-- Decoy fields to absorb browser autofill -->
+                <input type="text" style="display:none" name="fake-user" autocomplete="username">
+                <input type="password" style="display:none" name="fake-pass" autocomplete="current-password">
+
+                <div class="form-group">
+                    <label class="form-label" for="esewa-id">eSewa ID / Mobile Number</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-user inp-icon"></i>
+                        <input type="text" id="esewa-id" name="esewa-id-field" class="form-input" placeholder="9806800001" maxlength="20" autocomplete="new-password" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="esewa-pass">eSewa Password</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-lock inp-icon"></i>
+                        <input type="password" id="esewa-pass" name="esewa-pass-field" class="form-input" placeholder="••••••••" maxlength="32" autocomplete="new-password" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="esewa-mpin">MPIN</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-key inp-icon"></i>
+                        <input type="password" id="esewa-mpin" name="esewa-mpin-field" class="form-input pin-input" placeholder="••••" maxlength="6" autocomplete="new-password" />
+                    </div>
+                </div>
+            </form>
+
+            <button class="pay-btn" id="pay-btn" onclick="handlePay()">
+                <i class="fas fa-shield-alt"></i>
+                Pay NPR <span id="btn-amount">500</span>
+            </button>
+            <button class="btn-cancel" onclick="handleCancel()">
+                Cancel Payment
+            </button>
+        </div>
+
+        <div class="card-footer">
+            <i class="fas fa-lock"></i>
+            256-bit SSL Encrypted &nbsp;|&nbsp; Powered by eSewa Sandbox
+        </div>
+    </div>
+</div>
+
+<!-- Processing Overlay -->
+<div class="overlay" id="proc-overlay">
+    <div class="overlay-card">
+        <div class="spinner"></div>
+        <div class="overlay-title" id="proc-title">Processing Payment</div>
+        <div class="overlay-sub" id="proc-sub">Please wait while we verify your transaction...</div>
+    </div>
+</div>
+
+<!-- Error Overlay -->
+<div class="error-overlay" id="err-overlay">
+    <div class="error-card">
+        <div class="error-icon"><i class="fas fa-times-circle"></i></div>
+        <div class="error-title" id="err-title">Payment Failed</div>
+        <div class="error-sub" id="err-sub">Incorrect credentials. Please check your eSewa ID, password, and MPIN.</div>
+        <button class="error-btn" onclick="document.getElementById('err-overlay').classList.remove('active')">Try Again</button>
+    </div>
+</div>
+
+<script>
+const FRONTEND_URL = 'http://127.0.0.1:5500/Frontend';
+
+// Load payment data from sessionStorage
+const payData = JSON.parse(sessionStorage.getItem('mockPaymentData') || '{}');
+if (!payData || !payData.esewaData) {
+    alert('No payment data found. Please start from the subscription page.');
+    window.location.href = 'subscription.html';
+}
+
+const { esewaData, mockEncodedData } = payData;
+document.getElementById('amount-display').textContent = esewaData.total_amount;
+document.getElementById('btn-amount').textContent = esewaData.total_amount;
+
+// Explicitly clear fields on load to defeat aggressive browser autofill
+setTimeout(() => {
+    document.getElementById('esewa-id').value = '';
+    document.getElementById('esewa-pass').value = '';
+    document.getElementById('esewa-mpin').value = '';
+}, 100);
+
+function showProcessing(title, sub) {
+    document.getElementById('proc-title').textContent = title;
+    document.getElementById('proc-sub').textContent = sub;
+    document.getElementById('proc-overlay').classList.add('active');
+}
+
+function hideProcessing() {
+    document.getElementById('proc-overlay').classList.remove('active');
+}
+
+function showError(title, sub) {
+    document.getElementById('err-title').textContent = title;
+    document.getElementById('err-sub').textContent = sub;
+    document.getElementById('err-overlay').classList.add('active');
+}
+
+async function handlePay() {
+    const id   = document.getElementById('esewa-id').value.trim();
+    const pass = document.getElementById('esewa-pass').value;
+    const mpin = document.getElementById('esewa-mpin').value.trim();
+
+    if (!id || !pass || !mpin) {
+        showError('Missing Fields', 'Please fill in your eSewa ID, password, and MPIN to continue.');
+        return;
+    }
+
+    const btn = document.getElementById('pay-btn');
+    btn.disabled = true;
+
+    // Step 1: Authenticating
+    showProcessing('Authenticating...', 'Verifying your eSewa account credentials.');
+    await sleep(1200);
+
+    // Step 2: Debiting
+    showProcessing('Debiting Balance', `Deducting NPR ${esewaData.total_amount} from your eSewa wallet...`);
+    await sleep(1500);
+
+    // Step 3: Completing
+    showProcessing('Completing Transaction', 'Notifying merchant and finalising your order...');
+    await sleep(1200);
+
+    // Step 4: Redirect to success with mock encoded data
+    hideProcessing();
+    sessionStorage.removeItem('mockPaymentData');
+    window.location.href = `payment-success.html?data=${encodeURIComponent(mockEncodedData)}`;
+}
+
+function handleCancel() {
+    if (!confirm('Are you sure you want to cancel this payment?')) return;
+    sessionStorage.removeItem('mockPaymentData');
+    window.location.href = 'payment-failure.html';
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
+
+</body>
+</html>

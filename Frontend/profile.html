@@ -11,8 +11,42 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="profile.css">
+    <style>
+        /* â”€â”€ Toast â”€â”€ */
+        #toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;}
+        .toast{min-width:240px;max-width:340px;padding:0.85rem 1rem;border-radius:var(--radius-md,10px);color:#fff;font-size:0.88rem;font-weight:600;display:flex;align-items:center;gap:0.55rem;box-shadow:0 8px 24px rgba(0,0,0,0.18);animation:toastIn .25s ease;}
+        .toast.success{background:#10b981;}
+        .toast.error{background:#ef4444;}
+        .toast.info{background:#6366f1;}
+        @keyframes toastIn{from{opacity:0;transform:translateX(40px);}to{opacity:1;transform:translateX(0);}}
+        /* â”€â”€ Section edit pencil â”€â”€ */
+        .pcard-header{position:relative;}
+        .section-edit-btn{margin-left:auto;background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:0.9rem;padding:4px 6px;border-radius:6px;transition:.15s;}
+        .section-edit-btn:hover{color:var(--primary);background:rgba(99,102,241,0.08);}
+        /* â”€â”€ Avatar upload affordance â”€â”€ */
+        .profile-avatar-large{position:relative;cursor:pointer;overflow:hidden;}
+        .profile-avatar-large img{width:100%;height:100%;object-fit:cover;border-radius:inherit;position:absolute;inset:0;}
+        .avatar-upload-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.45);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;opacity:0;transition:.2s;border-radius:inherit;}
+        .profile-avatar-large:hover .avatar-upload-overlay{opacity:1;}
+        /* â”€â”€ Multi-select chips in modal â”€â”€ */
+        .chip-select{display:flex;flex-wrap:wrap;gap:0.5rem;}
+        .chip-option{padding:0.4rem 0.8rem;border-radius:999px;border:1.5px solid var(--border,#e2e8f0);background:transparent;color:var(--text-muted);cursor:pointer;font-size:0.82rem;font-weight:600;transition:.15s;}
+        .chip-option.selected{background:var(--primary);border-color:var(--primary);color:#fff;}
+        .field-error{color:#ef4444;font-size:0.78rem;margin-top:0.25rem;display:none;}
+        .field-error.show{display:block;}
+        .form-control.invalid{border-color:#ef4444!important;}
+        .field-note{color:var(--text-muted);font-size:0.76rem;margin-top:0.25rem;}
+        .img-preview-row{display:flex;align-items:center;gap:1rem;}
+        .img-preview-row .preview-circle{width:64px;height:64px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;overflow:hidden;flex-shrink:0;}
+        .img-preview-row .preview-circle img{width:100%;height:100%;object-fit:cover;}
+        .modal-actions{display:flex;gap:0.6rem;}
+        .modal-actions .btn{flex:1;}
+    </style>
+    <script src="auth-guard.js?v=2"></script>
 </head>
 <body>
+    <div id="toast-container"></div>
+
     <div class="app-layout">
         <!-- Mobile Header Toggle -->
         <div class="mobile-nav-toggle">
@@ -52,7 +86,7 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg>
                     Skill Gap Analysis
                 </a>
-                <a href="skill-input.html" class="nav-item nav-skill-input">
+                <a href="roadmap.html" class="nav-item nav-roadmap">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     My Roadmap
                 </a>
@@ -69,7 +103,7 @@
                     <div class="avatar" id="user-avatar"></div>
                     <div class="profile-text">
                         <h4 id="user-display-name">Loading...</h4>
-                        <p>Platform Architect</p>
+                        <p></p>
                     </div>
                 </div>
                 <button class="signout-btn" title="Sign Out" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">
@@ -78,19 +112,19 @@
             </div>
         </aside>
 
-        <!-- Main Content -->
         <main class="main-content">
             <div class="profile-container dashboard-container">
 
                 <!-- Profile Header Card -->
                 <div class="profile-header-card content-card">
-                    <!-- Gradient accent strip -->
                     <div class="profile-banner"></div>
-                    <!-- Avatar + Info + Actions -->
                     <div class="profile-top-row">
                         <div class="profile-left">
                             <div class="profile-avatar-ring">
-                                <div class="profile-avatar-large" id="profile-avatar">U</div>
+                                <div class="profile-avatar-large" id="profile-avatar" title="Click to change photo">
+                                    U
+                                    <div class="avatar-upload-overlay"><i class="fas fa-camera"></i></div>
+                                </div>
                             </div>
                             <div class="profile-info-primary">
                                 <h1 id="profile-name">User Name</h1>
@@ -99,6 +133,7 @@
                                 <div class="profile-meta-chips">
                                     <span class="meta-chip"><i class="fas fa-circle-check"></i> Active Member</span>
                                     <span class="meta-chip" id="member-since-chip" style="display:none;"><i class="fas fa-calendar-alt"></i> <span id="member-since-text"></span></span>
+                                    <span class="meta-chip" id="level-chip"><i class="fas fa-layer-group"></i> <span id="level-chip-text">Beginner</span></span>
                                 </div>
                             </div>
                         </div>
@@ -113,15 +148,38 @@
                     </div>
                 </div>
 
+                <!-- Stats Metrics Row -->
+                <div class="profile-stats-row">
+                    <div class="stat-metric-card">
+                        <div class="stat-metric-icon"><i class="fas fa-star"></i></div>
+                        <span class="stat-metric-value primary" id="stat-xp">0</span>
+                        <span class="stat-metric-label">Total XP</span>
+                    </div>
+                    <div class="stat-metric-card">
+                        <div class="stat-metric-icon orange"><i class="fas fa-fire"></i></div>
+                        <span class="stat-metric-value orange" id="stat-streak">0</span>
+                        <span class="stat-metric-label">Day Streak</span>
+                    </div>
+                    <div class="stat-metric-card">
+                        <div class="stat-metric-icon green"><i class="fas fa-chart-line"></i></div>
+                        <span class="stat-metric-value green" id="stat-roadmap">0%</span>
+                        <span class="stat-metric-label">Roadmap Done</span>
+                    </div>
+                    <div class="stat-metric-card">
+                        <div class="stat-metric-icon purple"><i class="fas fa-brain"></i></div>
+                        <span class="stat-metric-value purple" id="stat-score">0</span>
+                        <span class="stat-metric-label">Career Score</span>
+                    </div>
+                </div>
+
                 <!-- Info Cards Row -->
                 <div class="profile-cards-row">
                     <!-- Learning Path Card -->
                     <div class="content-card card-box profile-info-card">
                         <div class="pcard-header">
-                            <div class="pcard-icon-wrap">
-                                <i class="fas fa-route"></i>
-                            </div>
+                            <div class="pcard-icon-wrap"><i class="fas fa-route"></i></div>
                             <span class="pcard-title">Learning Path</span>
+                            <button class="section-edit-btn" id="edit-profile-btn-2" title="Edit"><i class="fas fa-pen"></i></button>
                         </div>
                         <div class="pcard-body">
                             <div class="pcard-row">
@@ -132,29 +190,95 @@
                                 <span class="pcard-label">Skill Level</span>
                                 <span id="display-level" class="pcard-badge">Beginner</span>
                             </div>
+                            <div class="pcard-row">
+                                <span class="pcard-label">Timeline</span>
+                                <span id="display-timeline" class="pcard-value">Not set</span>
+                            </div>
+                            <div class="pcard-row">
+                                <span class="pcard-label">Weekly Hours</span>
+                                <span id="display-hours" class="pcard-value">Not set</span>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Skills Card -->
                     <div class="content-card card-box profile-info-card">
                         <div class="pcard-header">
-                            <div class="pcard-icon-wrap">
-                                <i class="fas fa-tools"></i>
-                            </div>
+                            <div class="pcard-icon-wrap"><i class="fas fa-tools"></i></div>
                             <span class="pcard-title">My Skills</span>
                         </div>
                         <div id="profile-skills-container" class="skills-pills-wrap">
                             <div class="no-skills-state">
                                 <i class="fas fa-layer-group"></i>
-                                <span>No skills added yet. Visit the Skills page.</span>
+                                <span>No skills added yet. Complete onboarding.</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Subscription & Settings Row -->
+                <div class="profile-cards-row" style="margin-top: 1.5rem;">
+                    <!-- Subscription Card -->
+                    <div class="content-card card-box profile-info-card">
+                        <div class="pcard-header">
+                            <div class="pcard-icon-wrap" style="color: #f59e0b; background: rgba(245, 158, 11, 0.1);"><i class="fas fa-crown"></i></div>
+                            <span class="pcard-title">Subscription Status</span>
+                        </div>
+                        <div class="pcard-body">
+                            <div class="pcard-row">
+                                <span class="pcard-label">Current Plan</span>
+                                <span id="display-sub-plan" class="pcard-badge" style="background: var(--primary); color: white;">Free</span>
+                            </div>
+                            <div class="pcard-row" id="sub-action-row">
+                                <button class="btn btn-primary" style="width: 100%;" onclick="window.location.href='subscription.html'">Upgrade to Pro</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Email Reports Card -->
+                    <div class="content-card card-box profile-info-card">
+                        <div class="pcard-header">
+                            <div class="pcard-icon-wrap" style="color: #10b981; background: rgba(16, 185, 129, 0.1);"><i class="fas fa-envelope"></i></div>
+                            <span class="pcard-title">Email Progress Reports</span>
+                            <span class="pro-badge" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; margin-left: 10px;">PRO</span>
+                        </div>
+                        <div class="pcard-body">
+                            <p style="font-size: 0.85rem; color: var(--text-body); margin-bottom: 1rem;">Receive weekly actionable insights and progress tracking directly to your inbox.</p>
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-dark);">Enable Reports</span>
+                                <div id="email-report-toggle" style="width: 40px; height: 22px; background: var(--border); border-radius: 11px; position: relative; cursor: pointer; transition: 0.3s;" data-active="false">
+                                    <div id="email-report-toggle-knob" style="width: 18px; height: 18px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.2);"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interests & Goals Row -->
+                <div class="profile-interests-row">
+                    <!-- Interests Card -->
+                    <div class="content-card card-box profile-info-card">
+                        <div class="pcard-header">
+                            <div class="pcard-icon-wrap"><i class="fas fa-heart"></i></div>
+                            <span class="pcard-title">My Interests</span>
+                            <button class="section-edit-btn" id="edit-interests-btn" title="Edit"><i class="fas fa-pen"></i></button>
+                        </div>
+                        <div id="profile-interests-container" class="interests-chip-wrap">
+                            <div class="no-skills-state">
+                                <i class="fas fa-compass" style="font-size:1.3rem; opacity:0.25;"></i>
+                                <span>No interests selected yet. Complete onboarding.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
         </main>
     </div>
+
+    <!-- Hidden avatar file input -->
+    <input type="file" id="avatar-file-input" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif" style="display:none;">
 
     <!-- Edit Profile Modal -->
     <div class="modal-overlay" id="edit-profile-modal">
@@ -164,32 +288,35 @@
                 <button class="close-modal-btn" id="close-profile-modal"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body modal-grid">
+                <!-- Profile Picture -->
+                <div class="form-group span-2">
+                    <label>Profile Picture</label>
+                    <div class="img-preview-row">
+                        <div class="preview-circle" id="edit-avatar-preview">U</div>
+                        <div style="display:flex;flex-direction:column;gap:0.4rem;">
+                            <button type="button" class="btn btn-sm" id="edit-pick-photo-btn" style="background:rgba(99,102,241,0.1);color:var(--primary);"><i class="fas fa-upload"></i> Choose Image</button>
+                            <button type="button" class="btn btn-sm" id="edit-remove-photo-btn" style="background:transparent;color:#ef4444;">Remove</button>
+                        </div>
+                    </div>
+                    <p class="field-note">PNG/JPG/WEBP, max 2MB.</p>
+                    <p class="field-error" id="err-photo"></p>
+                </div>
+
                 <div class="form-group span-2">
                     <label>Full Name</label>
                     <input type="text" id="edit-name" class="form-control" placeholder="Your full name">
+                    <p class="field-error" id="err-name"></p>
                 </div>
                 <div class="form-group span-2">
                     <label>Email Address</label>
                     <input type="email" id="edit-email" class="form-control" placeholder="your@email.com">
+                    <p class="field-note" id="email-reverify-note" style="display:none;color:#d97706;"><i class="fas fa-exclamation-triangle"></i> Changing your email will require re-verification.</p>
+                    <p class="field-error" id="err-email"></p>
                 </div>
                 <div class="form-group span-2">
                     <label>Date of Birth</label>
                     <input type="date" id="edit-dob" class="form-control">
-                </div>
-                <div class="form-group span-2 section-divider">
-                    <label>Career Pathway</label>
-                    <select id="edit-category" class="form-control">
-                        <option value="Web Development">Web Development</option>
-                        <option value="Full Stack Development">Full Stack Development</option>
-                        <option value="Backend / APIs">Backend / APIs</option>
-                        <option value="Data Science">Data Science</option>
-                        <option value="NLP / AI">NLP / AI</option>
-                        <option value="Cloud / DevOps">Cloud / DevOps</option>
-                        <option value="UI/UX Design">UI/UX Design</option>
-                        <option value="Mobile Development">Mobile Development</option>
-                        <option value="Cybersecurity">Cybersecurity</option>
-                        <option value="Data Analytics">Data Analytics</option>
-                    </select>
+                    <p class="field-error" id="err-dob"></p>
                 </div>
                 <div class="form-group span-2">
                     <label>Skill Level</label>
@@ -199,8 +326,34 @@
                         <option value="Advanced">Advanced</option>
                     </select>
                 </div>
-                <div class="span-2">
-                    <button class="btn btn-primary btn-block" id="save-profile-btn">Save Changes</button>
+                <div class="form-group span-2">
+                    <label>Timeline</label>
+                    <select id="edit-timeline" class="form-control">
+                        <option value="">Not set</option>
+                        <option value="1-3 months">1-3 months</option>
+                        <option value="3-6 months">3-6 months</option>
+                        <option value="6-12 months">6-12 months</option>
+                        <option value="12+ months">12+ months</option>
+                    </select>
+                </div>
+                <div class="form-group span-2">
+                    <label>Weekly Hours</label>
+                    <select id="edit-hours" class="form-control">
+                        <option value="">Not set</option>
+                        <option value="1-5">1-5 hrs/week</option>
+                        <option value="5-10">5-10 hrs/week</option>
+                        <option value="10-20">10-20 hrs/week</option>
+                        <option value="20+">20+ hrs/week</option>
+                    </select>
+                </div>
+                <div class="form-group span-2">
+                    <label>Career Interests</label>
+                    <div class="chip-select" id="edit-interests-chips"></div>
+                </div>
+
+                <div class="span-2 modal-actions">
+                    <button class="btn" id="cancel-profile-btn" style="background:rgba(0,0,0,0.05);color:var(--text-muted);">Cancel</button>
+                    <button class="btn btn-primary" id="save-profile-btn">Save Changes</button>
                 </div>
             </div>
         </div>
@@ -214,7 +367,7 @@
                 <button class="close-modal-btn" id="close-password-modal"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body" style="display:flex;flex-direction:column;gap:0.9rem;">
-                <p style="color:var(--text-muted);font-size:0.85rem;line-height:1.5;margin:0;">Update your password. Minimum 6 characters.</p>
+                <p style="color:var(--text-muted);font-size:0.85rem;line-height:1.5;margin:0;">Update your password. Minimum 8 characters.</p>
                 <div id="password-alert" style="display:none;padding:0.6rem 0.85rem;border-radius:var(--radius-md);font-size:0.84rem;font-weight:500;"></div>
                 <div class="form-group">
                     <label>Current Password</label>
@@ -235,5 +388,6 @@
 
     <script src="global-sidebar.js"></script>
     <script src="profile.js"></script>
+    <script src="back-nav.js"></script>
 </body>
 </html>

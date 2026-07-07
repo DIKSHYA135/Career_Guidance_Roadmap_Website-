@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="global.css">
     <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="career-recommendation.css">
+    <script src="auth-guard.js?v=2"></script>
 </head>
 <body>
 
@@ -42,7 +43,7 @@
                 <i class="fas fa-robot"></i> AI Counselor
             </a>
             <a href="skill-gap.html" class="nav-item nav-skill-gap"><i class="fas fa-chart-line"></i> Skill Gap Analysis</a>
-            <a href="skill-input.html" class="nav-item nav-skill-input"><i class="fas fa-road"></i> My Roadmap</a>
+            <a href="roadmap.html" class="nav-item nav-roadmap"><i class="fas fa-road"></i> My Roadmap</a>
             <a href="progress.html" class="nav-item nav-progress"><i class="fas fa-chart-bar"></i> Progress Tracker</a>
         </nav>
         <div style="flex:1;"></div>
@@ -59,27 +60,19 @@
     </aside>
 
     <main class="main-content">
-        <div class="dashboard-container" style="max-width:1000px;margin:0 auto;">
+        <div class="dashboard-container" style="max-width:760px;margin:0 auto;">
 
-            <div class="reco-header-row">
+            <div class="reco-header-row" style="margin-bottom:2rem;">
                 <div>
-                    <h1>Your Top Career Matches</h1>
-                    <p>Based on your assessment, here are the careers that align best with your profile.</p>
+                    <h1 style="font-size:2rem;font-weight:800;color:var(--text-dark);margin:0 0 0.5rem;">Your Top 3 Career Matches</h1>
+                    <p style="color:var(--text-muted);margin:0;">Based on your assessment. Click any path to start your personalized roadmap.</p>
                 </div>
-                <a href="career-discovery.html" class="btn btn-outline">
-                    <i class="fas fa-redo-alt"></i> Retake Assessment
-                </a>
-            </div>
-
-            <div class="recommendations-container" id="recommendations-list">
-                <!-- Cards injected by JS -->
-            </div>
-
-            <div class="reco-footer">
-                <button class="btn btn-primary" id="compare-btn" style="padding: 12px 28px; font-size: 1rem;">
-                    <i class="fas fa-columns"></i> Compare Selected Careers
+                <button id="retake-btn" class="btn btn-outline" style="flex-shrink:0;">
+                    <i class="fas fa-redo-alt"></i> Retake
                 </button>
             </div>
+
+            <div id="recommendations-list"></div>
 
         </div>
     </main>
@@ -87,5 +80,6 @@
 
 <script src="global-sidebar.js"></script>
 <script src="career-recommendation.js"></script>
+<script src="back-nav.js"></script>
 </body>
 </html>

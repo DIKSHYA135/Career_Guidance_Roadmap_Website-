@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Bash(node --check server.js)",
+      "Bash(node fix-frontend-js.js)",
+      "Bash(node fix-dashboard.js)",
+      "Bash(node fix-dashboard2.js)",
+      "Bash(node fix-placeholder-role.js)",
+      "Bash(node fix-onboarding-skillgap.js)",
+      "Bash(node fix-onboarding2.js)",
+      "Bash(powershell -Command \"Get-Content 'c:\\\\Users\\\\ACER\\\\OneDrive\\\\Desktop\\\\Fake_career_path\\\\Frontend\\\\roadmap.js' | Measure-Object -Line | Select-Object -ExpandProperty Lines\")",
+      "Bash(cd /c/Users/ACER/OneDrive/Desktop/Fake_career_path/Frontend && cat landing.html | grep -i 'link rel=\"stylesheet\"' && echo \"---\" && cat login.html | grep -i 'link rel=\"stylesheet\"' && echo \"---\" && cat signup.html | grep -i 'link rel=\"stylesheet\"')",
+      "Read(//c/c/Users/ACER/OneDrive/Desktop/Fake_career_path/Frontend/**)"
+    ]
+  }
+}

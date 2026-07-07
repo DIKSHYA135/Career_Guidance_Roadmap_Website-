@@ -31,13 +31,14 @@
     font-size: 1rem;
 }
 
+/* Overall Progress Tracker */
 .overall-progress-card {
     background: var(--bg-surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-2xl);
     padding: var(--spacing-6);
     margin-bottom: 2rem;
-    box-shadow: var(--shadow-premium);
+    box-shadow: var(--shadow-sm);
 }
 
 .overall-progress-header {
@@ -206,7 +207,7 @@
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.4s var(--ease);
-    background: var(--bg-surface-solid);
+    background: var(--bg-surface-hover);
 }
 
 .accordion-content-inner {
@@ -367,6 +368,20 @@
 .btn-take-quiz.btn-quiz-passed {
     background: var(--success);
     pointer-events: none;
+    box-shadow: none;
+}
+
+.btn-take-quiz.btn-quiz-locked {
+    background: var(--bg-surface-hover);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    cursor: not-allowed;
+    box-shadow: none;
+}
+.btn-take-quiz.btn-quiz-locked:hover {
+    background: var(--bg-surface-hover);
+    color: var(--text-muted);
+    transform: none;
     box-shadow: none;
 }
 

@@ -163,36 +163,36 @@ const MODULES_DATA = {
   },
   "Data Science": {
     "Beginner": [
-      { id: "ds-beg-1", title: "Python Basics", desc: "Core Python programming." },
-      { id: "ds-beg-2", title: "NumPy", desc: "Numerical computing." },
-      { id: "ds-beg-3", title: "Pandas", desc: "Data manipulation." }
+      { id: "python-data", title: "Python Basics", desc: "Core Python programming." },
+      { id: "pandas-numpy", title: "NumPy", desc: "Numerical computing." },
+      { id: "data-viz", title: "Pandas", desc: "Data manipulation." }
     ],
     "Intermediate": [
-      { id: "ds-int-1", title: "Statistics", desc: "Core statistical concepts." },
+      { id: "machine-learning", title: "Statistics", desc: "Core statistical concepts." },
       { id: "ds-int-2", title: "Machine Learning", desc: "Predictive modeling basics." },
       { id: "ds-int-3", title: "Data Visualization", desc: "Plotting with Matplotlib and Seaborn." }
     ],
     "Advanced": [
       { id: "ds-adv-1", title: "Deep Learning", desc: "Neural networks with PyTorch/TF." },
       { id: "ds-adv-2", title: "MLOps", desc: "Deploying ML models." },
-      { id: "ds-adv-3", title: "Research Engineering", desc: "Reading and implementing papers." }
+      { id: "capstone", title: "Research Engineering", desc: "Reading and implementing papers." }
     ]
   },
   "NLP / AI": {
     "Beginner": [
-      { id: "nlp-beg-1", title: "Python for AI", desc: "AI-specific Python skills." },
-      { id: "nlp-beg-2", title: "Prompt Engineering", desc: "Effective prompting." },
-      { id: "nlp-beg-3", title: "OpenAI APIs", desc: "Integrating GPT models." }
+      { id: "python-data", title: "Python for AI", desc: "AI-specific Python skills." },
+      { id: "prompt-engineering", title: "Prompt Engineering", desc: "Effective prompting." },
+      { id: "openai-apis", title: "OpenAI APIs", desc: "Integrating GPT models." }
     ],
     "Intermediate": [
-      { id: "nlp-int-1", title: "Transformers", desc: "Understanding attention mechanisms." },
-      { id: "nlp-int-2", title: "LangChain", desc: "Building LLM applications." },
-      { id: "nlp-int-3", title: "RAG Systems", desc: "Retrieval-Augmented Generation." }
+      { id: "transformers-llms", title: "Transformers", desc: "Understanding attention mechanisms." },
+      { id: "langchain", title: "LangChain", desc: "Building LLM applications." },
+      { id: "nlp-fundamentals", title: "RAG Systems", desc: "Retrieval-Augmented Generation." }
     ],
     "Advanced": [
       { id: "nlp-adv-1", title: "Fine Tuning", desc: "Customizing foundation models." },
       { id: "nlp-adv-2", title: "Agent Architectures", desc: "Building autonomous agents." },
-      { id: "nlp-adv-3", title: "LLM Infrastructure", desc: "Serving and scaling LLMs." }
+      { id: "capstone", title: "LLM Infrastructure", desc: "Serving and scaling LLMs." }
     ]
   }
 };
@@ -209,6 +209,21 @@ MODULES_DATA["Full Stack Development"] = {
   ],
   "Advanced": [
     { id: "capstone", title: "Full Stack Capstone", desc: "Build a full stack MERN or PERN application." }
+  ]
+};
+
+// Machine Learning
+MODULES_DATA["Machine Learning"] = {
+  "Beginner": [
+    { id: "python-data", title: "Python for Data Science", desc: "Core Python programming." }
+  ],
+  "Intermediate": [
+    { id: "pandas-numpy", title: "Data Manipulation", desc: "Clean and manipulate datasets." },
+    { id: "data-viz", title: "Data Visualization", desc: "Plotting with Matplotlib and Seaborn." },
+    { id: "machine-learning", title: "Machine Learning", desc: "Supervised vs unsupervised learning, model evaluation." }
+  ],
+  "Advanced": [
+    { id: "capstone", title: "ML Capstone Project", desc: "End-to-end ML model." }
   ]
 };
 

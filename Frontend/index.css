@@ -1,8 +1,0 @@
-/* =========================================================
-   INDEX.CSS — Xyverra (Redirect from old dark-mode legacy CSS)
-   Now simply re-exports global.css tokens for pages that reference index.css
-   ========================================================= */
-@import url('global.css');
-
-/* index.css is kept for legacy compatibility.
-   All styling now lives in global.css and page-specific CSS files. */

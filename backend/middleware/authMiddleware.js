@@ -14,7 +14,7 @@ const authMiddleware = (req, res, next) => {
             return res.status(500).json({ success: false, message: 'Server configuration error' });
         }
         
-        req.user = jwt.verify(token, secret);
+        req.user = jwt.verify(token, secret, { algorithms: ['HS256'] });
         next();
     } catch (err) {
         return res.status(401).json({ success: false, message: 'Invalid or expired token' });

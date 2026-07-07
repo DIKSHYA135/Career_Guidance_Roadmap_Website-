@@ -1,11 +1,54 @@
 // progress.js
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+
+    // ── 0. Sync fresh data from server ───────────────────────
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (token) {
+        try {
+            const res = await fetch('http://localhost:5000/api/user/me', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success && data.user) {
+                    const u = data.user;
+                    if (u.selectedPath)  localStorage.setItem('xyverra_selected_path', u.selectedPath);
+                    if (Array.isArray(u.completedModules)) localStorage.setItem('completedModules', JSON.stringify(u.completedModules));
+                    if (typeof u.dailyStreak === 'number') localStorage.setItem('xyverra_user_streak', String(u.dailyStreak));
+                    if (u.quizScores) localStorage.setItem('quizScores', JSON.stringify(u.quizScores));
+                }
+            }
+        } catch (e) {
+            console.warn('[Progress] Backend sync failed, using localStorage.', e);
+        }
+    }
 
     // ── 1. Data Retrieval ────────────────────────────────────────
-    const selectedPath   = localStorage.getItem("xyverra_selected_path") || "Web Development";
+    const selectedPath   = localStorage.getItem("xyverra_selected_path") || "";
     const streak         = localStorage.getItem("xyverra_user_streak") || "0";
-    let matchedPathKey   = Object.keys(ROADMAP_DATA).find(k => selectedPath.includes(k)) || "Web Development";
-    const pathData       = ROADMAP_DATA[matchedPathKey] || [];
+
+    // If the user hasn't chosen a path yet, show an empty state
+    if (!selectedPath) {
+        const mainContent = document.querySelector('.dashboard-container') || document.querySelector('main');
+        if (mainContent) {
+            mainContent.innerHTML = `
+                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:60vh; text-align:center; padding:3rem 2rem;">
+                    <div style="font-size:4rem; margin-bottom:1.25rem;">🧭</div>
+                    <h2 style="font-size:1.6rem; font-weight:800; color:var(--text-dark); margin-bottom:0.75rem;">No career path selected yet</h2>
+                    <p style="color:var(--text-muted); max-width:480px; line-height:1.65; margin-bottom:2rem;">
+                        You haven't picked a career path yet! Start with Career Discovery. We'll ask you a few questions and match you to the best tech career for you.
+                    </p>
+                    <a href="career-discovery.html" class="btn btn-primary" style="font-size:1rem; padding:12px 28px; display:inline-flex; align-items:center; gap:0.5rem;">
+                        <i class="fas fa-compass"></i> Start Career Discovery
+                    </a>
+                </div>`;
+        }
+        return;
+    }
+
+    let matchedPathKey   = Object.keys(ROADMAP_DATA).find(k => selectedPath.includes(k)) || null;
+    if (!matchedPathKey) matchedPathKey = Object.keys(ROADMAP_DATA).find(k => k.includes(selectedPath.split(' ')[0])) || null;
+    const pathData       = matchedPathKey ? (ROADMAP_DATA[matchedPathKey] || []) : [];
 
     let completedModules = [];
     let userSkills = [];
@@ -14,6 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const s = localStorage.getItem("userSkills");
         if (s) userSkills = JSON.parse(s).map(x => x.toLowerCase().trim());
     } catch(_) {}
+
 
     // ── 2. Calculations ──────────────────────────────────────────
     const totalSteps          = pathData.length;
@@ -143,24 +187,30 @@ document.addEventListener("DOMContentLoaded", () => {
     // ── 6. Recent Activity ────────────────────────────────────────
     const historyList = document.getElementById("history-list");
     if (historyList) {
+        let quizScores = {};
+        try { quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}'); } catch(_) {}
+
         const done = pathData.filter(m => completedModules.includes(m.id)).reverse();
         if (done.length === 0) {
             historyList.innerHTML = `<p style="text-align:center;color:var(--text-muted);padding:1.5rem;">
                 No activity yet. Complete a module to see it here! 🚀</p>`;
         } else {
-            historyList.innerHTML = done.map(module => `
+            historyList.innerHTML = done.map(module => {
+                const score = quizScores[module.id];
+                const scoreText = (score !== undefined && score !== null) ? `Score: ${Math.round(score)}%` : 'Score: —';
+                return `
                 <div class="history-item">
                     <div class="item-icon success"><i class="fas fa-check"></i></div>
                     <div class="item-details">
                         <h4>${module.title} Quiz</h4>
                         <div class="item-meta">
                             <span><i class="far fa-calendar-check"></i> Completed</span>
-                            <span class="meta-score">Score: 100%</span>
+                            <span class="meta-score">${scoreText}</span>
                         </div>
                     </div>
                     <div class="item-badge completed">Verified</div>
-                </div>
-            `).join("");
+                </div>`;
+            }).join("");
         }
     }
 });

@@ -4,6 +4,16 @@
    TODO: Replace localStorage reads with GET /api/user/me
    ========================================================== */
 
+// ── Dynamically load notifications.js so the bell appears on every page ──
+(function() {
+    if (!document.getElementById('notif-script') && localStorage.getItem('token')) {
+        const s = document.createElement('script');
+        s.id  = 'notif-script';
+        s.src = 'notifications.js';
+        document.head.appendChild(s);
+    }
+})();
+
 // Early-execution hook: if mandatory quiz is active, restrict navigation and redirect
 (function() {
     const currentFile = window.location.pathname.split('/').pop() || './dashboard.html';
@@ -24,6 +34,15 @@
 })();
 
 document.addEventListener('DOMContentLoaded', () => {
+    // ── 8. Fade in on page load ─────────────────────────────
+    // Must run FIRST so it doesn't race with navigation handlers that also
+    // set body opacity; any subsequent opacity writes happen after this frame.
+    document.body.style.opacity = '0';
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        document.body.style.transition = 'opacity 0.3s ease';
+        document.body.style.opacity = '1';
+    }));
+
     // Lock sidebar navigation if mandatory quiz is active
     const rawState = localStorage.getItem('xyverra_mandatory_quiz_state');
     if (rawState) {
@@ -32,9 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (state && state.isActive && state.assignedQuizzes && state.assignedQuizzes.some(q => q.status !== 'passed')) {
                 document.querySelectorAll('.nav-item, .sidebar-brand, a').forEach(link => {
                     const href = link.getAttribute('href') || '';
-                    const isSignOut = href.includes('login.html') || 
-                                      link.classList.contains('signout-btn') || 
-                                      link.id === 'signout-btn' || 
+                    const isSignOut = href.includes('login.html') ||
+                                      link.classList.contains('signout-btn') ||
+                                      link.id === 'signout-btn' ||
                                       link.id === 'modal-signout-btn';
                     const isQuizLink = href.includes('quiz.html');
 
@@ -62,6 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ── 1. Mobile Sidebar Toggle ────────────────────────────
+    // Support both the existing #sidebar-toggle-btn / #sidebar-menu pattern
+    // AND a generic #sidebar-toggle / .sidebar-toggle + .sidebar pattern.
     const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
     const sidebarMenu      = document.getElementById('sidebar-menu');
     const sidebarOverlay   = document.getElementById('sidebar-overlay');
@@ -76,11 +97,98 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
     }
 
+    // Generic hamburger button (#sidebar-toggle or .sidebar-toggle) → .sidebar
+    const genericToggle  = document.getElementById('sidebar-toggle') ||
+                           document.querySelector('.sidebar-toggle');
+    const genericSidebar = document.querySelector('.sidebar');
+
+    if (genericToggle && genericSidebar) {
+        // Ensure an overlay exists; create one if not already in the DOM
+        let overlay = document.querySelector('.sidebar-overlay-generic');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.className = 'sidebar-overlay-generic';
+            Object.assign(overlay.style, {
+                display: 'none',
+                position: 'fixed',
+                inset: '0',
+                background: 'rgba(0,0,0,0.45)',
+                zIndex: '998',
+                cursor: 'pointer'
+            });
+            document.body.appendChild(overlay);
+        }
+
+        const openGenericSidebar = () => {
+            genericSidebar.classList.add('open');
+            overlay.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        };
+
+        const closeGenericSidebar = () => {
+            genericSidebar.classList.remove('open');
+            overlay.style.display = 'none';
+            document.body.style.overflow = '';
+        };
+
+        genericToggle.addEventListener('click', () => {
+            if (genericSidebar.classList.contains('open')) {
+                closeGenericSidebar();
+            } else {
+                openGenericSidebar();
+            }
+        });
+
+        overlay.addEventListener('click', closeGenericSidebar);
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeGenericSidebar(); });
+    }
+
     function closeSidebar() {
         sidebarMenu?.classList.remove('active');
         sidebarOverlay?.classList.remove('active');
         document.body.style.overflow = '';
     }
+
+    // ── 1.5 Dynamically inject New Pro Links and Admin/Upgrade links ──
+    const navMenus = document.querySelectorAll('.nav-menu');
+    navMenus.forEach(nav => {
+        // Career Analytics link
+        if (!nav.querySelector('[href="career-analytics.html"]')) {
+            const analyticsLink = document.createElement('a');
+            analyticsLink.href = 'career-analytics.html';
+            analyticsLink.className = 'nav-item nav-analytics';
+            analyticsLink.innerHTML = '<i class="fas fa-chart-bar"></i> Career Analytics';
+            nav.appendChild(analyticsLink);
+        }
+
+        // Interview Prep link
+        if (!nav.querySelector('[href="interview-prep.html"]')) {
+            const interviewLink = document.createElement('a');
+            interviewLink.href = 'interview-prep.html';
+            interviewLink.className = 'nav-item nav-interview';
+            interviewLink.innerHTML = '<i class="fas fa-comments"></i> Interview Prep';
+            nav.appendChild(interviewLink);
+        }
+
+        // Upgrade Pro link
+        if (!nav.querySelector('[href="subscription.html"]')) {
+            const upgLink = document.createElement('a');
+            upgLink.href = 'subscription.html';
+            upgLink.className = 'nav-item nav-subscription';
+            upgLink.innerHTML = '<i class="fas fa-crown"></i> Upgrade Pro';
+            nav.appendChild(upgLink);
+        }
+        
+        // Admin Panel link (if user is admin)
+        const isAdmin = localStorage.getItem('xyverra_is_admin') === 'true';
+        if (isAdmin && !nav.querySelector('[href="admin.html"]')) {
+            const adminLink = document.createElement('a');
+            adminLink.href = 'admin.html';
+            adminLink.className = 'nav-item nav-admin';
+            adminLink.innerHTML = '<i class="fas fa-shield-alt"></i> Admin Panel';
+            nav.appendChild(adminLink);
+        }
+    });
 
     // ── 2. Populate User Info ───────────────────────────────
     // TODO: Replace with GET /api/user/me → { name, role, avatarInitials }
@@ -109,12 +217,26 @@ document.addEventListener('DOMContentLoaded', () => {
     if (welcomeStrong) welcomeStrong.textContent = userName;
 
     // ── 3. Sign Out ─────────────────────────────────────────
-    // TODO: Call POST /api/auth/logout before clearing storage
     function performSignOut() {
+        // Call server logout endpoint (non-blocking) before clearing state
+        const token = localStorage.getItem('token');
+        if (token) {
+            fetch('http://localhost:5000/api/auth/logout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+            }).catch(() => {});
+        }
         // Save current user data before clearing
         const email = localStorage.getItem('xyverra_user_email');
         if (email) {
-            const usersData = JSON.parse(localStorage.getItem('xyverra_users')) || {};
+            // Safe JSON.parse with fallback to empty object
+            let usersData = {};
+            try {
+                usersData = JSON.parse(localStorage.getItem('xyverra_users')) || {};
+            } catch (e) {
+                console.warn('Could not parse xyverra_users, resetting to {}', e);
+                usersData = {};
+            }
             usersData[email] = {
                 name: localStorage.getItem('xyverra_user_name'),
                 path: localStorage.getItem('xyverra_selected_path'),
@@ -133,13 +255,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const keysToRemove = [
             'xyverra_user_name', 'xyverra_user_role', 'xyverra_selected_path',
             'userLevel', 'userSkills', 'completedModules', 'xyverra_skill_score',
-            'xyverra_user', 'xyverra_user_streak', 'xyverra_user_email', 'xyverra_mandatory_quiz_state',
-            'xyverra_active_quiz'
+            'xyverra_user', 'xyverra_user_streak', 'xyverra_user_email',
+            'xyverra_mandatory_quiz_state', 'xyverra_active_quiz',
+            'xyverra_email_verified'
         ];
         keysToRemove.forEach(k => localStorage.removeItem(k));
-        document.body.style.opacity = '0';
-        document.body.style.transition = 'opacity 0.25s ease';
-        setTimeout(() => { window.location.href = 'login.html'; }, 260);
+        // Also clear auth-guard managed keys for full cleanup
+        if (typeof window.XyLogout === 'function') {
+            window.XyLogout();
+        } else {
+            // Fallback: clear remaining keys manually if XyLogout not available
+            ['token', 'chatSubscriptionActive', 'openedCourses', 'xyverra_quiz_scores',
+             'xyverra_selected_path', 'xyverra_onboarded', 'roadmapGenerated',
+             'xyverra_interests', 'xyverra_selected_level'].forEach(k => localStorage.removeItem(k));
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.25s ease';
+            setTimeout(() => { window.location.href = 'login.html'; }, 260);
+        }
     }
 
     // Wire up signout buttons — DON'T rewrite innerHTML (that causes layout issues)
@@ -392,11 +524,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         document.body.appendChild(backBtn);
     }
-
-    // ── 8. Fade in on page load ─────────────────────────────
-    document.body.style.opacity = '0';
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-        document.body.style.transition = 'opacity 0.3s ease';
-        document.body.style.opacity = '1';
-    }));
 });

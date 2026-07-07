@@ -10,11 +10,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="global.css">
     <link rel="stylesheet" href="signup.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
+    <!-- Toast Container -->
+    <div id="xv-toast-container" class="xv-toast-container"></div>
+
     <div class="centered-layout">
 
         <!-- Brand Header -->
@@ -31,47 +35,111 @@
             <h2 class="card-title">Create your account</h2>
             <p class="card-subtitle">Start your journey to becoming job-ready</p>
 
-            <form id="signup-form" novalidate>
+            <!-- General error card -->
+            <div id="general-error" class="inline-error-card" role="alert" aria-live="polite">
+                <span class="err-icon">⚠</span>
+                <span id="general-error-text"></span>
+            </div>
+
+            <form id="signup-form" novalidate autocomplete="off">
+
+                <!-- Full Name -->
                 <div class="form-group">
                     <label for="signup-name">Full name</label>
                     <div class="input-wrapper">
                         <i class="far fa-user"></i>
                         <input type="text" id="signup-name" placeholder="Jane Doe" autocomplete="name" required>
                     </div>
-                    <div id="name-error" class="error-message"></div>
+                    <div id="name-error" class="inline-field-error" role="alert"></div>
                 </div>
 
+                <!-- Email -->
                 <div class="form-group">
                     <label for="signup-email">Email address</label>
                     <div class="input-wrapper">
                         <i class="far fa-envelope"></i>
-                        <input type="email" id="signup-email" placeholder="jane@example.com" autocomplete="email"
-                            required>
+                        <input type="email" id="signup-email" placeholder="jane@example.com" autocomplete="email" required>
                     </div>
-                    <div id="email-error" class="error-message"></div>
+                    <div id="email-error" class="inline-field-error" role="alert"></div>
                 </div>
 
+                <!-- Password -->
                 <div class="form-group">
                     <label for="signup-password">Password</label>
                     <div class="input-wrapper">
                         <i class="fas fa-lock"></i>
                         <input type="password" id="signup-password" placeholder="Min. 8 characters"
-                            autocomplete="new-password" required minlength="6">
-                        <i class="far fa-eye eye-icon" id="toggle-password" title="Show password"></i>
+                            autocomplete="new-password" required>
+                        <i class="far fa-eye eye-icon" id="toggle-password" title="Show password" role="button" tabindex="0" aria-label="Toggle password visibility"></i>
                     </div>
-                    <div id="password-error" class="error-message"></div>
-                    <p class="hint-text">At least 8 characters</p>
+                    <div id="password-error" class="inline-field-error" role="alert"></div>
+
+                    <!-- Live Password Checklist -->
+                    <ul class="pw-checklist" id="pw-checklist" aria-label="Password requirements">
+                        <li id="rule-length" class="pw-rule">
+                            <span class="pw-check-icon">✓</span>
+                            At least 8 characters
+                        </li>
+                        <li id="rule-number" class="pw-rule">
+                            <span class="pw-check-icon">✓</span>
+                            Contains a number (0–9)
+                        </li>
+                        <li id="rule-special" class="pw-rule">
+                            <span class="pw-check-icon">✓</span>
+                            Contains a special character (@, #, $, %, &amp; …)
+                        </li>
+                    </ul>
                 </div>
 
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <label for="signup-confirm">Confirm password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-shield-alt"></i>
+                        <input type="password" id="signup-confirm" placeholder="Re-enter your password"
+                            autocomplete="new-password" required>
+                        <i class="far fa-eye eye-icon" id="toggle-confirm" title="Show password" role="button" tabindex="0" aria-label="Toggle confirm password visibility"></i>
+                    </div>
+                    <div id="confirm-error" class="inline-field-error" role="alert"></div>
+                </div>
 
-
-                <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">
-                    <i class="fas fa-user-plus"></i> Create Free Account
+                <button type="submit" id="signup-btn" class="btn btn-primary signup-btn" disabled>
+                    <i class="fas fa-user-plus"></i>
+                    <span id="btn-label">Create Free Account</span>
                 </button>
             </form>
 
+            <!-- OTP Verification Form (Hidden by default) -->
+            <form id="otp-form" novalidate autocomplete="off" style="display: none;">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div style="width: 64px; height: 64px; background: rgba(79,70,229,0.1); color: #4F46E5; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 1.8rem; margin-bottom: 1rem;">
+                        <i class="fas fa-envelope-open-text"></i>
+                    </div>
+                    <h3 style="font-size: 1.2rem; font-weight: 700; color: #0F172A; margin-bottom: 0.5rem;">Check your email</h3>
+                    <p style="font-size: 0.9rem; color: #64748B; line-height: 1.5;">We've sent a 6-digit verification code to <strong id="otp-email-display" style="color:#0F172A"></strong>.</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="otp-code" style="text-align: center; display: block; margin-bottom: 0.5rem;">Enter verification code</label>
+                    <div class="input-wrapper" style="text-align: center;">
+                        <input type="text" id="otp-code" placeholder="• • • • • •" autocomplete="one-time-code" required maxlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5em; padding: 15px;">
+                    </div>
+                    <div id="otp-error" class="inline-field-error" role="alert" style="text-align: center;"></div>
+                </div>
+
+                <button type="submit" class="btn btn-primary signup-btn" id="btn-verify-otp" style="width: 100%; margin-top: 1.5rem;">
+                    <i class="fas fa-check"></i> Verify Email
+                </button>
+
+                <div style="text-align: center; margin-top: 1.5rem;">
+                    <p style="font-size: 0.85rem; color: #64748B;">Didn't receive the code? <button type="button" id="btn-resend-otp" style="background: none; border: none; color: #4F46E5; font-weight: 600; cursor: pointer; text-decoration: underline;">Resend code</button></p>
+                </div>
+            </form>
+
             <p class="terms-note">
-                By signing up, you agree to our <a href="javascript:void(0)" onclick="alert('Terms page coming soon.')">Terms of Service</a> and <a href="javascript:void(0)" onclick="alert('Privacy Policy coming soon.')">Privacy Policy</a>.
+                By signing up, you agree to our
+                <a href="javascript:void(0)" id="terms-link">Terms of Service</a> and
+                <a href="javascript:void(0)" id="privacy-link">Privacy Policy</a>.
             </p>
         </div>
 
@@ -81,6 +149,7 @@
 
     </div>
     <script src="auth-popup.js"></script>
+    <script src="toast.js"></script>
     <script src="signup.js"></script>
 </body>
 
