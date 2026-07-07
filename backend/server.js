@@ -15,10 +15,21 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const BCRYPT_ROUNDS = 12;
 
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// ==========================
-// REQUIRED ENVIRONMENT VARS
-// ==========================
+// Request Logger - Improved for debugging
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    if (req.method !== 'GET') {
+        console.log('Request Body:', JSON.stringify(req.body, null, 2));
+    }
+    next();
+});
+
+// MongoDB Connection
 if (!process.env.MONGO_URI) {
     console.error('❌ Error: MONGO_URI is not defined in the .env file.');
     process.exit(1);
@@ -172,7 +183,7 @@ function handleValidation(req, res, next) {
 // PUBLIC ROUTES
 // ==========================
 app.get('/', (req, res) => {
-    res.json({ message: 'Xyverra API is running' });
+    res.json({ message: "Xyverra API is running" });
 });
 
 app.get('/health', (req, res) => {
@@ -183,27 +194,28 @@ app.get('/health', (req, res) => {
         dbName: mongoose.connection.name
     });
 });
+// Auth Middleware
+const authMiddleware = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'No token provided' });
+    }
+    const token = authHeader.split(' ')[1];
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret');
+        req.user = decoded;
+        next();
+    } catch (err) {
+        return res.status(401).json({ message: 'Invalid token' });
+    }
+};
 
 // ==========================
 // REGISTER ROUTE
 // ==========================
-app.post(
-    '/api/auth/register',
-    authLimiter,
-    [
-        body('email').isEmail().withMessage('A valid email is required')
-            .bail().customSanitizer(v => v.trim().toLowerCase()),
-        body('password')
-            .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long')
-            .matches(/\d/).withMessage('Password must contain at least one number')
-            .matches(/[a-zA-Z]/).withMessage('Password must contain at least one letter'),
-        body('name').optional().trim().isLength({ max: 100 }),
-        body('skills').optional().isArray().withMessage('Skills must be an array')
-    ],
-    handleValidation,
-    async (req, res) => {
-        try {
-            const { email, password, name, skills } = req.body;
+app.post('/api/auth/register', async (req, res) => {
+    console.log('--- Registration Process Started ---');
+    console.log('Received Body:', req.body);
 
             const existingUser = await User.findOne({ email });
             if (existingUser) {
@@ -228,63 +240,77 @@ app.post(
                     existingUser.lastLoginDate = now;
                     await existingUser.save();
 
-                    const token = signToken(existingUser);
-                    return res.json({
-                        success: true,
-                        message: 'User already exists. Logged in successfully.',
-                        token,
-                        user: {
-                            id: existingUser._id,
-                            email: existingUser.email,
-                            name: existingUser.name,
-                            selectedPath: existingUser.selectedPath,
-                            selectedLevel: existingUser.selectedLevel,
-                            skills: existingUser.skills,
-                            competencyScore: existingUser.competencyScore,
-                            experienceRank: existingUser.experienceRank,
-                            dailyStreak: existingUser.dailyStreak,
-                            lastActivePage: existingUser.lastActivePage,
-                            quizScores: existingUser.quizScores,
-                            completedModules: existingUser.completedModules
-                        }
-                    });
-                } else {
-                    return res.status(409).json({
-                        success: false,
-                        message: 'User already exists (incorrect password)'
-                    });
-                }
+        if (!email || !password) {
+            console.warn('Missing email or password in request body');
+            return res.status(400).json({
+                success: false,
+                message: 'Email and password are required'
+            });
+        }
+
+        if (password.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: 'Password must be at least 6 characters long'
+            });
+        }
+
+        const existingUser = await User.findOne({ email: email.toLowerCase() });
+
+        if (existingUser) {
+            console.warn(`User with email ${email} already exists`);
+            return res.status(400).json({
+                success: false,
+                message: 'User already exists'
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newUser = new User({
+            email: email.toLowerCase(),
+            password: hashedPassword,
+            name: name || email.split('@')[0],
+            skills: skills || []
+        });
+
+        console.log('Attempting to save user:', { 
+            email: newUser.email, 
+            name: newUser.name,
+            skillsCount: newUser.skills.length 
+        });
+
+        const savedUser = await newUser.save();
+        console.log('✅ User saved successfully with ID:', savedUser._id);
+
+        const token = jwt.sign(
+            {
+                userId: savedUser._id,
+                email: savedUser.email
+            },
+            process.env.JWT_SECRET || 'secretkey',
+            { expiresIn: '24h' }
+        );
+
+        res.status(201).json({
+            success: true,
+            message: 'User registered successfully',
+            token,
+            user: {
+                id: savedUser._id,
+                email: savedUser.email,
+                name: savedUser.name,
+                skills: savedUser.skills
             }
 
-            const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
+    } catch (error) {
+        console.error('❌ Registration Error:', error);
 
-            const newUser = await User.create({
-                email,
-                password: hashedPassword,
-                name: name || email.split('@')[0],
-                skills: Array.isArray(skills) ? skills : [],
-                dailyStreak: 1,
-                lastLoginDate: new Date()
-            });
-
-            console.log('✅ User saved successfully with ID:', newUser._id);
-
-            const token = signToken(newUser);
-
-            res.status(201).json({
-                success: true,
-                message: 'User registered successfully',
-                token,
-                user: {
-                    id: newUser._id,
-                    email: newUser.email,
-                    name: newUser.name,
-                    skills: newUser.skills
-                }
-            });
-        } catch (error) {
-            return serverError(res, 'Registration Error', error);
-        }
+        res.status(500).json({
+            success: false,
+            message: 'Server error during registration',
+            error: error.message
+        });
     }
 );
 
