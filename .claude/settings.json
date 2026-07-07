@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(node --check \"c:/Users/ACER/OneDrive/Desktop/Fake_career_path/Frontend/study.js\")",
-      "Bash(grep -rn \"completedModules\\\\|\\\\/api\\\\/user\\\\/me\\\\|router.get.*\\\\/me\" \"c:/Users/ACER/OneDrive/Desktop/Fake_career_path/backend\")",
-      "Bash(xargs -I{} grep -l \"roadmap-data.js\" {})"
-    ]
-  }
-}
