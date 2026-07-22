@@ -55,6 +55,22 @@ const userSchema = new mongoose.Schema({
         default: 0
     },
 
+    // Canonical Job Readiness Score (0-100) — single source of truth,
+    // recomputed server-side whenever progress-affecting data changes.
+    // See backend/utils/readiness.js for the formula.
+    readinessScore: {
+        type: Number,
+        default: 0
+    },
+
+    // Individual completed-lesson ids (finer-grained than completedModules,
+    // which only tracks whole-module quiz completion). Format matches the
+    // frontend's courseId scheme: `${moduleId}_${courseName}`.
+    completedLessons: {
+        type: [String],
+        default: []
+    },
+
     experienceRank: {
         type: Number,
         default: 0
@@ -169,6 +185,22 @@ const userSchema = new mongoose.Schema({
 
     careerInterests: {
         type: [String],
+        default: []
+    },
+
+    // Career Discovery questionnaire results (persisted so admin can audit them
+    // and so results survive across devices — previously localStorage-only)
+    careerAssessmentAnswers: {
+        type: mongoose.Schema.Types.Mixed,
+        default: null
+    },
+
+    recommendedCareers: {
+        type: [{
+            career: String,
+            match: Number,
+            reason: String
+        }],
         default: []
     },
 

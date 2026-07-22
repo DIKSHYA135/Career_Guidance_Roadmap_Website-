@@ -122,92 +122,121 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    /* ── Submit: smart scoring → top 3 paths ── */
-    submitBtn.addEventListener('click', () => {
+    /* ── Rule-based fallback scoring (used if AI call fails) ── */
+    function runRuleBasedScoring(ans) {
+        const sc = {
+            'Web Development': 0, 'UI/UX Design': 0, 'Data Science': 0,
+            'Machine Learning': 0, 'Cybersecurity': 0, 'Cloud / DevOps': 0,
+            'Backend / APIs': 0, 'Mobile Development': 0,
+        };
+        const { q1, q2, q3, q4, q5, q6, q7, q8, q9 } = ans;
+        if (q1 === 'systems')  { sc['Backend / APIs'] += 3; sc['Cloud / DevOps'] += 3; }
+        if (q1 === 'creative') { sc['UI/UX Design'] += 4; sc['Web Development'] += 2; }
+        if (q1 === 'data')     { sc['Data Science'] += 4; sc['Machine Learning'] += 3; }
+        if (q1 === 'security') { sc['Cybersecurity'] += 5; }
+        if (q2 === 'creative')  { sc['UI/UX Design'] += 3; sc['Web Development'] += 2; }
+        if (q2 === 'logical')   { sc['Backend / APIs'] += 2; sc['Data Science'] += 2; sc['Machine Learning'] += 2; }
+        if (q2 === 'balanced')  { sc['Web Development'] += 3; sc['Mobile Development'] += 2; }
+        if (q2 === 'systems')   { sc['Cloud / DevOps'] += 3; sc['Backend / APIs'] += 2; }
+        if (q3 === 'high')     { sc['Machine Learning'] += 3; sc['Data Science'] += 2; }
+        if (q3 === 'somewhat') { sc['Data Science'] += 1; sc['Cybersecurity'] += 1; }
+        if (q3 === 'low')      { sc['UI/UX Design'] += 2; sc['Web Development'] += 2; }
+        if (q4 === 'team')        { sc['Web Development'] += 1; sc['UI/UX Design'] += 1; }
+        if (q4 === 'independent') { sc['Machine Learning'] += 1; sc['Cybersecurity'] += 1; }
+        if (q5 === 'high')     { sc['Cloud / DevOps'] += 3; sc['Backend / APIs'] += 2; }
+        if (q5 === 'somewhat') { sc['Backend / APIs'] += 1; }
+        if (q6 === 'high')     { sc['Cloud / DevOps'] += 4; }
+        if (q6 === 'somewhat') { sc['Cloud / DevOps'] += 1; sc['Backend / APIs'] += 1; }
+        if (q6 === 'low')      { sc['Web Development'] += 1; sc['Mobile Development'] += 1; }
+        if (q7 === 'fast_job')           { sc['Web Development'] += 2; sc['Cloud / DevOps'] += 1; }
+        if (q7 === 'high_salary')        { sc['Machine Learning'] += 2; sc['Cloud / DevOps'] += 2; sc['Cybersecurity'] += 2; }
+        if (q7 === 'deep_skill')         { sc['Machine Learning'] += 2; sc['Cybersecurity'] += 2; }
+        if (q7 === 'creative_portfolio') { sc['UI/UX Design'] += 3; sc['Web Development'] += 2; }
+        if (q8 === 'full' || q8 === '20h') { sc['Machine Learning'] += 1; sc['Cybersecurity'] += 1; sc['Cloud / DevOps'] += 1; }
+        if (q8 === '5h') { sc['Web Development'] += 1; sc['UI/UX Design'] += 1; }
+        if (q9 === 'app')           { sc['Web Development'] += 3; sc['Mobile Development'] += 3; }
+        if (q9 === 'ai_product')    { sc['Machine Learning'] += 4; sc['Data Science'] += 2; }
+        if (q9 === 'secure_system') { sc['Cybersecurity'] += 3; sc['Backend / APIs'] += 2; }
+        if (q9 === 'data_dashboard') { sc['Data Science'] += 3; sc['Machine Learning'] += 1; }
+        return sc;
+    }
+
+    /* ── Submit: AI-powered → top 3 paths, with rule-based fallback ── */
+    submitBtn.addEventListener('click', async () => {
         const answers = {};
         document.querySelectorAll('input[type="radio"]:checked').forEach(r => {
             answers[r.name] = r.value;
         });
         localStorage.setItem('xyverra_career_assessment', JSON.stringify(answers));
 
-        /* ── Scoring table ── */
-        const scores = {
-            'Web Development':     0,
-            'UI/UX Design':        0,
-            'Data Science':        0,
-            'Machine Learning':    0,
-            'Cybersecurity':       0,
-            'Cloud / DevOps':      0,
-            'Backend Development': 0,
-            'Mobile Development':  0,
-        };
-
-        const { q1, q2, q3, q4, q5, q6, q7, q8, q9 } = answers;
-
-        // Q1 – primary interest
-        if (q1 === 'systems')  { scores['Backend Development'] += 3; scores['Cloud / DevOps'] += 3; }
-        if (q1 === 'creative') { scores['UI/UX Design'] += 4; scores['Web Development'] += 2; }
-        if (q1 === 'data')     { scores['Data Science'] += 4; scores['Machine Learning'] += 3; }
-        if (q1 === 'security') { scores['Cybersecurity'] += 5; }
-
-        // Q2 – visual vs logical
-        if (q2 === 'creative')  { scores['UI/UX Design'] += 3; scores['Web Development'] += 2; }
-        if (q2 === 'logical')   { scores['Backend Development'] += 2; scores['Data Science'] += 2; scores['Machine Learning'] += 2; }
-        if (q2 === 'balanced')  { scores['Web Development'] += 3; scores['Mobile Development'] += 2; }
-        if (q2 === 'systems')   { scores['Cloud / DevOps'] += 3; scores['Backend Development'] += 2; }
-
-        // Q3 – math comfort
-        if (q3 === 'high')     { scores['Machine Learning'] += 3; scores['Data Science'] += 2; }
-        if (q3 === 'somewhat') { scores['Data Science'] += 1; scores['Cybersecurity'] += 1; }
-        if (q3 === 'low')      { scores['UI/UX Design'] += 2; scores['Web Development'] += 2; }
-
-        // Q4 – teamwork
-        if (q4 === 'team')        { scores['Web Development'] += 1; scores['UI/UX Design'] += 1; }
-        if (q4 === 'independent') { scores['Machine Learning'] += 1; scores['Cybersecurity'] += 1; }
-
-        // Q5 – automation interest
-        if (q5 === 'high')     { scores['Cloud / DevOps'] += 3; scores['Backend Development'] += 2; }
-        if (q5 === 'somewhat') { scores['Backend Development'] += 1; }
-
-        // Q6 – DevOps interest
-        if (q6 === 'high')     { scores['Cloud / DevOps'] += 4; }
-        if (q6 === 'somewhat') { scores['Cloud / DevOps'] += 1; scores['Backend Development'] += 1; }
-        if (q6 === 'low')      { scores['Web Development'] += 1; scores['Mobile Development'] += 1; }
-
-        // Q7 – primary goal
-        if (q7 === 'fast_job')          { scores['Web Development'] += 2; scores['Cloud / DevOps'] += 1; }
-        if (q7 === 'high_salary')       { scores['Machine Learning'] += 2; scores['Cloud / DevOps'] += 2; scores['Cybersecurity'] += 2; }
-        if (q7 === 'deep_skill')        { scores['Machine Learning'] += 2; scores['Cybersecurity'] += 2; }
-        if (q7 === 'creative_portfolio') { scores['UI/UX Design'] += 3; scores['Web Development'] += 2; }
-
-        // Q8 – time commitment
-        if (q8 === 'full' || q8 === '20h') {
-            scores['Machine Learning'] += 1; scores['Cybersecurity'] += 1; scores['Cloud / DevOps'] += 1;
-        }
-        if (q8 === '5h') { scores['Web Development'] += 1; scores['UI/UX Design'] += 1; }
-
-        // Q9 – product type
-        if (q9 === 'app')           { scores['Web Development'] += 3; scores['Mobile Development'] += 3; }
-        if (q9 === 'ai_product')    { scores['Machine Learning'] += 4; scores['Data Science'] += 2; }
-        if (q9 === 'secure_system') { scores['Cybersecurity'] += 3; scores['Backend Development'] += 2; }
-        if (q9 === 'data_dashboard') { scores['Data Science'] += 3; scores['Machine Learning'] += 1; }
-
-        // Pick top 3
-        const ranked = Object.entries(scores)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 3)
-            .map(([path]) => path);
-
-        localStorage.setItem('xyverra_recommended_paths', JSON.stringify(ranked));
-        localStorage.setItem('xyverra_top_recommendation', ranked[0]);
-        // Store raw scores so career-recommendation.js can show real match percentages
-        localStorage.setItem('xyverra_career_scores', JSON.stringify(scores));
-
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing your profile...';
         submitBtn.disabled = true;
 
-        setTimeout(() => { window.location.href = 'career-recommendation.html'; }, 1000);
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        let ranked = null;
+        let aiRecommendations = null;
+
+        // ── Try AI-powered recommendation ──
+        if (token) {
+            try {
+                const res = await fetch('http://localhost:5000/api/ai/recommend-career', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ answers })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.success && Array.isArray(data.recommendations) && data.recommendations.length > 0) {
+                        aiRecommendations = data.recommendations;
+                        ranked = aiRecommendations.map(r => r.career);
+                    }
+                }
+            } catch (e) {
+                console.warn('AI recommendation failed, using fallback:', e.message);
+            }
+        }
+
+        // ── Fallback: rule-based scoring ──
+        if (!ranked) {
+            const scores = runRuleBasedScoring(answers);
+            ranked = Object.entries(scores)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(([path]) => path);
+            localStorage.setItem('xyverra_career_scores', JSON.stringify(scores));
+        }
+
+        // ── Save to localStorage ──
+        localStorage.setItem('xyverra_recommended_paths', JSON.stringify(ranked));
+        localStorage.setItem('xyverra_top_recommendation', ranked[0]);
+        if (aiRecommendations) {
+            localStorage.setItem('xyverra_ai_recommendations', JSON.stringify(aiRecommendations));
+        } else {
+            localStorage.removeItem('xyverra_ai_recommendations');
+        }
+
+        // ── Persist to backend so results survive across devices and are admin-visible ──
+        if (token) {
+            try {
+                await fetch('http://localhost:5000/api/user/save-career-assessment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({
+                        answers,
+                        recommendedCareers: aiRecommendations || ranked.map(career => ({ career, match: null, reason: null }))
+                    })
+                });
+            } catch (e) {
+                console.warn('Failed to persist career assessment to server:', e.message);
+            }
+        }
+
+        window.location.href = 'career-recommendation.html';
     });
 
     updateUI();
 });
+

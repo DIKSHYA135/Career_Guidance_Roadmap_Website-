@@ -66,13 +66,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ── Sync fresh data from server (/api/user/me) ────────────────────────────
     // Fire-and-forget: merges server state into localStorage then re-renders.
+    // Uses the same memoized fetch as roadmap.js (also loaded on this page for
+    // the roadmap-preview widget) so only one network request is made, not two.
     (function syncFromServer() {
         const token = localStorage.getItem('token');
         if (!token) return;
-        fetch('http://localhost:5000/api/user/me', {
-            headers: { 'Authorization': 'Bearer ' + token }
-        })
-        .then(r => r.ok ? r.json() : null)
+        const fetchMe = window.xyFetchUserMe || (t => fetch('http://localhost:5000/api/user/me', {
+            headers: { 'Authorization': 'Bearer ' + t }
+        }).then(r => r.ok ? r.json() : null).catch(() => null));
+        fetchMe(token)
         .then(data => {
             if (!data || !data.success) return;
             const u = data.user;
@@ -88,6 +90,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 Object.entries(u.quizScores).forEach(([k, v]) => { scores[k] = v; });
                 localStorage.setItem('xyverra_quiz_scores', JSON.stringify(scores));
             }
+            if (typeof u.readinessScore === 'number')
+                localStorage.setItem('xyverra_readiness_score', String(u.readinessScore));
             // Re-render stats with fresher data after server sync
             renderDashboardStats();
         })
@@ -100,15 +104,26 @@ document.addEventListener("DOMContentLoaded", () => {
     
         let totalSteps = 12;
         let currentModule = { title: "Introduction to " + selectedPath };
-    
-        if (typeof ROADMAP_DATA !== 'undefined' && ROADMAP_DATA[selectedPath]) {
-            const pathData = ROADMAP_DATA[selectedPath];
+
+        // Shared resolver (roadmap-data.js) — keeps this page, Roadmap, and Progress consistent.
+        const matchedPathKey = (typeof ROADMAP_DATA !== 'undefined' && window.resolveRoadmapPathKey)
+            ? window.resolveRoadmapPathKey(selectedPath)
+            : selectedPath;
+
+        let completedCount = 0;
+        if (typeof ROADMAP_DATA !== 'undefined' && ROADMAP_DATA[matchedPathKey]) {
+            const pathData = ROADMAP_DATA[matchedPathKey];
             totalSteps = pathData.length;
+            
+            // Calculate completed count ONLY for modules in this roadmap
+            completedCount = pathData.filter(m => completedModules.includes(m.id)).length;
+            
             const uncompleted = pathData.filter(m => !completedModules.includes(m.id) && m.id !== 'capstone');
             if (uncompleted.length > 0) currentModule = uncompleted[0];
+        } else {
+            completedCount = completedModules.length; // Fallback if no roadmap data
         }
     
-        const completedCount = completedModules.length;
         const progressPct = totalSteps > 0 ? Math.round((completedCount / totalSteps) * 100) : 0;
     
         const rawQuizScores = JSON.parse(localStorage.getItem('xyverra_quiz_scores') || '{}');
@@ -117,9 +132,16 @@ document.addEventListener("DOMContentLoaded", () => {
     
         const xp = (completedCount * 120) + (streak * 50);
         const xpPct = Math.min(100, (xp / 3000) * 100);
-    
-        const careerReadinessScore = Math.round((progressPct * 0.6) + (avgQuiz * 0.2) + (xpPct * 0.2));
-    
+
+        // Job Readiness Score — canonical value computed & persisted server-side
+        // (backend/utils/readiness.js), synced into localStorage on every server sync
+        // so Dashboard, Career Analytics, Progress and Admin Panel never disagree.
+        // Fall back to a rough local estimate only before the first server sync completes.
+        const cachedReadiness = localStorage.getItem('xyverra_readiness_score');
+        const careerReadinessScore = cachedReadiness !== null
+            ? parseInt(cachedReadiness, 10)
+            : Math.round((progressPct * 0.4) + (avgQuiz * 0.3) + (xpPct * 0.2));
+
         // Helper: animate a number from 0 to target
         function animateNumber(el, target, suffix = '', duration = 900) {
             if (!el) return;
@@ -161,12 +183,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const xpDisplay = document.getElementById('xp-display-val');
         if (xpDisplay) xpDisplay.textContent = `${xp.toLocaleString()} XP`;
     
+        // Job Readiness classification — must match backend/utils/readiness.js exactly.
         const rankTitle = document.getElementById('user-rank-title');
         if (rankTitle) {
-            if (careerReadinessScore < 30) rankTitle.textContent = "Beginner";
-            else if (careerReadinessScore < 60) rankTitle.textContent = "Intermediate";
-            else if (careerReadinessScore < 85) rankTitle.textContent = "Advanced";
-            else rankTitle.textContent = "Job Ready";
+            if (careerReadinessScore >= 90) rankTitle.textContent = "Outstanding";
+            else if (careerReadinessScore >= 70) rankTitle.textContent = "Excellent";
+            else if (careerReadinessScore >= 50) rankTitle.textContent = "Good";
+            else if (careerReadinessScore >= 30) rankTitle.textContent = "Fair";
+            else rankTitle.textContent = "Beginner";
         }
         const rankBar = document.getElementById('rank-progress-bar');
         if (rankBar) requestAnimationFrame(() => { rankBar.style.width = `${Math.max(xpPct, 4)}%`; });

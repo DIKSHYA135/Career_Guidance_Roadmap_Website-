@@ -166,7 +166,7 @@ exports.verifyPayment = async (req, res) => {
 
 exports.getHistory = async (req, res) => {
     try {
-        const transactions = await Transaction.find({ userId: req.user.userId }).sort({ createdAt: -1 });
+        const transactions = await Transaction.find({ userId: req.user.userId }).sort({ createdAt: -1 }).limit(50);
         res.json({ success: true, transactions });
     } catch (err) {
         res.status(500).json({ success: false, message: 'Server error fetching transactions' });

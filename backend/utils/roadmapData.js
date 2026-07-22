@@ -420,30 +420,5 @@ const ROADMAP_DATA = {
 // an earlier version of the Career Discovery flow before it was corrected to
 // "Backend / APIs") so users who already have an old label saved are fixed
 // immediately, without needing to redo Career Discovery.
-window.resolveRoadmapPathKey = function(selectedPath) {
-    if (!selectedPath) return "Web Development";
-    if (ROADMAP_DATA[selectedPath]) return selectedPath;
 
-    const p = selectedPath.toLowerCase();
-    const ALIASES = [
-        { test: p => p.includes('full stack') || p.includes('fullstack'), key: "Full Stack Development" },
-        { test: p => p.includes('backend') || p.includes('back-end') || p.includes('api'), key: "Backend / APIs" },
-        { test: p => p.includes('machine learning') || /\bml\b/.test(p), key: "Machine Learning" },
-        { test: p => p.includes('nlp') || p.includes('natural language') || /\bai\b/.test(p), key: "NLP / AI" },
-        { test: p => p.includes('data science'), key: "Data Science" },
-        { test: p => p.includes('data analytics') || p.includes('analytics'), key: "Data Analytics" },
-        { test: p => p.includes('cloud') || p.includes('devops'), key: "Cloud / DevOps" },
-        { test: p => p.includes('cyber') || p.includes('security'), key: "Cybersecurity" },
-        { test: p => p.includes('ui') || p.includes('ux') || p.includes('design'), key: "UI/UX Design" },
-        { test: p => p.includes('mobile'), key: "Mobile Development" },
-        { test: p => p.includes('web'), key: "Web Development" },
-    ];
-    const matched = ALIASES.find(a => a.test(p));
-    if (matched && ROADMAP_DATA[matched.key]) return matched.key;
-
-    // Last-resort fuzzy match in both directions
-    const found = Object.keys(ROADMAP_DATA).find(key =>
-        p.includes(key.toLowerCase()) || key.toLowerCase().includes(p.split(' ')[0])
-    );
-    return found || "Web Development";
-};
+module.exports = ROADMAP_DATA;

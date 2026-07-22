@@ -1,5 +1,14 @@
 /* career-analytics.js */
 
+// Job Readiness Score classification — must match backend/utils/readiness.js exactly.
+function getReadinessLabel(score) {
+    if (score >= 90) return { label: 'Outstanding', color: '#10b981' };
+    if (score >= 70) return { label: 'Excellent', color: '#2563eb' };
+    if (score >= 50) return { label: 'Good', color: '#f59e0b' };
+    if (score >= 30) return { label: 'Fair', color: '#f97316' };
+    return { label: 'Beginner', color: '#ef4444' };
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     // Pro Check
     if (typeof window.XyRequirePro === 'function') {
@@ -40,7 +49,16 @@ function renderDashboard(data, targetCareer) {
     
     document.getElementById('an-salary-range').textContent = `${formatCurrency(userProgress.projectedSalaryRange.min)} - ${formatCurrency(userProgress.projectedSalaryRange.max)}`;
     document.getElementById('an-job-demand').textContent = jobDemand;
-    document.getElementById('an-readiness').textContent = `${userProgress.readinessScore}/100`;
+
+    const readinessScore = userProgress.readinessScore || 0;
+    const readinessInfo = getReadinessLabel(readinessScore);
+    document.getElementById('an-readiness').textContent = `${readinessScore}%`;
+    const readinessLabelEl = document.getElementById('an-readiness-label');
+    if (readinessLabelEl) {
+        readinessLabelEl.textContent = `${readinessInfo.label} Readiness`;
+        readinessLabelEl.style.color = readinessInfo.color;
+        readinessLabelEl.style.fontWeight = '700';
+    }
 
     // Skills List
     const skillsList = document.getElementById('an-top-skills');

@@ -1,70 +1,191 @@
 /* admin.js - Logic for XYVERRA Admin Panel */
 
-// Modal functions for User Details
-window.openUserModal = function(index) {
-    const user = window.adminUsersData[index];
-    if (!user) return;
+// Job Readiness Score classification — must match backend/utils/readiness.js exactly.
+function getReadinessLabel(score) {
+    if (score >= 90) return { label: 'Outstanding', color: '#10b981' };
+    if (score >= 70) return { label: 'Excellent', color: '#2563eb' };
+    if (score >= 50) return { label: 'Good', color: '#f59e0b' };
+    if (score >= 30) return { label: 'Fair', color: '#f97316' };
+    return { label: 'Beginner', color: '#ef4444' };
+}
 
-    document.getElementById('ud-name').textContent = user.name || 'Unknown User';
-    document.getElementById('ud-email').textContent = user.email || '';
-    document.getElementById('ud-roadmap').textContent = user.selectedPath || 'Not Selected';
-    document.getElementById('ud-joined').textContent = new Date(user.createdAt).toLocaleDateString();
+// ── USER DETAILS MODAL ──
+window.viewUserDetails = async (userId) => {
+    try {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        const res = await fetch(`http://localhost:5000/api/admin/user/${userId}/detailed`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            const { user, subscriptions, quizAttempts, interviews, activityLogs, chatHistory, progressRecords } = data;
 
-    // ── Completed Modules (passed quiz) ─────────────────────────────
-    const modsList = document.getElementById('ud-modules');
-    const completedMods = user.completedModules || [];
-    if (completedMods.length > 0) {
-        modsList.innerHTML = completedMods.map(m =>
-            `<li style="padding:4px 0;border-bottom:1px solid #f1f5f9;">
-                <i class="fas fa-check-circle" style="color:#10b981;margin-right:8px;"></i>
-                <span>${m.replace(/_/g, ' ')}</span>
-            </li>`
-        ).join('');
-    } else {
-        modsList.innerHTML = `<li style="color:#94a3b8;padding:8px 0;">No modules completed yet.</li>`;
+            document.getElementById('ud-name').textContent = user.name || 'Unknown User';
+            document.getElementById('ud-email').textContent = user.email || 'No email';
+            document.getElementById('ud-roadmap').textContent = user.selectedPath || 'Not Selected';
+            document.getElementById('ud-joined').textContent = new Date(user.createdAt).toLocaleDateString();
+
+            // Level / XP / Streak — XP formula matches dashboard.js so figures are consistent
+            const completedCount = (user.completedModules || []).length;
+            const streak = user.dailyStreak || 0;
+            const xp = (completedCount * 120) + (streak * 50);
+            document.getElementById('ud-level').textContent = user.selectedLevel || 'Beginner';
+            document.getElementById('ud-xp').textContent = xp.toLocaleString() + ' XP';
+            document.getElementById('ud-streak').textContent = streak + (streak === 1 ? ' day' : ' days');
+
+            // Job Readiness Score — same canonical, server-persisted value shown on
+            // Career Analytics and the Dashboard (backend/utils/readiness.js).
+            const readinessScore = user.readinessScore || 0;
+            const readinessInfo = getReadinessLabel(readinessScore);
+            const readinessEl = document.getElementById('ud-readiness');
+            readinessEl.textContent = `${readinessScore}% — ${readinessInfo.label}`;
+            readinessEl.style.color = readinessInfo.color;
+
+            // Roadmap progress %
+            const roadmapMods = (typeof ROADMAP_DATA !== 'undefined' && user.selectedPath && ROADMAP_DATA[user.selectedPath]) || [];
+            const progressPct = roadmapMods.length > 0
+                ? Math.round((roadmapMods.filter(m => (user.completedModules || []).includes(m.id)).length / roadmapMods.length) * 100)
+                : 0;
+            document.getElementById('ud-progress-pct').textContent = roadmapMods.length > 0 ? progressPct + '%' : 'N/A';
+
+            // Current Skills
+            const skillsDiv = document.getElementById('ud-skills');
+            const skills = user.skills || [];
+            skillsDiv.innerHTML = skills.length > 0
+                ? skills.map(s => `<span class="badge badge-blue" style="margin:2px;display:inline-block;">${s}</span>`).join('')
+                : '<p style="color:#94a3b8;">No skills listed.</p>';
+
+            // Career Discovery Results / Recommended Careers
+            const cdDiv = document.getElementById('ud-career-discovery');
+            const recommended = user.recommendedCareers || [];
+            if (recommended.length > 0) {
+                cdDiv.innerHTML = recommended.map(r => `
+                    <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;">
+                        <strong>${r.career}</strong>${r.match != null ? ` — ${r.match}% match` : ''}
+                        ${r.reason ? `<br><small style="color:#64748b;">${r.reason}</small>` : ''}
+                    </div>`).join('');
+            } else {
+                cdDiv.innerHTML = '<p style="color:#94a3b8;">Career Discovery not completed yet.</p>';
+            }
+
+            // Roadmap modules — unlocked / studied / completed (from Progress collection)
+            const lessonsDiv = document.getElementById('ud-lessons');
+            const progList = progressRecords || [];
+            if (progList.length > 0) {
+                lessonsDiv.innerHTML = `<ul style="list-style:none;padding:0;margin:0;">` + progList.map(p => {
+                    const date = p.lastAccessedAt ? new Date(p.lastAccessedAt).toLocaleDateString() : '—';
+                    const statusBadge = p.status === 'completed'
+                        ? `<span style="background:#dcfce7;color:#16a34a;border-radius:4px;padding:1px 6px;font-size:0.75rem;font-weight:600;">Completed</span>`
+                        : p.status === 'studied'
+                        ? `<span style="background:#eff6ff;color:#2563eb;border-radius:4px;padding:1px 6px;font-size:0.75rem;font-weight:600;">Studied</span>`
+                        : `<span style="background:#f1f5f9;color:#94a3b8;border-radius:4px;padding:1px 6px;font-size:0.75rem;font-weight:600;">${p.status}</span>`;
+                    return `<li style="padding:5px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:8px;">
+                        <i class="fas fa-book-open" style="color:#3b82f6;flex-shrink:0;"></i>
+                        <span style="flex:1;font-size:0.9rem;">${p.moduleId.replace(/_/g, ' ')}</span>
+                        ${statusBadge}
+                        <span style="color:#94a3b8;font-size:0.78rem;white-space:nowrap;">${date}</span>
+                    </li>`;
+                }).join('') + `</ul>`;
+            } else {
+                lessonsDiv.innerHTML = '<p style="color:#94a3b8;">No modules unlocked/studied yet.</p>';
+            }
+
+            // Subscriptions
+            const subsDiv = document.getElementById('ud-subscriptions');
+            if (subscriptions && subscriptions.length > 0) {
+                subsDiv.innerHTML = subscriptions.map(sub => {
+                    const txStr = sub.transaction ? ` Paid Rs. ${sub.transaction.amount} via ${sub.transaction.paymentMethod}` : '';
+                    return `<div style="padding: 10px; border-bottom: 1px solid #e2e8f0;">
+                        <strong>Plan:</strong> ${sub.planId} (${sub.status}) <br>
+                        <small>Started: ${new Date(sub.startDate).toLocaleDateString()}${txStr}</small>
+                    </div>`;
+                }).join('');
+            } else {
+                subsDiv.innerHTML = '<p>No subscriptions found.</p>';
+            }
+
+            // Quizzes
+            const quizDiv = document.getElementById('ud-quiz-history');
+            if (quizAttempts && quizAttempts.length > 0) {
+                quizDiv.innerHTML = quizAttempts.map(q => {
+                    let answersHtml = '';
+                    if (q.answers && q.answers.length > 0) {
+                        answersHtml = `<ul style="margin-top: 5px; font-size: 0.85rem; color: #475569;">` + q.answers.map((a, i) => {
+                            const icon = a.isCorrect ? '✅' : '❌';
+                            return `<li>${icon} Q${i+1}: ${a.questionText} <br> <em>Selected: ${a.selectedOption}</em></li>`;
+                        }).join('') + `</ul>`;
+                    }
+                    return `<div style="padding: 10px; border-bottom: 1px solid #e2e8f0;">
+                        <strong>Module: ${q.moduleId}</strong> - Score: ${q.scorePercentage}% (${q.passed ? 'Passed' : 'Failed'})
+                        <br><small>Date: ${new Date(q.createdAt).toLocaleString()}</small>
+                        ${answersHtml}
+                    </div>`;
+                }).join('');
+            } else {
+                quizDiv.innerHTML = '<p>No quiz history found.</p>';
+            }
+
+            // Interviews
+            const intDiv = document.getElementById('ud-interviews');
+            if (interviews && interviews.length > 0) {
+                intDiv.innerHTML = interviews.map(int => {
+                    let qsHtml = '';
+                    if (int.questionsAsked && int.questionsAsked.length > 0) {
+                        qsHtml = `<ul style="margin-top: 5px; font-size: 0.85rem; color: #475569;">` + int.questionsAsked.map((qa, i) => {
+                            return `<li>
+                                <strong>Q${i+1}:</strong> ${qa.question} <br>
+                                <strong>Answer:</strong> ${qa.userAnswer || 'Skipped'} <br>
+                                <strong>AI Feedback:</strong> ${qa.aiFeedback || 'None'}
+                            </li>`;
+                        }).join('') + `</ul>`;
+                    }
+                    return `<div style="padding: 10px; border-bottom: 1px solid #e2e8f0;">
+                        <strong>Job Role: ${int.jobRole}</strong> - Score: ${Math.round(int.overallScore || 0)}%
+                        <br><small>Date: ${new Date(int.createdAt).toLocaleString()}</small>
+                        ${qsHtml}
+                    </div>`;
+                }).join('');
+            } else {
+                intDiv.innerHTML = '<p>No mock interviews found.</p>';
+            }
+
+            // Chat History
+            const chatDiv = document.getElementById('ud-chat-history');
+            if (chatHistory && chatHistory.length > 0) {
+                chatDiv.innerHTML = chatHistory.map(msg => {
+                    const isUser = msg.role === 'user';
+                    const ts = msg.timestamp ? new Date(msg.timestamp).toLocaleString() : '';
+                    const bg = isUser ? '#eff6ff' : '#f0fdf4';
+                    const label = isUser ? '🧑 User' : '🤖 AI';
+                    const labelColor = isUser ? '#2563eb' : '#059669';
+                    return `<div style="margin-bottom:8px;padding:8px 10px;background:${bg};border-radius:6px;">
+                        <div style="font-size:0.75rem;font-weight:700;color:${labelColor};margin-bottom:3px;">${label} ${ts ? `<span style="color:#94a3b8;font-weight:400;">&nbsp;·&nbsp;${ts}</span>` : ''}</div>
+                        <div style="font-size:0.875rem;color:#1e293b;line-height:1.5;">${msg.content}</div>
+                    </div>`;
+                }).join('');
+            } else {
+                chatDiv.innerHTML = '<p style="color:#94a3b8;">No chat history found.</p>';
+            }
+
+            // Activity
+            const actDiv = document.getElementById('ud-activity');
+            if (activityLogs && activityLogs.length > 0) {
+                actDiv.innerHTML = activityLogs.map(a => {
+                    return `<div style="padding: 5px; border-bottom: 1px dashed #e2e8f0; font-size: 0.85rem;">
+                        <strong>[${new Date(a.timestamp).toLocaleString()}]</strong> ${a.actionType}: ${a.details || ''}
+                    </div>`;
+                }).join('');
+            } else {
+                actDiv.innerHTML = '<p>No activity logs found.</p>';
+            }
+
+            document.getElementById('user-details-modal').style.display = 'flex';
+        }
+    } catch (e) {
+        console.error(e);
+        showToast('Error', 'Failed to fetch user details.', 'error');
     }
-
-    // ── Studied Modules / Lessons (from Progress records) ────────────
-    const lessonsList = document.getElementById('ud-lessons');
-    const progressRecords = user.progressRecords || [];
-    if (progressRecords.length > 0) {
-        lessonsList.innerHTML = progressRecords.map(p => {
-            const date = p.lastAccessed ? new Date(p.lastAccessed).toLocaleDateString() : '—';
-            const statusBadge = p.status === 'completed'
-                ? `<span style="background:#dcfce7;color:#16a34a;border-radius:4px;padding:1px 6px;font-size:0.75rem;font-weight:600;">Completed</span>`
-                : `<span style="background:#eff6ff;color:#2563eb;border-radius:4px;padding:1px 6px;font-size:0.75rem;font-weight:600;">Studied</span>`;
-            const label = p.moduleId.replace(/_/g, ' ');
-            return `<li style="padding:5px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:8px;">
-                <i class="fas fa-book-open" style="color:#3b82f6;flex-shrink:0;"></i>
-                <span style="flex:1;font-size:0.9rem;">${label}</span>
-                ${statusBadge}
-                <span style="color:#94a3b8;font-size:0.78rem;white-space:nowrap;">${date}</span>
-            </li>`;
-        }).join('');
-    } else {
-        lessonsList.innerHTML = `<li style="color:#94a3b8;padding:8px 0;">No modules studied yet.</li>`;
-    }
-
-    // ── Quiz Scores (from Progress records via quizScoresFromProgress) ─
-    const quizzesList = document.getElementById('ud-quizzes');
-    const quizScores = user.quizScoresFromProgress || {};
-    const quizKeys = Object.keys(quizScores);
-    if (quizKeys.length > 0) {
-        quizzesList.innerHTML = quizKeys.map(q => {
-            const score = quizScores[q];
-            const color = score >= 80 ? '#10b981' : score >= 50 ? '#f59e0b' : '#ef4444';
-            const bg    = score >= 80 ? '#f0fdf4' : score >= 50 ? '#fffbeb' : '#fef2f2';
-            return `<li style="padding:5px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:8px;">
-                <i class="fas fa-clipboard-list" style="color:#8b5cf6;flex-shrink:0;"></i>
-                <span style="flex:1;font-size:0.9rem;">${q.replace(/_/g, ' ')}</span>
-                <span style="background:${bg};color:${color};border-radius:4px;padding:2px 10px;font-weight:700;font-size:0.9rem;">${score}%</span>
-            </li>`;
-        }).join('');
-    } else {
-        quizzesList.innerHTML = `<li style="color:#94a3b8;padding:8px 0;">No quizzes taken yet.</li>`;
-    }
-
-    document.getElementById('user-details-modal').style.display = 'flex';
 };
 
 window.closeUserModal = function() {
@@ -238,6 +359,140 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function fetchSubscriptions() {
+        try {
+            const res = await fetch(`${API_URL}/subscriptions`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.status === 401 || res.status === 403) return forceLogout();
+            const data = await res.json();
+            if (data.success) {
+                const subTbody = document.getElementById('subscriptions-tbody');
+                if (subTbody) {
+                    if (data.subscriptions.length === 0) {
+                        subTbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2.5rem;color:var(--text-muted);">No subscriptions found.</td></tr>`;
+                        return;
+                    }
+                    subTbody.innerHTML = data.subscriptions.map(s => {
+                        const amount = s.amountPaid ? `Rs. ${s.amountPaid}` : '—';
+                        const start = s.startDate ? new Date(s.startDate).toLocaleDateString() : '—';
+                        const end = s.endDate ? new Date(s.endDate).toLocaleDateString() : '—';
+                        const statusColor = s.status === 'active' ? 'badge-green' : (s.status === 'expired' ? 'badge-red' : 'badge-yellow');
+                        
+                        return `
+                        <tr>
+                            <td><strong>${s.userName}</strong><br><small style="color:var(--text-muted)">${s.userEmail}</small></td>
+                            <td><span class="badge badge-purple">${s.planId}</span></td>
+                            <td><span class="badge ${statusColor}">${s.status}</span></td>
+                            <td>${amount}</td>
+                            <td>${s.paymentMethod || '—'}</td>
+                            <td style="font-family:monospace;font-size:0.85rem;">${s.transactionId || '—'}</td>
+                            <td style="color:var(--text-muted);font-size:0.85rem;">${start}</td>
+                            <td style="color:var(--text-muted);font-size:0.85rem;">${end}</td>
+                        </tr>`;
+                    }).join('');
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching subscriptions:', error);
+            const subTbody = document.getElementById('subscriptions-tbody');
+            if (subTbody) subTbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2.5rem;color:var(--color-red);">Error connecting to server.</td></tr>`;
+        }
+    }
+
+    async function fetchInterviews() {
+        try {
+            const res = await fetch(`${API_URL}/interviews`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.status === 401 || res.status === 403) return forceLogout();
+            const data = await res.json();
+            if (data.success) {
+                const intTbody = document.getElementById('interviews-tbody');
+                if (intTbody) {
+                    if (data.interviews.length === 0) {
+                        intTbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2.5rem;color:var(--text-muted);">No interviews found.</td></tr>`;
+                        return;
+                    }
+                    intTbody.innerHTML = data.interviews.map(i => {
+                        const date = i.createdAt ? new Date(i.createdAt).toLocaleDateString() : '—';
+                        const score = Math.round(i.overallScore || 0);
+                        const statusColor = i.completed ? 'badge-green' : 'badge-yellow';
+                        const statusText = i.completed ? 'Completed' : 'In Progress';
+                        
+                        return `
+                        <tr>
+                            <td><strong>${i.userName}</strong><br><small style="color:var(--text-muted)">${i.userEmail}</small></td>
+                            <td><span class="badge badge-purple">${i.jobRole || '—'}</span></td>
+                            <td><strong>${score}%</strong></td>
+                            <td><span class="badge ${statusColor}">${statusText}</span></td>
+                            <td style="color:var(--text-muted);font-size:0.85rem;">${date}</td>
+                            <td>${i.questionsAsked ? i.questionsAsked.length : 0} Qs</td>
+                        </tr>`;
+                    }).join('');
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching interviews:', error);
+            const intTbody = document.getElementById('interviews-tbody');
+            if (intTbody) intTbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2.5rem;color:var(--color-red);">Error connecting to server.</td></tr>`;
+        }
+    }
+
+    async function fetchChatLogs() {
+        try {
+            const res = await fetch(`${API_URL}/chat-logs`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.status === 401 || res.status === 403) return forceLogout();
+            const data = await res.json();
+            if (data.success) {
+                window.adminChatLogs = data.chatLogs; // cache for search
+                renderChatLogs(data.chatLogs);
+            }
+        } catch (error) {
+            console.error('Error fetching chat logs:', error);
+            const el = document.getElementById('chat-logs-list');
+            if (el) el.innerHTML = `<p style="color:var(--color-red);text-align:center;padding:2rem;">Error connecting to server.</p>`;
+        }
+    }
+
+    function renderChatLogs(chatLogs) {
+        const el = document.getElementById('chat-logs-list');
+        if (!el) return;
+        if (!chatLogs || chatLogs.length === 0) {
+            el.innerHTML = `<p style="color:var(--text-muted);text-align:center;padding:2rem;">No chat logs found. Users need to start chatting first.</p>`;
+            return;
+        }
+        el.innerHTML = chatLogs.map(u => {
+            const msgs = u.chatHistory || [];
+            const msgHtml = msgs.map(msg => {
+                const isUser = msg.role === 'user';
+                const ts = msg.timestamp ? new Date(msg.timestamp).toLocaleString() : '';
+                const bg = isUser ? '#eff6ff' : '#f0fdf4';
+                const label = isUser ? '🧑 User' : '🤖 AI';
+                const labelColor = isUser ? '#2563eb' : '#059669';
+                return `<div style="margin-bottom:6px;padding:7px 10px;background:${bg};border-radius:5px;">
+                    <div style="font-size:0.72rem;font-weight:700;color:${labelColor};margin-bottom:2px;">${label} ${ts ? `<span style="color:#94a3b8;font-weight:400;">· ${ts}</span>` : ''}</div>
+                    <div style="font-size:0.85rem;color:#1e293b;line-height:1.5;">${msg.content}</div>
+                </div>`;
+            }).join('');
+
+            return `<div class="glass-card" style="margin-bottom:1rem;padding:1rem;">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:0.75rem;">
+                    <div style="width:36px;height:36px;background:#eff6ff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#2563eb;font-size:0.9rem;flex-shrink:0;">${(u.userName || '?').charAt(0).toUpperCase()}</div>
+                    <div style="flex:1;">
+                        <div style="font-weight:700;color:#0f172a;">${u.userName}</div>
+                        <div style="font-size:0.8rem;color:#64748b;">${u.userEmail}</div>
+                    </div>
+                    <span class="badge badge-blue">${u.totalMessages} total msgs</span>
+                    <span class="badge" style="background:#f0fdf4;color:#059669;">${msgs.length} saved</span>
+                </div>
+                ${msgs.length > 0 ? `<div style="max-height:300px;overflow-y:auto;border-top:1px solid #e2e8f0;padding-top:0.75rem;">${msgHtml}</div>` : '<p style="color:#94a3b8;font-size:0.85rem;">No saved messages yet.</p>'}
+            </div>`;
+        }).join('');
+    }
+
     async function fetchUsers() {
         try {
             const res = await fetch(`${API_URL}/users`, {
@@ -268,7 +523,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <td><span class="badge" style="background:#faf5ff;color:#7c3aed;">${quizCount} Quizzes</span></td>
                             <td style="color:var(--text-muted);font-size:0.82rem;">${new Date(u.createdAt).toLocaleDateString()}</td>
                             <td>
-                                <button class="btn btn-sm btn-outline" title="View Profile" onclick="openUserModal(${i})">
+                                <button class="btn btn-sm btn-outline" title="View Profile" onclick="viewUserDetails('${u._id}')">
                                     <i class="fas fa-eye"></i> View
                                 </button>
                             </td>
@@ -384,6 +639,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td><span class="badge badge-purple" style="padding:3px 10px;">${quizCount}</span></td>
                 <td style="color:var(--text-muted);font-size:0.875rem;">${(u.chatMessagesUsed || 0).toLocaleString()}</td>
                 <td style="color:var(--text-muted);font-size:0.82rem;white-space:nowrap;">${lastActive}</td>
+                <td>
+                    <button class="btn btn-sm" style="background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;padding:4px 10px;border-radius:5px;font-size:0.8rem;cursor:pointer;" onclick="viewUserDetails('${u._id}')">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                </td>
             </tr>`;
         }).join('');
     }
@@ -598,10 +858,28 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchDashboardStats();
         fetchActivityLogs();
         fetchUsers();
+        fetchSubscriptions();
+        fetchInterviews();
+        fetchChatLogs();
     };
 
     refreshData(); // Initial fetch
-    setInterval(refreshData, 5000); // Poll every 5 seconds for real-time feel
+    const refreshIntervalId = setInterval(refreshData, 5000); // Poll every 5 seconds for real-time feel
+    window.addEventListener('beforeunload', () => clearInterval(refreshIntervalId));
+
+    // Chat logs search filter
+    const chatSearchInput = document.getElementById('chat-logs-search');
+    if (chatSearchInput) {
+        chatSearchInput.addEventListener('input', () => {
+            const q = chatSearchInput.value.toLowerCase().trim();
+            const logs = window.adminChatLogs || [];
+            const filtered = q ? logs.filter(u =>
+                (u.userName || '').toLowerCase().includes(q) ||
+                (u.userEmail || '').toLowerCase().includes(q)
+            ) : logs;
+            renderChatLogs(filtered);
+        });
+    }
     // --- CUSTOM TOAST NOTIFICATIONS ---
     function showToast(title, message, type = 'success') {
         let container = document.querySelector('.toast-container');

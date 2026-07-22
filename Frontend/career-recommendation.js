@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
             salary: '$110k – $170k', demand: 'Very High', demandClass: 'demand-vhigh', time: '8–12 months',
             skills: ['AWS / Azure', 'Docker', 'Kubernetes', 'Terraform', 'CI/CD']
         },
-        'Backend Development': {
+        'Backend / APIs': {
             icon: '⚙️', title: 'Backend Developer',
             description: 'Build the server-side logic, APIs, and databases that power applications. Focus on performance, scalability, and reliability.',
             salary: '$95k – $145k', demand: 'Very High', demandClass: 'demand-vhigh', time: '6–9 months',

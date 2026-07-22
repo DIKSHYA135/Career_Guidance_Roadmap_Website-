@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     if (Array.isArray(u.completedModules)) localStorage.setItem('completedModules', JSON.stringify(u.completedModules));
                     if (typeof u.dailyStreak === 'number') localStorage.setItem('xyverra_user_streak', String(u.dailyStreak));
                     if (u.quizScores) localStorage.setItem('quizScores', JSON.stringify(u.quizScores));
+                    if (typeof u.readinessScore === 'number') localStorage.setItem('xyverra_readiness_score', String(u.readinessScore));
                 }
             }
         } catch (e) {
@@ -46,8 +47,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    let matchedPathKey   = Object.keys(ROADMAP_DATA).find(k => selectedPath.includes(k)) || null;
-    if (!matchedPathKey) matchedPathKey = Object.keys(ROADMAP_DATA).find(k => k.includes(selectedPath.split(' ')[0])) || null;
+    // Shared resolver (roadmap-data.js) — keeps this page, Roadmap, and Dashboard consistent.
+    const matchedPathKey = window.resolveRoadmapPathKey
+        ? window.resolveRoadmapPathKey(selectedPath)
+        : (Object.keys(ROADMAP_DATA).find(k => selectedPath.includes(k)) || null);
     const pathData       = matchedPathKey ? (ROADMAP_DATA[matchedPathKey] || []) : [];
 
     let completedModules = [];
@@ -65,12 +68,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     const progressPercentage  = totalSteps === 0 ? 0 : Math.round((completedStepsCount / totalSteps) * 100);
     const skillScore          = Math.min(100, Math.round((userSkills.length * 5) + (progressPercentage * 0.5)));
 
-    // Job Readiness: 50% roadmap + 30% skills (cap 20 skills) + 20% quizzes
-    const jobReadiness = Math.min(100, Math.round(
-        progressPercentage * 0.50 +
-        Math.min(100, userSkills.length * 5) * 0.30 +
-        (totalSteps > 0 ? (completedStepsCount / totalSteps) * 100 : 0) * 0.20
-    ));
+    // Job Readiness Score — canonical value computed & persisted server-side
+    // (backend/utils/readiness.js), synced above from /api/user/me so this page
+    // always matches Career Analytics, Dashboard, and the Admin Panel.
+    // Fall back to a rough local estimate only before the first server sync completes.
+    const cachedReadiness = localStorage.getItem('xyverra_readiness_score');
+    const jobReadiness = cachedReadiness !== null
+        ? parseInt(cachedReadiness, 10)
+        : Math.min(100, Math.round(
+            progressPercentage * 0.40 +
+            Math.min(100, userSkills.length * 5) * 0.30 +
+            (totalSteps > 0 ? (completedStepsCount / totalSteps) * 100 : 0) * 0.20
+        ));
 
     let skillLevel = "Beginner";
     if (skillScore >= 20 && skillScore < 40) skillLevel = "Intermediate";
@@ -78,11 +87,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     else if (skillScore >= 60 && skillScore < 80) skillLevel = "Professional";
     else if (skillScore >= 80) skillLevel = "Expert";
 
+    // Classification bands must match backend/utils/readiness.js exactly.
     let jrLabel = "Beginner";
-    let jrColor = "#64748B";
-    if (jobReadiness >= 75)      { jrLabel = "Job Ready 🎉"; jrColor = "#10B981"; }
-    else if (jobReadiness >= 50) { jrLabel = "Advanced";     jrColor = "#6366F1"; }
-    else if (jobReadiness >= 25) { jrLabel = "Intermediate"; jrColor = "#F59E0B"; }
+    let jrColor = "#ef4444";
+    if (jobReadiness >= 90)      { jrLabel = "Outstanding"; jrColor = "#10b981"; }
+    else if (jobReadiness >= 70) { jrLabel = "Excellent";   jrColor = "#2563eb"; }
+    else if (jobReadiness >= 50) { jrLabel = "Good";        jrColor = "#f59e0b"; }
+    else if (jobReadiness >= 30) { jrLabel = "Fair";        jrColor = "#f97316"; }
 
     // ── 3. Summary Cards ─────────────────────────────────────────
     const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };

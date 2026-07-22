@@ -61,6 +61,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     populateSkills();
 
+    const fetchHistory = async () => {
+        try {
+            const res = await fetch('http://localhost:5000/api/interview/history', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            const historyList = document.getElementById('int-history-list');
+            if (data.success && data.history && data.history.length > 0) {
+                historyList.innerHTML = data.history.map(session => {
+                    const d = new Date(session.createdAt).toLocaleDateString();
+                    const score = Math.round(session.overallScore || 0);
+                    let color = "#3b82f6";
+                    if (score < 50) color = "#ef4444";
+                    else if (score < 75) color = "#f59e0b";
+                    else if (score >= 90) color = "#10b981";
+                    
+                    return `
+                    <div class="history-item" style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 style="margin: 0; font-size: 1rem;">${session.jobRole}</h4>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">${d} • ${session.questionsAsked.length} Questions</span>
+                        </div>
+                        <div style="font-size: 1.2rem; font-weight: bold; color: ${color};">
+                            ${score}%
+                        </div>
+                    </div>`;
+                }).join('');
+            } else {
+                historyList.innerHTML = '<div class="int-empty-state">No past sessions found. Start one above!</div>';
+            }
+        } catch (e) {
+            console.error('Failed to fetch interview history:', e);
+        }
+    };
+
+    fetchHistory();
+
     const formatTime = (seconds) => {
         const m = Math.floor(seconds / 60);
         const s = seconds % 60;
