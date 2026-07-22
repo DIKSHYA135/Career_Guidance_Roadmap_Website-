@@ -447,3 +447,28 @@ window.resolveRoadmapPathKey = function(selectedPath) {
     );
     return found || "Web Development";
 };
+
+// ── Resolve a raw module id (e.g. "web_mod4", "ux_mod2", "html") to its
+// human-readable title. Used anywhere a moduleId is shown to a user or admin
+// (Dashboard activity timeline, Admin Panel quiz attempts) instead of the raw
+// internal id. Searches ROADMAP_DATA first, then falls back to the legacy
+// MODULES_DATA structure (app-data.js) if it happens to be loaded on the page.
+window.resolveModuleTitle = function(moduleId) {
+    if (!moduleId || typeof moduleId !== 'string') return moduleId;
+
+    for (const modules of Object.values(ROADMAP_DATA)) {
+        const match = modules.find(m => m.id === moduleId);
+        if (match) return match.title;
+    }
+
+    if (typeof MODULES_DATA !== 'undefined') {
+        for (const levels of Object.values(MODULES_DATA)) {
+            for (const modules of Object.values(levels)) {
+                const match = modules.find(m => m.id === moduleId);
+                if (match) return match.title;
+            }
+        }
+    }
+
+    return moduleId;
+};

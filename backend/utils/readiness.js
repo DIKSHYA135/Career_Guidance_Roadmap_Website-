@@ -49,7 +49,12 @@ function computeReadinessScore(user) {
     
     let totalModules = DEFAULT_TOTAL_MODULES;
     let relevantCompletedCount = 0;
-    
+    // Module ids belonging to the user's CURRENT roadmap only — used below to
+    // keep quiz scores and completed lessons from a previous roadmap (leftover
+    // from before a path switch, or from switching before this filter existed)
+    // from leaking into this user's score.
+    const pathModuleIds = pathData ? new Set(pathData.map(m => m.id)) : null;
+
     if (pathData) {
         totalModules = pathData.length;
         relevantCompletedCount = pathData.filter(m => completedModules.includes(m.id)).length;
@@ -62,12 +67,19 @@ function computeReadinessScore(user) {
     const quizScoresObj = user.quizScores instanceof Map
         ? Object.fromEntries(user.quizScores)
         : (user.quizScores || {});
-    const quizValues = Object.values(quizScoresObj).filter(v => typeof v === 'number');
+    const quizEntries = pathModuleIds
+        ? Object.entries(quizScoresObj).filter(([key]) => pathModuleIds.has(key))
+        : Object.entries(quizScoresObj);
+    const quizValues = quizEntries.map(([, v]) => v).filter(v => typeof v === 'number');
     const quizAvgPct = quizValues.length > 0
         ? clamp0to100(quizValues.reduce((a, b) => a + b, 0) / quizValues.length)
         : 0;
 
-    const completedLessons = user.completedLessons || [];
+    const allCompletedLessons = user.completedLessons || [];
+    const completedLessons = pathModuleIds
+        ? allCompletedLessons.filter(courseId =>
+            [...pathModuleIds].some(id => courseId.startsWith(id + '_')))
+        : allCompletedLessons;
     const lessonsEngagementPct = clamp0to100((completedLessons.length / LESSONS_FOR_FULL_ENGAGEMENT_CREDIT) * 100);
 
     // Profile completion: path, level, at least one skill, DOB
@@ -94,7 +106,6 @@ async function recomputeAndSaveReadiness(userId) {
 }
 
 module.exports = {
-    TOTAL_MODULES_BY_PATH,
     computeReadinessScore,
     getReadinessLabel,
     recomputeAndSaveReadiness

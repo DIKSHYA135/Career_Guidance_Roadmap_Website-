@@ -46,14 +46,6 @@
         }
         .btn-complete:hover { background: #15803d; transform: translateY(-1px); }
         .btn-complete:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
-        .btn-open-tab {
-            display: inline-flex; align-items: center; gap: 0.5rem;
-            padding: 0.55rem 1.2rem; border: 1.5px solid #e2e8f0;
-            border-radius: 8px; color: #334155; font-weight: 600;
-            font-size: 0.875rem; text-decoration: none; background: #f8fafc;
-            transition: all 0.18s;
-        }
-        .btn-open-tab:hover { border-color: #3b82f6; color: #2563eb; background: #eff6ff; }
 
         /* ── Content area ── */
         .content-area {
@@ -118,13 +110,12 @@
     <!-- Header -->
     <header class="study-header">
         <div class="study-header-left">
-
+            <a href="roadmap.html" id="back-btn" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
             <h1 class="course-title" id="display-title">Loading...</h1>
         </div>
         <div class="study-header-right">
-            <a href="#" id="open-new-tab" target="_blank" rel="noopener" class="btn-open-tab">
-                <i class="fas fa-external-link-alt"></i> Open in New Tab
-            </a>
             <button type="button" id="mark-complete" class="btn-complete">
                 <i class="fas fa-check-circle"></i>
                 <span id="complete-label">Mark as Complete</span>
@@ -157,12 +148,23 @@
         const mdBody       = document.getElementById('markdown-body');
         const titleEl      = document.getElementById('display-title');
         const completeBtn  = document.getElementById('mark-complete');
-        const openTabBtn   = document.getElementById('open-new-tab');
+        const backBtn      = document.getElementById('back-btn');
 
         titleEl.textContent = title;
         document.title = title + ' - Xyverra';
 
-        if (rawUrl) openTabBtn.href = rawUrl;
+        // ── Back: prefer real browser history (keeps roadmap scroll position etc.),
+        // fall back to the roadmap page directly if this tab has no prior entry
+        // (e.g. opened via a direct link). The href="roadmap.html" already covers
+        // the no-JS case. ──
+        if (backBtn) {
+            backBtn.addEventListener('click', (e) => {
+                if (window.history.length > 1 && document.referrer) {
+                    e.preventDefault();
+                    window.history.back();
+                }
+            });
+        }
 
         const completionKey = courseId || rawUrl;
 
