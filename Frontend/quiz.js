@@ -10569,10 +10569,12 @@ let quizPhase = 'read';      // 'read' | 'answer'
 let currentQuestionIndex = 0;
 let selectedOptionIndex = null;
 let score = 0;
+let detailedQuizAnswers = [];
 let moduleId = 'html';
 let quizQuestions = [];
 let totalQuestions = 0;
 let quizTimerInterval;
+let currentQuestion = null;
 
 // ── Utility Functions ──
 function isValidQuestion(q) {
@@ -10621,7 +10623,38 @@ document.addEventListener("DOMContentLoaded", () => {
     let moduleId = urlParams.get('module') || urlParams.get('moduleId');
     const isVerify = urlParams.get('verify') === 'true';
 
-    let quizData = { title: "Assessment", questions: [] };
+    // ── Lesson-completion gating: assessments unlock only after a lesson is studied ──
+    const hasCompletedAnyLesson = JSON.parse(localStorage.getItem('completedCourses') || '[]').length > 0;
+    if (!hasCompletedAnyLesson) {
+        const moduleTitleEl    = document.getElementById('quiz-module-title');
+        const timerContainerEl = document.querySelector('.timer-container');
+        const progressDotsEl   = document.getElementById('quiz-progress-dots');
+        const questionMetaEl   = document.querySelector('.question-meta');
+        const quizBodyEl       = document.getElementById('quiz-body');
+        const nextBtnEl        = document.getElementById('btn-next-question');
+        const statusEl         = document.getElementById('quiz-status');
+
+        if (moduleTitleEl) moduleTitleEl.textContent = 'Assessment Locked';
+        if (timerContainerEl) timerContainerEl.style.display = 'none';
+        if (progressDotsEl) progressDotsEl.style.display = 'none';
+        if (questionMetaEl) questionMetaEl.style.display = 'none';
+        if (nextBtnEl) nextBtnEl.style.display = 'none';
+        if (quizBodyEl) {
+            quizBodyEl.innerHTML =
+                '<div style="text-align:center;padding:2rem 1rem;">' +
+                '<i class="fas fa-lock" style="font-size:2rem;color:var(--text-muted);margin-bottom:1rem;"></i>' +
+                '<h3 style="margin-bottom:0.5rem;">Complete lessons first to unlock assessments.</h3>' +
+                '<p style="color:var(--text-muted);">Study at least one lesson on your roadmap, then come back to test your skills.</p>' +
+                '</div>';
+        }
+        if (statusEl) {
+            statusEl.textContent = '';
+            statusEl.className = 'quiz-status';
+        }
+        return;
+    }
+
+    let quizData = { title: "Skill Assessment", questions: [] };
     let activeModuleIds = [];
 
     if (specificModulesParam) {
@@ -10673,12 +10706,12 @@ document.addEventListener("DOMContentLoaded", () => {
         
         // Final fallback if still empty
         if (quizData.questions.length === 0) {
-            quizData = QUIZ_DATA['html'] || { title: 'Assessment', questions: [] };
+            quizData = QUIZ_DATA['html'] || { title: 'Skill Assessment', questions: [] };
             // Note: do NOT override activeModuleIds[0] here — we keep originalModuleId for submit
         }
     } else {
         if (!moduleId && !specificModulesParam) {
-            quizData.title = `${categoryParam} Overall Assessment`;
+            quizData.title = `${categoryParam} Skill Assessment`;
         } else {
             quizData.title = titles.join(' & ');
         }
@@ -10761,7 +10794,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ── Set page title ──
     const moduleTitle = document.getElementById('quiz-module-title');
-    if (moduleTitle) moduleTitle.textContent = quizData.title + ' Assessment';
+    if (moduleTitle) {
+        moduleTitle.textContent = /assessment/i.test(quizData.title)
+            ? quizData.title
+            : quizData.title + ' Assessment';
+    }
 
     // ── DOM refs ──
     const quizQuestionTxt   = document.getElementById('quiz-question');
@@ -10785,6 +10822,7 @@ document.addEventListener("DOMContentLoaded", () => {
         quizQuestions = [];
         currentQuestionIndex = 0;
         score = 0;
+        detailedQuizAnswers = [];
         
         // generate a completely new randomized quiz, avoid recently used, start from Q1
         generateNewQuiz();
@@ -10818,7 +10856,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        let currentQuestion = quizQuestions[currentQuestionIndex];
+        currentQuestion = quizQuestions[currentQuestionIndex];
         
         // 2. Before rendering a question run validation
         if (
@@ -10968,6 +11006,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     quizStatus.textContent = "⏰ Time's up! The correct answer is highlighted.";
                     quizStatus.className = 'quiz-status error';
                     timerText.textContent = 'Time Up!';
+                    
+                    // Track timed-out answer
+                    detailedQuizAnswers.push({
+                        questionText: cleanQuestion,
+                        selectedOption: 'None (Time Up)',
+                        isCorrect: false
+                    });
+
                     if (btnNextQuestion) {
                         btnNextQuestion.style.display = 'inline-flex';
                         btnNextQuestion.textContent = currentQuestionIndex + 1 < totalQuestions ? 'Next Question →' : 'See Results →';
@@ -11011,6 +11057,12 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
+        detailedQuizAnswers.push({
+            questionText: currentQuestion.question || '',
+            selectedOption: opts[index] ? opts[index].text : '',
+            isCorrect: effectivelyCorrect
+        });
+
         if (timerText) timerText.textContent = 'Answered';
         if (btnNextQuestion) {
             btnNextQuestion.style.display = 'inline-flex';
@@ -11051,7 +11103,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 const res = await fetch('http://localhost:5000/api/progress/submit-quiz', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                    body: JSON.stringify({ moduleId: originalModuleId, roadmapId: userPath, scorePercentage: pct })
+                    body: JSON.stringify({ 
+                        moduleId: originalModuleId, 
+                        roadmapId: userPath, 
+                        scorePercentage: pct,
+                        totalQuestions: totalQuestions,
+                        answers: detailedQuizAnswers 
+                    })
                 });
                 const data = await res.json();
                 if (data.success) {

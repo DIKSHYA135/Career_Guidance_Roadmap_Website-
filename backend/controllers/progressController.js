@@ -1,7 +1,9 @@
 const Progress = require('../models/Progress');
 const Quiz = require('../models/Quiz');
 const User = require('../models/User');
+const QuizAttempt = require('../models/QuizAttempt');
 const https = require('https');
+const { recomputeAndSaveReadiness } = require('../utils/readiness');
 
 exports.markViewed = async (req, res) => {
     try {
@@ -9,7 +11,7 @@ exports.markViewed = async (req, res) => {
         const userId = req.user.userId;
 
         let progress = await Progress.findOne({ userId, moduleId });
-        
+
         if (!progress) {
             progress = new Progress({
                 userId,
@@ -33,9 +35,39 @@ exports.markViewed = async (req, res) => {
             { new: true }
         );
 
-        res.json({ success: true, message: 'Module marked as viewed' });
+        const readinessScore = await recomputeAndSaveReadiness(userId);
+
+        res.json({ success: true, message: 'Module marked as viewed', readinessScore });
     } catch (err) {
         console.error('Mark Viewed Error:', err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
+// Marks a single lesson (not a whole module) as permanently completed for
+// this user. Distinct from markViewed (which only tracks module-level
+// "studied" status) — this is what powers the persistent "✓ Completed"
+// button state on the lesson page across reloads/logins/devices.
+exports.markLessonComplete = async (req, res) => {
+    try {
+        const { courseId } = req.body;
+        const userId = req.user.userId;
+
+        if (!courseId || typeof courseId !== 'string') {
+            return res.status(400).json({ success: false, message: 'courseId is required' });
+        }
+
+        await User.findByIdAndUpdate(
+            userId,
+            { $addToSet: { completedLessons: courseId } },
+            { new: true }
+        );
+
+        const readinessScore = await recomputeAndSaveReadiness(userId);
+
+        res.json({ success: true, message: 'Lesson marked as completed', readinessScore });
+    } catch (err) {
+        console.error('Mark Lesson Complete Error:', err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
@@ -43,7 +75,7 @@ exports.markViewed = async (req, res) => {
 
 exports.submitQuiz = async (req, res) => {
     try {
-        let { moduleId, roadmapId, scorePercentage } = req.body;
+        let { moduleId, roadmapId, scorePercentage, totalQuestions, answers } = req.body;
 
         const userId = req.user.userId;
 
@@ -53,13 +85,7 @@ exports.submitQuiz = async (req, res) => {
 
         const quiz = await Quiz.findOne({ moduleId });
         const passingScore = quiz ? quiz.passingScorePercentage : 70; // default 70%
-        let passed = scorePercentage >= passingScore;
-
-        // --- BACKDOOR FOR DEMO ACCOUNT ---
-        if (req.user && req.user.email === 'mamta_sahu_a25@sunway.edu.np') {
-            scorePercentage = 100;
-            passed = true;
-        }
+        const passed = scorePercentage >= passingScore;
 
         // Update Progress collection
         let progress = await Progress.findOne({ userId, moduleId });
@@ -82,6 +108,17 @@ exports.submitQuiz = async (req, res) => {
         progress.lastAccessedAt = Date.now();
         await progress.save();
 
+        // Save Detailed QuizAttempt
+        const attempt = new QuizAttempt({
+            userId,
+            moduleId,
+            scorePercentage,
+            passed,
+            totalQuestions: totalQuestions || 0,
+            answers: answers || []
+        });
+        await attempt.save();
+
         // If passed, update User.completedModules so /api/user/me returns it
         if (passed) {
             await User.findByIdAndUpdate(
@@ -101,7 +138,9 @@ exports.submitQuiz = async (req, res) => {
             );
         }
 
-        res.json({ success: true, passed, score: scorePercentage, passingScore });
+        const readinessScore = await recomputeAndSaveReadiness(userId);
+
+        res.json({ success: true, passed, score: scorePercentage, passingScore, readinessScore });
     } catch (err) {
         console.error('Submit Quiz Error:', err);
         res.status(500).json({ success: false, message: 'Server error' });

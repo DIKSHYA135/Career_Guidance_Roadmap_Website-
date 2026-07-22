@@ -118,9 +118,7 @@
     <!-- Header -->
     <header class="study-header">
         <div class="study-header-left">
-            <a id="back-btn" href="roadmap.html" class="back-btn">
-                <i class="fas fa-arrow-left"></i> Back
-            </a>
+
             <h1 class="course-title" id="display-title">Loading...</h1>
         </div>
         <div class="study-header-right">
@@ -159,13 +157,60 @@
         const mdBody       = document.getElementById('markdown-body');
         const titleEl      = document.getElementById('display-title');
         const completeBtn  = document.getElementById('mark-complete');
-        const backBtn      = document.getElementById('back-btn');
         const openTabBtn   = document.getElementById('open-new-tab');
 
         titleEl.textContent = title;
         document.title = title + ' - Xyverra';
 
         if (rawUrl) openTabBtn.href = rawUrl;
+
+        const completionKey = courseId || rawUrl;
+
+        // ── Render the button as already-completed (disabled, ✓ state) ──
+        function showCompletedState() {
+            completeBtn.innerHTML = '<i class="fas fa-check-circle"></i> <span>Completed</span>';
+            completeBtn.style.background = '#166534';
+            completeBtn.disabled = true;
+        }
+
+        // ── Check completion status on load: localStorage first (instant),
+        //    then the backend (authoritative — survives logout/new device) ──
+        function isCompletedLocally() {
+            try {
+                const arr = JSON.parse(localStorage.getItem('completedCourses') || '[]');
+                return arr.includes(completionKey);
+            } catch (e) { return false; }
+        }
+
+        if (isCompletedLocally()) {
+            showCompletedState();
+        }
+
+        (async function checkServerCompletionStatus() {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            if (!token || !completionKey) return;
+            try {
+                const res = await fetch('http://localhost:5000/api/user/me', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+                const completedLessons = (data && data.user && data.user.completedLessons) || [];
+                if (completedLessons.includes(completionKey)) {
+                    // Backfill localStorage so the roadmap page's checkmarks stay in sync too.
+                    try {
+                        const arr = JSON.parse(localStorage.getItem('completedCourses') || '[]');
+                        if (!arr.includes(completionKey)) {
+                            arr.push(completionKey);
+                            localStorage.setItem('completedCourses', JSON.stringify(arr));
+                        }
+                    } catch (e) { /* ignore */ }
+                    showCompletedState();
+                }
+            } catch (e) {
+                console.warn('Failed to check server completion status:', e);
+            }
+        })();
 
         function showContent(mdText) {
             if (window.marked) {
@@ -203,26 +248,60 @@
             showError('No lesson content found. Please go back and try again.');
         }
 
-        // ── Back button ──
-        backBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            history.back();
-        });
+        // ── Persist lesson completion to the backend ──
+        // Two separate, complementary writes:
+        //  1. mark-viewed  → whole-module "studied" status (Progress + User.studiedLessons) — unchanged, existing behaviour
+        //  2. mark-lesson-complete → THIS specific lesson, permanently, in User.completedLessons
+        //     (this is what lets the button correctly show "Completed" on every future visit)
+        async function reportModuleStudied() {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            if (!moduleId || !token) return;
+            try {
+                const roadmapId = localStorage.getItem('xyverra_selected_path') || moduleId;
+                await fetch('http://localhost:5000/api/progress/mark-viewed', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ moduleId, roadmapId })
+                });
+            } catch (e) {
+                console.warn('Failed to sync lesson progress to server:', e);
+            }
+        }
+
+        async function reportLessonComplete() {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            if (!token || !completionKey) return;
+            try {
+                await fetch('http://localhost:5000/api/progress/mark-lesson-complete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ courseId: completionKey })
+                });
+            } catch (e) {
+                console.warn('Failed to persist lesson completion to server:', e);
+            }
+        }
 
         // ── Mark as Complete ──
-        function markComplete() {
+        async function markComplete() {
+            // Guard against duplicate/double-click submissions.
+            if (completeBtn.disabled) return;
+            completeBtn.disabled = true;
+            completeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
             try {
-                // Mark in completedCourses
+                // Mark in completedCourses (drives roadmap unlock/checkmarks)
                 const raw = localStorage.getItem('completedCourses');
                 const arr = (raw ? JSON.parse(raw) : []);
-                const key = courseId || rawUrl;
+                const key = completionKey;
                 if (!arr.includes(key)) arr.push(key);
                 localStorage.setItem('completedCourses', JSON.stringify(arr));
 
+                // Persist to MongoDB (fire-and-forget is OK; localStorage is immediate fallback)
+                await Promise.all([reportModuleStudied(), reportLessonComplete()]);
+
                 // Visual feedback
-                completeBtn.innerHTML = '<i class="fas fa-check-circle"></i> Completed!';
-                completeBtn.style.background = '#166534';
-                completeBtn.disabled = true;
+                showCompletedState();
 
                 // Return to roadmap after brief delay
                 setTimeout(function() {

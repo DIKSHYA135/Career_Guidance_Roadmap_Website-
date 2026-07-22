@@ -1,4 +1,4 @@
-/* counselor.js - AI Counselor with Gemini AI + 3-free-question monetization */
+/* counselor.js - AI Counselor with Groq AI + 3-free-question monetization */
 
 document.addEventListener('DOMContentLoaded', () => {
     /* ============================================================
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return h;
     };
 
-    // Send message to backend - returns aiResponse if Gemini available
+    // Send message to backend - returns aiResponse if Groq available
     const syncMessage = async (content) => {
         try {
             const res = await fetch(API_BASE + '/api/chat/message', {
@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Greeting shown when history is empty
     const greeting = () =>
-        `Hello ${firstName === 'there' ? 'there' : firstName}! I'm your <strong>AI Career Counselor</strong>, powered by Gemini AI. 🎓<br><br>`
+        `Hello ${firstName === 'there' ? 'there' : firstName}! I'm your <strong>AI Career Counselor</strong>. 🎓<br><br>`
         + (selectedPath
             ? `I see you're aiming for <strong>${selectedPath}</strong>${selectedLevel ? ` at the <strong>${selectedLevel}</strong> level` : ''}. How can I help you get there?`
             : `How can I help you shape your future today? Ask me anything about <strong>career paths</strong>, <strong>skills to learn</strong>, <strong>interview prep</strong>, or <strong>industry trends</strong>.`);
@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     /* ============================================================
-     * KEYWORD-BASED FALLBACK AI (when Gemini unavailable)
+     * KEYWORD-BASED FALLBACK AI (when Groq unavailable)
      * ============================================================ */
     const pathAdvice = () => {
         if (!selectedPath) return '';
@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chatHistoryEl.appendChild(typingDiv);
         scrollToBottom();
 
-        // 3. Call backend (Gemini AI)
+        // 3. Call backend (Groq AI)
         const serverData = await syncMessage(text);
         const typingEl = document.getElementById(typingId);
         if (typingEl) typingEl.remove();
@@ -372,7 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 4. Use Gemini response if available, otherwise use keyword fallback
+        // 4. Use Groq response if available, otherwise use keyword fallback
         let response;
         if (serverData && serverData.aiResponse) {
             response = serverData.aiResponse;

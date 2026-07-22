@@ -468,7 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
         goToSkillsBtn.addEventListener('click', () => {
             document.body.style.opacity = '0';
             document.body.style.transition = 'opacity 0.22s ease';
-            setTimeout(() => { window.location.href = 'skills.html'; }, 230);
+            setTimeout(() => { window.location.href = 'skill-gap.html'; }, 230);
         });
     }
 

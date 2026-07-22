@@ -591,11 +591,24 @@
 
     // ─────────────────────────────────────────────────────────────
     //  9. XySuccess / XyError / XyWarning / XyInfo — shortcuts
+    //  3rd arg may be either a button-label string, or an onClose
+    //  callback function (invoked once the user dismisses the modal).
     // ─────────────────────────────────────────────────────────────
-    window.XySuccess = (title, msg, btn) => window.XyAlert({ title, message: msg, type: 'success', btnText: btn });
-    window.XyError   = (title, msg, btn) => window.XyAlert({ title, message: msg, type: 'error',   btnText: btn });
-    window.XyWarning = (title, msg, btn) => window.XyAlert({ title, message: msg, type: 'warning', btnText: btn });
-    window.XyInfo    = (title, msg, btn) => window.XyAlert({ title, message: msg, type: 'info',    btnText: btn });
+    function xyShortcut(type, title, msg, btnOrCallback) {
+        const isCallback = typeof btnOrCallback === 'function';
+        const promise = window.XyAlert({
+            title,
+            message: msg,
+            type,
+            ...(isCallback ? {} : { btnText: btnOrCallback })
+        });
+        if (isCallback) promise.then(btnOrCallback);
+        return promise;
+    }
+    window.XySuccess = (title, msg, btn) => xyShortcut('success', title, msg, btn);
+    window.XyError   = (title, msg, btn) => xyShortcut('error',   title, msg, btn);
+    window.XyWarning = (title, msg, btn) => xyShortcut('warning', title, msg, btn);
+    window.XyInfo    = (title, msg, btn) => xyShortcut('info',    title, msg, btn);
 
     // ─────────────────────────────────────────────────────────────
     //  10. XyMilestone — Celebratory pop-up for achievements

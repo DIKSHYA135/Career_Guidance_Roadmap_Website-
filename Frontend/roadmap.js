@@ -7,19 +7,10 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Load state
     const selectedPath = localStorage.getItem("xyverra_selected_path") || "Web Development";
-    let matchedPathKey = selectedPath;
-    if (!ROADMAP_DATA[matchedPathKey]) {
-        const p = selectedPath.toLowerCase();
-        if (p.includes('machine learning') || p.includes('ml')) {
-            matchedPathKey = "Machine Learning";
-        } else if (p.includes('nlp') || p.includes('natural language') || p.includes(' ai') || p === 'ai') {
-            matchedPathKey = "NLP / AI";
-        } else if (p.includes('data science') || p.includes('data')) {
-            matchedPathKey = "Data Science";
-        } else {
-            matchedPathKey = Object.keys(ROADMAP_DATA).find(key => p.includes(key.toLowerCase())) || "Web Development";
-        }
-    }
+    // Shared resolver (roadmap-data.js) — keeps this page, Progress, and Dashboard consistent.
+    let matchedPathKey = window.resolveRoadmapPathKey
+        ? window.resolveRoadmapPathKey(selectedPath)
+        : selectedPath;
     
     if (headerTitle) {
         headerTitle.innerText = `${matchedPathKey} Roadmap`;
@@ -78,21 +69,28 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 100);
     }
 
+    // Shared /api/user/me fetch — memoized on window so pages that load both
+    // roadmap.js and dashboard.js (e.g. dashboard.html) issue exactly one
+    // network request instead of two independent, redundant ones.
+    window.xyFetchUserMe = window.xyFetchUserMe || function(token) {
+        if (!window.__xyMePromise) {
+            window.__xyMePromise = fetch('http://localhost:5000/api/user/me', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            }).then(r => r.ok ? r.json() : null).catch(() => null);
+        }
+        return window.__xyMePromise;
+    };
+
     // ── Sync completedModules from backend FIRST, then render ──
     (async function syncAndRender() {
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (token) {
             try {
-                const res = await fetch('http://localhost:5000/api/user/me', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.success && Array.isArray(data.user.completedModules)) {
-                        // Always use the authoritative server data
-                        completedModules = data.user.completedModules;
-                        localStorage.setItem('completedModules', JSON.stringify(completedModules));
-                    }
+                const data = await window.xyFetchUserMe(token);
+                if (data && data.success && Array.isArray(data.user.completedModules)) {
+                    // Always use the authoritative server data
+                    completedModules = data.user.completedModules;
+                    localStorage.setItem('completedModules', JSON.stringify(completedModules));
                 }
             } catch (e) {
                 console.warn('[Roadmap] Backend sync failed, using localStorage fallback.', e);

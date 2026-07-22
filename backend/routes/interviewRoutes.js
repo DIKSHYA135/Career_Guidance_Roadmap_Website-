@@ -7,6 +7,18 @@ const authMiddleware = require('../middleware/authMiddleware');
 router.use(authMiddleware);
 router.use(proAuthMiddleware); // Must be Pro
 
+// Get past interview history
+router.get('/history', async (req, res) => {
+    try {
+        const history = await InterviewSession.find({ userId: req.userDoc._id, completed: true })
+            .sort({ createdAt: -1 });
+        res.json({ success: true, history });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Failed to fetch history' });
+    }
+});
+
 // Start a new mock interview session
 router.post('/start', async (req, res) => {
     try {

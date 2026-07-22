@@ -25,6 +25,7 @@ const Transaction = require('./models/Transaction');
 const ActivityLog = require('./models/ActivityLog');
 const authMiddleware = require('./middleware/authMiddleware');
 const adminRoutes = require('./routes/adminRoutes');
+const { recomputeAndSaveReadiness, getReadinessLabel } = require('./utils/readiness');
 
 // Admin middleware — only allows users with isAdmin flag
 const adminMiddleware = async (req, res, next) => {
@@ -515,7 +516,10 @@ app.get('/health', (req, res) => {
 // ==========================
 app.post(
     '/api/leads/subscribe',
-    apiLimiter,
+    // Note: apiLimiter is already applied globally to every /api/* route
+    // (app.use('/api/', apiLimiter) above). Re-applying it here double-counted
+    // every request against the same shared store, silently halving this
+    // route's effective limit versus every other route.
     [
         body('email').isEmail().withMessage('Please provide a valid email address')
             .bail().customSanitizer(v => v.trim().toLowerCase())
@@ -866,6 +870,7 @@ app.post('/api/auth/resend-otp', authMiddleware, otpLimiter, async (req, res) =>
 // ==========================
 app.post(
     '/api/auth/verify-otp',
+    otpLimiter,
     authMiddleware,
     [
         body('otp').trim().isLength({ min: 6, max: 6 }).withMessage('A valid 6-digit OTP is required')
@@ -894,7 +899,7 @@ app.post(
                 return res.status(400).json({ success: false, message: 'OTP has expired. Please request a new one.' });
             }
 
-            if (hashOTP(otp) !== user.emailVerificationOTP && otp !== '123456') {
+            if (hashOTP(otp) !== user.emailVerificationOTP) {
                 return res.status(400).json({ success: false, message: 'Invalid OTP' });
             }
 
@@ -940,8 +945,8 @@ app.get('/api/chat/usage', authMiddleware, async (req, res) => {
 });
 
 // ==========================
-// GEMINI AI CHAT ROUTE (auth required)
-// Enforces free-tier limit, calls Gemini API, stores chat history.
+// GROQ AI CHAT ROUTE (auth required)
+// Enforces free-tier limit, calls Groq API, stores chat history.
 // ==========================
 
 // In-memory chat history per user session (resets on server restart)
@@ -1199,13 +1204,45 @@ app.post('/api/user/save-path', authMiddleware, async (req, res) => {
             });
         } catch (ne) { console.warn('Notification error:', ne); }
 
+        const readinessScore = await recomputeAndSaveReadiness(req.user.userId);
+
         return res.json({
             success: true,
             message: 'Path saved successfully',
-            selectedPath: updatedUser.selectedPath
+            selectedPath: updatedUser.selectedPath,
+            readinessScore
         });
     } catch (error) {
         return serverError(res, 'Save Path Error', error);
+    }
+});
+
+// ==========================
+// SAVE CAREER DISCOVERY RESULTS (auth required)
+// Persists questionnaire answers + recommended careers so they survive
+// across devices and are visible to admins.
+// ==========================
+app.post('/api/user/save-career-assessment', authMiddleware, async (req, res) => {
+    try {
+        const { answers, recommendedCareers } = req.body;
+
+        const update = {};
+        if (answers && typeof answers === 'object') update.careerAssessmentAnswers = answers;
+        if (Array.isArray(recommendedCareers)) update.recommendedCareers = recommendedCareers;
+
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user.userId,
+            { $set: update },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        return res.json({ success: true, message: 'Career assessment saved' });
+    } catch (error) {
+        return serverError(res, 'Save Career Assessment Error', error);
     }
 });
 
@@ -1538,12 +1575,15 @@ app.post('/api/user/save-onboarding', authMiddleware, async (req, res) => {
 
         if (!updatedUser) return res.status(404).json({ success: false, message: 'User not found' });
 
+        const readinessScore = await recomputeAndSaveReadiness(req.user.userId);
+
         return res.json({
             success: true,
             message: 'Onboarding saved successfully',
             selectedPath: updatedUser.selectedPath,
             selectedLevel: updatedUser.selectedLevel,
-            onboardingCompleted: updatedUser.onboardingCompleted
+            onboardingCompleted: updatedUser.onboardingCompleted,
+            readinessScore
         });
     } catch (error) {
         return serverError(res, 'Save Onboarding Error', error);
@@ -1678,245 +1718,18 @@ app.post('/api/auth/logout', (req, res) => {
     return res.json({ success: true, message: 'Logged out successfully' });
 });
 
-// ==========================
-// SUBSCRIPTION STATUS (auth required)
-// ==========================
-app.get('/api/subscription/status', authMiddleware, async (req, res) => {
-    try {
-        const user = await User.findById(req.user.userId).populate('activeSubscription');
-        if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+// NOTE: Subscription status/history/create-payment/verify-payment/cancel are all
+// handled by routes/subscriptionRoutes.js -> controllers/subscriptionController.js
+// (mounted at /api/subscription, server.js:180). That is the single, correct,
+// currently-used implementation — duplicate/broken copies that used to live here
+// (mismatched Subscription/Transaction field names, causing every call to 500)
+// have been removed to avoid dead code and schema drift.
 
-        const sub = user.activeSubscription;
-        const now = new Date();
-        const isActive = sub && sub.status === 'active' && sub.endDate && new Date(sub.endDate) > now;
-
-        // If subscription expired, mark it
-        if (sub && sub.status === 'active' && sub.endDate && new Date(sub.endDate) <= now) {
-            sub.status = 'expired';
-            await sub.save();
-        }
-
-        res.json({
-            success: true,
-            hasSubscription: !!isActive,
-            subscription: isActive ? {
-                planName: sub.planName,
-                status: sub.status,
-                startDate: sub.startDate,
-                endDate: sub.endDate,
-                priceNPR: sub.priceNPR
-            } : null
-        });
-    } catch (error) {
-        return serverError(res, 'Subscription Status Error', error);
-    }
-});
-
-// ==========================
-// TRANSACTION HISTORY (auth required)
-// ==========================
-app.get('/api/subscription/transactions', authMiddleware, async (req, res) => {
-    try {
-        const transactions = await Transaction.find({ user: req.user.userId })
-            .sort({ createdAt: -1 })
-            .limit(20)
-            .select('-rawResponse');
-        res.json({ success: true, transactions });
-    } catch (error) {
-        return serverError(res, 'Transaction History Error', error);
-    }
-});
-
-// ==========================
-// ESEWA: INITIATE PAYMENT
-// Creates a pending Subscription + Transaction, returns the eSewa form params.
-// ==========================
-app.post('/api/payment/esewa/initiate', authMiddleware, async (req, res) => {
-    try {
-        const ESEWA_MERCHANT_CODE = process.env.ESEWA_MERCHANT_CODE || 'EPAYTEST';
-        const PRICE_NPR = 500; // ~$3.70 at ~134 NPR/USD
-        const now = new Date();
-
-        // Block duplicate active subscriptions
-        const user = await User.findById(req.user.userId).populate('activeSubscription');
-        if (user.activeSubscription && user.activeSubscription.status === 'active' &&
-            user.activeSubscription.endDate && new Date(user.activeSubscription.endDate) > now) {
-            return res.status(400).json({ success: false, message: 'You already have an active subscription.' });
-        }
-
-        // Create a unique transaction ID
-        const txnId = `XYV-${Date.now()}-${user._id.toString().slice(-6)}`;
-
-        // Create pending Subscription record
-        const sub = await Subscription.create({
-            user: user._id,
-            planName: 'Monthly Pro',
-            priceUSD: 1.30,
-            priceNPR: PRICE_NPR,
-            status: 'pending',
-            esewaTransactionId: txnId
-        });
-
-        // Create pending Transaction record
-        await Transaction.create({
-            user: user._id,
-            subscription: sub._id,
-            transactionId: txnId,
-            amountNPR: PRICE_NPR,
-            status: 'pending'
-        });
-
-        // Return params needed to build the eSewa HTML form on the frontend
-        res.json({
-            success: true,
-            esewaParams: {
-                merchantCode: ESEWA_MERCHANT_CODE,
-                amount: PRICE_NPR,
-                taxAmount: 0,
-                totalAmount: PRICE_NPR,
-                transactionId: txnId,
-                successUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment-success.html`,
-                failureUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment-failure.html`
-            }
-        });
-    } catch (error) {
-        return serverError(res, 'eSewa Initiate Error', error);
-    }
-});
-
-// ==========================
-// ESEWA: VERIFY PAYMENT (called after eSewa redirects back)
-// ==========================
-app.post('/api/payment/esewa/verify', authMiddleware, async (req, res) => {
-    try {
-        const { refId, amount, transactionId } = req.body;
-
-        if (!refId || !transactionId) {
-            return res.status(400).json({ success: false, message: 'refId and transactionId are required' });
-        }
-
-        // Find matching pending transaction for THIS user
-        const txn = await Transaction.findOne({
-            transactionId,
-            user: req.user.userId,
-            status: 'pending'
-        });
-
-        if (!txn) {
-            return res.status(404).json({ success: false, message: 'Transaction not found or already processed' });
-        }
-
-        // Verify with eSewa server-to-server
-        const ESEWA_MERCHANT_CODE = process.env.ESEWA_MERCHANT_CODE || 'EPAYTEST';
-        const verifyUrl = `https://uat.esewa.com.np/epay/transrec`;
-
-        const params = new URLSearchParams({
-            amt: String(txn.amountNPR),
-            rid: refId,
-            pid: transactionId,
-            scd: ESEWA_MERCHANT_CODE
-        });
-
-        let verifyResult = null;
-        try {
-            const verifyResponse = await fetch(`${verifyUrl}?${params.toString()}`);
-            verifyResult = await verifyResponse.text();
-        } catch (fetchErr) {
-            // In sandbox mode without real network access, trust the frontend params
-            console.warn('eSewa server verify unavailable (sandbox mode), trusting frontend params.');
-            verifyResult = '<response>Success</response>';
-        }
-
-        const isVerified = verifyResult && verifyResult.includes('Success');
-
-        if (!isVerified) {
-            txn.status = 'failed';
-            txn.rawResponse = { result: verifyResult };
-            await txn.save();
-            if (txn.subscription) {
-                await Subscription.findByIdAndUpdate(txn.subscription, { status: 'expired' });
-            }
-            return res.status(400).json({ success: false, message: 'Payment verification failed with gateway.' });
-        }
-
-        // Payment verified — activate subscription
-        const startDate = new Date();
-        const endDate = new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000);
-
-        const sub = await Subscription.findByIdAndUpdate(
-            txn.subscription,
-            { status: 'active', startDate, endDate, esewaRefId: refId },
-            { new: true }
-        );
-
-        txn.status = 'success';
-        txn.refId = refId;
-        txn.rawResponse = { result: verifyResult };
-        await txn.save();
-
-        // Link subscription to user and activate chat subscription
-        await User.findByIdAndUpdate(req.user.userId, {
-            activeSubscription: sub._id,
-            chatSubscriptionActive: true,
-            chatSubscriptionExpiry: endDate
-        });
-
-        // 🔔 Notify user of successful subscription
-        try {
-            const { createNotification } = require('./routes/notificationRoutes');
-            await createNotification(req.user.userId, {
-                title: '✅ Pro Subscription Activated!',
-                message: `Your XYVERRA Pro plan is active until ${endDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}. Enjoy all premium features!`,
-                type: 'success',
-                actionLink: 'dashboard.html'
-            });
-        } catch (ne) { console.warn('Notification error:', ne); }
-
-        res.json({
-            success: true,
-            message: 'Payment verified. Subscription activated!',
-            subscription: {
-                planName: sub.planName,
-                status: sub.status,
-                startDate: sub.startDate,
-                endDate: sub.endDate,
-                priceNPR: sub.priceNPR
-            }
-        });
-    } catch (error) {
-        return serverError(res, 'eSewa Verify Error', error);
-    }
-});
-
-// ==========================
-// ADMIN: GET ALL USERS
-// ==========================
-app.get('/api/admin/users', authMiddleware, adminMiddleware, async (req, res) => {
-    try {
-        const page = Math.max(1, parseInt(req.query.page) || 1);
-        const limit = Math.min(100, parseInt(req.query.limit) || 20);
-        const skip = (page - 1) * limit;
-        const search = req.query.search ? req.query.search.trim() : '';
-
-        const filter = search
-            ? { $or: [{ email: { $regex: search, $options: 'i' } }, { name: { $regex: search, $options: 'i' } }] }
-            : {};
-
-        const [users, total] = await Promise.all([
-            User.find(filter)
-                .select('-password -emailVerificationOTP -emailVerificationExpiry -profilePicture')
-                .sort({ createdAt: -1 })
-                .skip(skip)
-                .limit(limit)
-                .lean(),
-            User.countDocuments(filter)
-        ]);
-
-        res.json({ success: true, users, total, page, pages: Math.ceil(total / limit) });
-    } catch (error) {
-        return serverError(res, 'Admin Users Error', error);
-    }
-});
+// NOTE: GET /api/admin/users is handled by routes/adminRoutes.js (mounted at
+// /api/admin, server.js:180), which enriches each user with progressRecords,
+// quizScoresFromProgress, etc. — the data admin.js's Users Management table
+// actually depends on. A simpler, unenriched duplicate used to be registered
+// here too (dead code, always shadowed); it has been removed.
 
 // ==========================
 // ADMIN: GET USER DETAIL
@@ -1941,8 +1754,30 @@ app.delete('/api/admin/users/:id', authMiddleware, adminMiddleware, async (req, 
         if (req.params.id === req.user.userId) {
             return res.status(400).json({ success: false, message: 'Cannot delete your own admin account.' });
         }
-        await User.findByIdAndDelete(req.params.id);
-        res.json({ success: true, message: 'User deleted.' });
+
+        const userId = req.params.id;
+        const deletedUser = await User.findByIdAndDelete(userId);
+        if (!deletedUser) {
+            return res.status(404).json({ success: false, message: 'User not found.' });
+        }
+
+        // Cascade delete every record that references this user, so nothing is
+        // left orphaned in the database (Progress, quiz attempts, subscriptions,
+        // transactions, activity logs, notifications, interview sessions).
+        const Progress = require('./models/Progress');
+        const QuizAttempt = require('./models/QuizAttempt');
+        const InterviewSession = require('./models/InterviewSession');
+        await Promise.all([
+            Progress.deleteMany({ userId }),
+            QuizAttempt.deleteMany({ userId }),
+            Subscription.deleteMany({ userId }),
+            Transaction.deleteMany({ userId }),
+            ActivityLog.deleteMany({ userId }),
+            Notification.deleteMany({ userId }),
+            InterviewSession.deleteMany({ userId })
+        ]);
+
+        res.json({ success: true, message: 'User and all associated records deleted.' });
     } catch (error) {
         return serverError(res, 'Admin Delete User Error', error);
     }
@@ -1963,30 +1798,12 @@ app.put('/api/admin/users/:id/toggle-admin', authMiddleware, adminMiddleware, as
     }
 });
 
-// ==========================
-// ADMIN: GET ALL SUBSCRIPTIONS
-// ==========================
-app.get('/api/admin/subscriptions', authMiddleware, adminMiddleware, async (req, res) => {
-    try {
-        const page = Math.max(1, parseInt(req.query.page) || 1);
-        const limit = Math.min(100, parseInt(req.query.limit) || 20);
-        const skip = (page - 1) * limit;
-
-        const [subs, total] = await Promise.all([
-            Subscription.find()
-                .populate('user', 'name email')
-                .sort({ createdAt: -1 })
-                .skip(skip)
-                .limit(limit)
-                .lean(),
-            Subscription.countDocuments()
-        ]);
-
-        res.json({ success: true, subscriptions: subs, total, page, pages: Math.ceil(total / limit) });
-    } catch (error) {
-        return serverError(res, 'Admin Subscriptions Error', error);
-    }
-});
+// NOTE: GET /api/admin/subscriptions is handled by routes/adminRoutes.js
+// (mounted at /api/admin, server.js:180), which correctly enriches each
+// subscription with userName/userEmail/transaction info using the real
+// `userId` schema field. A duplicate used to be registered here too — it was
+// both dead code (always shadowed) AND broken (`.populate('user', ...)` when
+// the actual Subscription field is `userId`, so it always populated nothing).
 
 // ==========================
 // ADMIN: GET ANALYTICS SUMMARY
@@ -2048,243 +1865,183 @@ app.get('/api/admin/analytics', authMiddleware, adminMiddleware, async (req, res
 });
 
 // ==========================
-// ESEWA PAYMENT ROUTES
+// NOTE: this file used to contain a second, entirely unused parallel payment
+// subsystem (/api/payment/esewa/initiate, /api/payment/esewa/verify,
+// /api/payment/status, /api/payment/transactions). Verified via a full
+// Frontend/ grep that no page ever calls any /api/payment/* route — the real,
+// live checkout flow (subscription.html -> mock-checkout.html ->
+// payment-success.html) exclusively uses /api/subscription/create-payment and
+// /api/subscription/verify-payment (routes/subscriptionRoutes.js ->
+// controllers/subscriptionController.js). Removed to eliminate dead code and
+// reduce unnecessary attack surface (an unused, unmaintained payment-adjacent
+// API is still a live target). If a real eSewa integration is added later,
+// build it as an extension of subscriptionController.js so there is only ever
+// one payment code path.
+
 // ==========================
-// Official eSewa Test/Sandbox Credentials:
-// Merchant Code: EPAYTEST
-// Test Username: 9806800001 / 9806800002 / 9806800003
-// Test Password: Nepal@123
-// Test MPIN: 1122 / OTP: 123456
+// AI CAREER RECOMMENDATION
+// Calls Groq with questionnaire answers → returns top 3 careers with match % and reasons
+// ==========================
+app.post('/api/ai/recommend-career', authMiddleware, async (req, res) => {
+    try {
+        const { answers } = req.body;
+        if (!answers || typeof answers !== 'object') {
+            return res.status(400).json({ success: false, message: 'answers object is required' });
+        }
 
-const ESEWA_MERCHANT_CODE = process.env.ESEWA_MERCHANT_CODE || 'EPAYTEST';
-const ESEWA_VERIFY_URL = process.env.ESEWA_VERIFY_URL || 'https://uat.esewa.com.np/api/epay/transaction/status/';
-const ESEWA_GATEWAY_URL = process.env.ESEWA_GATEWAY_URL || 'https://rc-epay.esewa.com.np/api/epay/main/v2/form';
-const PLAN_PRICE_USD = 3.70;
-const NPR_PER_USD = 135; // approximate exchange rate
-const PLAN_PRICE_NPR = 500;  // 500 NPR
-const SUBSCRIPTION_DAYS = 30;
+        // Map answer codes to human-readable labels for better AI context
+        const answerLabels = {
+            q1: {
+                systems:  'Building scalable systems',
+                creative: 'Designing visual experiences',
+                data:     'Finding patterns in data',
+                security: 'Finding & fixing vulnerabilities'
+            },
+            q2: {
+                creative: 'Mostly visual & creative',
+                logical:  'Mostly logical & analytical',
+                balanced: 'A balanced mix of both',
+                systems:  'Infrastructure & backend systems'
+            },
+            q3: {
+                high:     'Very comfortable with math/statistics - loves it',
+                somewhat: 'Comfortable enough with math',
+                low:      'Prefers to avoid heavy math'
+            },
+            q4: {
+                team:        'Highly collaborative teams',
+                balanced:    'A balanced mix of team and solo work',
+                independent: 'Mostly independent work'
+            },
+            q5: {
+                high:     'Absolutely loves automating workflows',
+                somewhat: 'Somewhat interested in automation',
+                low:      'Not interested in automation'
+            },
+            q6: {
+                high:     'Very interested in cloud infrastructure & DevOps',
+                somewhat: 'Somewhat interested in DevOps',
+                low:      'Prefers just writing code'
+            },
+            q7: {
+                fast_job:          'Land a job as fast as possible',
+                high_salary:       'Maximise starting salary',
+                deep_skill:        'Master a deep technical skill',
+                creative_portfolio: 'Build a creative portfolio'
+            },
+            q8: {
+                '5h':  'Less than 5 hours per week',
+                '10h': '5-10 hours per week',
+                '20h': '10-20 hours per week',
+                full:  'Full-time dedication'
+            },
+            q9: {
+                app:           'A consumer app (web or mobile)',
+                ai_product:    'An AI-powered tool or assistant',
+                secure_system: 'A secure financial/enterprise system',
+                data_dashboard:'A data dashboard or analytics tool'
+            }
+        };
 
-// Helper: build HMAC-SHA256 signature for eSewa v2
-function esewaSign(data) {
-    const secretKey = process.env.ESEWA_SECRET_KEY || '8gBm/:&EnhH.1/q';
-    const message = `total_amount=${data.total_amount},transaction_uuid=${data.transaction_uuid},product_code=${data.product_code}`;
-    return crypto.createHmac('sha256', secretKey).update(message).digest('base64');
+        const readable = {};
+        Object.keys(answers).forEach(key => {
+            readable[key] = (answerLabels[key] && answerLabels[key][answers[key]]) || answers[key];
+        });
+
+        const prompt = `You are a career guidance AI expert. Based on the following user assessment answers, recommend exactly the top 3 tech career paths that best match this person.
+
+User Assessment:
+- Primary interest: ${readable.q1 || 'Not answered'}
+- Work preference (visual vs logical): ${readable.q2 || 'Not answered'}
+- Math comfort level: ${readable.q3 || 'Not answered'}
+- Team vs independent work: ${readable.q4 || 'Not answered'}
+- Interest in automation/DevOps tools: ${readable.q5 || 'Not answered'}
+- Interest in cloud infrastructure: ${readable.q6 || 'Not answered'}
+- Primary career goal: ${readable.q7 || 'Not answered'}
+- Weekly learning commitment: ${readable.q8 || 'Not answered'}
+- Type of product they want to build: ${readable.q9 || 'Not answered'}
+
+Available career paths to choose from:
+- Web Development
+- UI/UX Design
+- Data Science
+- Machine Learning
+- Cybersecurity
+- Cloud / DevOps
+- Backend / APIs
+- Mobile Development
+
+Return ONLY valid JSON with no markdown, no explanation, no extra text. The response must be exactly this structure:
+{
+  "recommendations": [
+    { "career": "Career Name", "match": 94, "reason": "Brief 1-2 sentence explanation why this matches." },
+    { "career": "Career Name", "match": 88, "reason": "Brief 1-2 sentence explanation why this matches." },
+    { "career": "Career Name", "match": 81, "reason": "Brief 1-2 sentence explanation why this matches." }
+  ]
 }
 
-// POST /api/payment/esewa/initiate
-app.post('/api/payment/esewa/initiate', authMiddleware, async (req, res) => {
-    try {
-        const user = await User.findById(req.user.userId);
-        if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+Only pick career names from the available list above. Match percentages should be realistic (70-98 range). Order by match percentage descending.`;
 
-        // Prevent duplicate active subscription
-        const existingSub = await Subscription.findOne({
-            userId: user._id,
-            status: 'active',
-            endDate: { $gt: new Date() }
+        const apiKey = process.env.GROQ_API_KEY;
+        if (!apiKey) {
+            return res.status(503).json({ success: false, message: 'AI service not configured' });
+        }
+
+        const requestBody = JSON.stringify({
+            model: 'llama-3.3-70b-versatile',
+            messages: [{ role: 'user', content: prompt }],
+            temperature: 0.4,
+            max_tokens: 600,
+            response_format: { type: 'json_object' }
         });
-        if (existingSub) {
-            return res.status(409).json({
-                success: false,
-                message: 'You already have an active subscription.',
-                subscription: existingSub
+
+        const aiResult = await new Promise((resolve) => {
+            const options = {
+                hostname: 'api.groq.com',
+                path: '/openai/v1/chat/completions',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Length': Buffer.byteLength(requestBody)
+                },
+                timeout: 20000
+            };
+
+            const groqReq = https.request(options, (groqRes) => {
+                let data = '';
+                groqRes.on('data', chunk => data += chunk);
+                groqRes.on('end', () => {
+                    try {
+                        const parsed = JSON.parse(data);
+                        if (parsed.choices && parsed.choices[0] && parsed.choices[0].message) {
+                            const content = parsed.choices[0].message.content;
+                            const json = JSON.parse(content);
+                            resolve(json);
+                        } else {
+                            resolve(null);
+                        }
+                    } catch (e) {
+                        console.error('AI Recommend parse error:', e.message);
+                        resolve(null);
+                    }
+                });
             });
+            groqReq.on('error', () => resolve(null));
+            groqReq.on('timeout', () => { groqReq.destroy(); resolve(null); });
+            groqReq.write(requestBody);
+            groqReq.end();
+        });
+
+        if (!aiResult || !Array.isArray(aiResult.recommendations) || aiResult.recommendations.length === 0) {
+            return res.status(502).json({ success: false, message: 'AI returned an invalid response' });
         }
 
-        // Create a pending transaction record
-        const transactionUUID = `XYV-${user._id.toString().slice(-6)}-${Date.now()}`;
-        const transaction = await Transaction.create({
-            userId: user._id,
-            amountUSD: PLAN_PRICE_USD,
-            amountNPR: PLAN_PRICE_NPR,
-            currency: 'NPR',
-            provider: 'esewa',
-            transactionRef: transactionUUID,
-            status: 'pending'
-        });
+        return res.json({ success: true, recommendations: aiResult.recommendations });
 
-        // Build eSewa v2 payment payload
-        const successUrl = `${process.env.FRONTEND_URL || 'http://localhost:5000'}/payment-success.html`;
-        const failureUrl = `${process.env.FRONTEND_URL || 'http://localhost:5000'}/payment-failure.html`;
-
-        const esewaData = {
-            amount: PLAN_PRICE_NPR,
-            tax_amount: 0,
-            total_amount: PLAN_PRICE_NPR,
-            transaction_uuid: transactionUUID,
-            product_code: ESEWA_MERCHANT_CODE,
-            product_service_charge: 0,
-            product_delivery_charge: 0,
-            success_url: successUrl,
-            failure_url: failureUrl,
-            signed_field_names: 'total_amount,transaction_uuid,product_code'
-        };
-        esewaData.signature = esewaSign(esewaData);
-
-        return res.json({
-            success: true,
-            gatewayUrl: ESEWA_GATEWAY_URL,
-            esewaData,
-            transactionId: transaction._id,
-            priceNPR: PLAN_PRICE_NPR,
-            priceUSD: PLAN_PRICE_USD
-        });
     } catch (error) {
-        return serverError(res, 'eSewa Initiate Error', error);
-    }
-});
-
-// POST /api/payment/esewa/verify  — called from payment-success.html
-app.post('/api/payment/esewa/verify', authMiddleware, async (req, res) => {
-    try {
-        const { encodedData } = req.body;
-        if (!encodedData) {
-            return res.status(400).json({ success: false, message: 'Missing payment data' });
-        }
-
-        // Decode the base64 response from eSewa
-        let paymentData;
-        try {
-            paymentData = JSON.parse(Buffer.from(encodedData, 'base64').toString('utf8'));
-        } catch (_) {
-            return res.status(400).json({ success: false, message: 'Invalid payment data encoding' });
-        }
-
-        const {
-            transaction_uuid,
-            status,
-            total_amount,
-            transaction_code
-        } = paymentData;
-
-        if (status !== 'COMPLETE') {
-            // Update transaction to failed
-            await Transaction.findOneAndUpdate(
-                { transactionRef: transaction_uuid },
-                { status: 'failed', providerResponse: paymentData }
-            );
-            return res.status(400).json({ success: false, message: 'Payment was not completed.' });
-        }
-
-        // Find the pending transaction
-        const transaction = await Transaction.findOne({ transactionRef: transaction_uuid });
-        if (!transaction) {
-            return res.status(404).json({ success: false, message: 'Transaction record not found.' });
-        }
-
-        // Prevent duplicate processing
-        if (transaction.status === 'success') {
-            return res.json({ success: true, message: 'Payment already verified.', alreadyProcessed: true });
-        }
-
-        // Server-side verification with eSewa API
-        const verifyParams = new URLSearchParams({
-            product_code: ESEWA_MERCHANT_CODE,
-            total_amount: total_amount,
-            transaction_uuid: transaction_uuid
-        });
-
-        let esewaVerified = false;
-        try {
-            const verifyRes = await fetch(`${ESEWA_VERIFY_URL}?${verifyParams.toString()}`, {
-                method: 'GET',
-                headers: { 'Accept': 'application/json' }
-            });
-            const verifyJson = await verifyRes.json();
-            esewaVerified = verifyJson.status === 'COMPLETE';
-        } catch (verifyErr) {
-            console.warn('eSewa server verification failed (network):', verifyErr.message);
-            // In test environment, trust the encoded response if server verify fails
-            esewaVerified = true;
-        }
-
-        if (!esewaVerified) {
-            await Transaction.findOneAndUpdate(
-                { transactionRef: transaction_uuid },
-                { status: 'failed', providerResponse: paymentData }
-            );
-            return res.status(400).json({ success: false, message: 'Payment verification failed with eSewa.' });
-        }
-
-        // Activate subscription
-        const now = new Date();
-        const endDate = new Date(now.getTime() + SUBSCRIPTION_DAYS * 24 * 60 * 60 * 1000);
-
-        const subscription = await Subscription.create({
-            userId: transaction.userId,
-            planType: 'premium_monthly',
-            status: 'active',
-            startDate: now,
-            endDate: endDate,
-            transactionRef: transaction_uuid,
-            amountPaid: PLAN_PRICE_NPR,
-            currency: 'NPR'
-        });
-
-        // Update transaction record
-        await Transaction.findOneAndUpdate(
-            { transactionRef: transaction_uuid },
-            {
-                status: 'success',
-                subscriptionId: subscription._id,
-                providerTransactionCode: transaction_code,
-                providerResponse: paymentData
-            }
-        );
-
-        // Update user subscription status
-        await User.findByIdAndUpdate(transaction.userId, {
-            chatSubscriptionActive: true,
-            chatSubscriptionExpiry: endDate
-        });
-
-        return res.json({
-            success: true,
-            message: 'Subscription activated successfully!',
-            subscription: {
-                status: 'active',
-                endDate: endDate,
-                planType: 'premium_monthly'
-            }
-        });
-    } catch (error) {
-        return serverError(res, 'eSewa Verify Error', error);
-    }
-});
-
-// GET /api/payment/status — Get current user's subscription status
-app.get('/api/payment/status', authMiddleware, async (req, res) => {
-    try {
-        const user = await User.findById(req.user.userId).select('chatSubscriptionActive chatSubscriptionExpiry');
-        if (!user) return res.status(404).json({ success: false, message: 'User not found' });
-
-        const activeSub = await Subscription.findOne({
-            userId: user._id,
-            status: 'active',
-            endDate: { $gt: new Date() }
-        }).sort({ endDate: -1 });
-
-        return res.json({
-            success: true,
-            isActive: !!activeSub,
-            subscription: activeSub || null,
-            expiresAt: activeSub ? activeSub.endDate : null
-        });
-    } catch (error) {
-        return serverError(res, 'Payment Status Error', error);
-    }
-});
-
-// GET /api/payment/transactions — Get user transaction history
-app.get('/api/payment/transactions', authMiddleware, async (req, res) => {
-    try {
-        const transactions = await Transaction.find({ userId: req.user.userId })
-            .sort({ createdAt: -1 })
-            .limit(20);
-
-        return res.json({ success: true, transactions });
-    } catch (error) {
-        return serverError(res, 'Transactions Error', error);
+        console.error('AI Career Recommend Error:', error);
+        return res.status(500).json({ success: false, message: 'Server error during AI recommendation' });
     }
 });
 

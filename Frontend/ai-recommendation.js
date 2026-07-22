@@ -31,10 +31,14 @@
         // ── 3. Compute Structural Skill Gap from roadmap progress ────
         const completedModules = safeParseJSON('completedModules', []);
         let totalModules = 0;
+        let completedCount = 0;
         if (typeof ROADMAP_DATA !== 'undefined' && ROADMAP_DATA[selectedPath]) {
-            totalModules = ROADMAP_DATA[selectedPath].filter(Boolean).length;
+            const pathData = ROADMAP_DATA[selectedPath].filter(Boolean);
+            totalModules = pathData.length;
+            completedCount = pathData.filter(m => completedModules.includes(m.id)).length;
+        } else {
+            completedCount = completedModules.length; // fallback
         }
-        const completedCount  = completedModules.length;
         const completionPct   = totalModules > 0 ? Math.round((completedCount / totalModules) * 100) : 0;
         const gapPct          = 100 - completionPct;
         const gapRisk         = gapPct < 30 ? 'Low Risk' : gapPct < 60 ? 'Medium Risk' : 'High Risk';

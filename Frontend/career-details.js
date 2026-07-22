@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Roadmap CTA
     const startBtn = document.getElementById('generate-roadmap-btn');
-    startBtn.addEventListener('click', () => {
+    startBtn.addEventListener('click', async () => {
         localStorage.setItem('xyverra_selected_path', career.targetPath);
         localStorage.setItem('xyverra_target_career', career.title);
         localStorage.setItem('xyverra_onboarded', 'true');
@@ -176,6 +176,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Setting up roadmap...';
         startBtn.disabled = true;
+
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (token) {
+            try {
+                await fetch('http://localhost:5000/api/user/save-path', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ selectedPath: career.targetPath })
+                });
+                await fetch('http://localhost:5000/api/user/save-onboarding', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ selectedLevel: 'Beginner' })
+                });
+            } catch (e) {
+                console.warn('[CareerDetails] Backend save failed, proceeding with localStorage.', e);
+            }
+        }
 
         setTimeout(() => {
             window.location.href = 'roadmap.html';

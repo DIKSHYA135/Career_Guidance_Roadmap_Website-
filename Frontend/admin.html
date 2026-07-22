@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="admin.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="auth-guard.js?v=2"></script>
 </head>
 <body>
 
@@ -193,13 +194,14 @@
                             <th>Career Path</th>
                             <th>Modules Done</th>
                             <th>Lessons Studied</th>
-                            <th>Quizzes Taken</th>
+                            <th>Quizzes</th>
                             <th>AI Chats</th>
                             <th>Last Active</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="dash-users-tbody">
-                        <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted);">
+                        <tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text-muted);">
                             <i class="fas fa-spinner fa-spin"></i>&nbsp; Loading…
                         </td></tr>
                     </tbody>
@@ -447,14 +449,20 @@
             </div>
         </div>
         <div class="glass-card">
-            <p class="chart-title"><i class="fas fa-wave-square"></i> Recent AI Chat Activity</p>
-            <div id="ai-activity-list">
-                <p style="color:var(--text-muted);font-size:0.875rem;text-align:center;padding:2rem;">Loading AI activity…</p>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:0.75rem;">
+                <p class="chart-title" style="margin:0;"><i class="fas fa-comments"></i> All User Chat Histories</p>
+                <div class="search-box" style="width:220px;">
+                    <i class="fas fa-magnifying-glass"></i>
+                    <input type="text" id="chat-logs-search" placeholder="Search user name or email…">
+                </div>
+            </div>
+            <div id="chat-logs-list">
+                <p style="color:var(--text-muted);font-size:0.875rem;text-align:center;padding:2rem;"><i class="fas fa-spinner fa-spin"></i>&nbsp; Loading chat histories…</p>
             </div>
         </div>
     </div>
 
-    <!-- ── MOCK INTERVIEWS ── -->
+
     <div id="panel-mock" class="admin-panel">
         <div class="page-header">
             <div>
@@ -483,9 +491,25 @@
             </div>
         </div>
         <div class="glass-card">
-            <p class="chart-title"><i class="fas fa-clock-rotate-left"></i> Recent Interview Sessions</p>
-            <div id="mock-activity-list">
-                <p style="color:var(--text-muted);font-size:0.875rem;text-align:center;padding:2rem;">Loading interview data…</p>
+            <p class="chart-title"><i class="fas fa-list"></i> All Interview Sessions</p>
+            <div class="table-container">
+                <table class="data-table" id="interviews-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Role</th>
+                            <th>Score</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Questions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="interviews-tbody">
+                        <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted);">
+                            <i class="fas fa-spinner fa-spin"></i>&nbsp; Loading interviews…
+                        </td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -528,9 +552,27 @@
             </div>
         </div>
         <div class="glass-card">
-            <p class="chart-title"><i class="fas fa-clock-rotate-left"></i> Recent Premium Activity</p>
-            <div id="premium-activity-list">
-                <p style="color:var(--text-muted);font-size:0.875rem;text-align:center;padding:2rem;">Loading subscription data…</p>
+            <p class="chart-title"><i class="fas fa-list"></i> All Subscriptions</p>
+            <div class="table-container">
+                <table class="data-table" id="subscriptions-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Plan</th>
+                            <th>Status</th>
+                            <th>Amount Paid</th>
+                            <th>Payment Method</th>
+                            <th>Transaction ID</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subscriptions-tbody">
+                        <tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text-muted);">
+                            <i class="fas fa-spinner fa-spin"></i>&nbsp; Loading subscriptions…
+                        </td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -623,12 +665,12 @@
 
 <!-- ── USER DETAILS MODAL ── -->
 <div id="user-details-modal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-    <div class="modal-content" style="background: white; border-radius: 12px; padding: 2rem; max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative;">
+    <div class="modal-content" style="background: white; border-radius: 12px; padding: 2rem; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative;">
         <button class="modal-close" onclick="closeUserModal()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b;"><i class="fas fa-times"></i></button>
         <h2 id="ud-name" style="margin-bottom: 5px; font-family: 'Plus Jakarta Sans'; color: #0f172a;">User Name</h2>
         <p id="ud-email" style="color: #64748b; margin-bottom: 20px;">user@example.com</p>
 
-        <div class="modal-grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+        <div class="modal-grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
             <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
                 <p style="font-size: 0.85rem; color: #64748b; font-weight: 600; text-transform: uppercase;">Selected Roadmap</p>
                 <p id="ud-roadmap" style="font-size: 1.1rem; font-weight: 700; color: #0f172a;">None</p>
@@ -639,26 +681,74 @@
             </div>
         </div>
 
-        <div style="margin-bottom: 20px;">
-            <h3 style="font-size: 1rem; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 10px;">Completed Modules</h3>
-            <ul id="ud-modules" style="list-style: none; padding: 0; max-height: 120px; overflow-y: auto; background: #f8fafc; border-radius: 6px; padding: 10px; border: 1px solid #e2e8f0; font-size: 0.95rem; color: #334155;"></ul>
+        <div class="modal-grid-2" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 20px;">
+            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <p style="font-size: 0.85rem; color: #64748b; font-weight: 600; text-transform: uppercase;">Job Readiness</p>
+                <p id="ud-readiness" style="font-size: 1.1rem; font-weight: 700; color: #0f172a;">-</p>
+            </div>
+            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <p style="font-size: 0.85rem; color: #64748b; font-weight: 600; text-transform: uppercase;">Level</p>
+                <p id="ud-level" style="font-size: 1.1rem; font-weight: 700; color: #0f172a;">-</p>
+            </div>
+            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <p style="font-size: 0.85rem; color: #64748b; font-weight: 600; text-transform: uppercase;">XP</p>
+                <p id="ud-xp" style="font-size: 1.1rem; font-weight: 700; color: #0f172a;">-</p>
+            </div>
+            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <p style="font-size: 0.85rem; color: #64748b; font-weight: 600; text-transform: uppercase;">Learning Streak</p>
+                <p id="ud-streak" style="font-size: 1.1rem; font-weight: 700; color: #0f172a;">-</p>
+            </div>
+            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <p style="font-size: 0.85rem; color: #64748b; font-weight: 600; text-transform: uppercase;">Roadmap Progress</p>
+                <p id="ud-progress-pct" style="font-size: 1.1rem; font-weight: 700; color: #0f172a;">-</p>
+            </div>
         </div>
 
         <div style="margin-bottom: 20px;">
-            <h3 style="font-size: 1rem; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 10px;">Studied Lessons</h3>
-            <ul id="ud-lessons" style="list-style: none; padding: 0; max-height: 120px; overflow-y: auto; background: #f8fafc; border-radius: 6px; padding: 10px; border: 1px solid #e2e8f0; font-size: 0.95rem; color: #334155;"></ul>
+            <h3 style="font-size: 1.1rem; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 10px;">Current Skills</h3>
+            <div id="ud-skills" style="background: #f8fafc; border-radius: 6px; padding: 10px; border: 1px solid #e2e8f0; font-size: 0.95rem; color: #334155;"></div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 1.1rem; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 10px;">Career Discovery Results / Recommended Careers</h3>
+            <div id="ud-career-discovery" style="background: #f8fafc; border-radius: 6px; padding: 10px; border: 1px solid #e2e8f0; font-size: 0.95rem; color: #334155;"></div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 1.1rem; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 10px;">Roadmap Modules — Unlocked / Studied / Completed</h3>
+            <div id="ud-lessons" style="max-height: 200px; overflow-y: auto; background: #f8fafc; border-radius: 6px; padding: 10px; border: 1px solid #e2e8f0; font-size: 0.95rem; color: #334155;"></div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 1.1rem; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 10px;">Subscriptions & Payments</h3>
+            <div id="ud-subscriptions" style="background: #f8fafc; border-radius: 6px; padding: 10px; border: 1px solid #e2e8f0; font-size: 0.95rem; color: #334155;"></div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 1.1rem; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 10px;">Detailed Quiz History</h3>
+            <div id="ud-quiz-history" style="max-height: 200px; overflow-y: auto; background: #f8fafc; border-radius: 6px; padding: 10px; border: 1px solid #e2e8f0; font-size: 0.95rem; color: #334155;"></div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 1.1rem; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 10px;">Mock Interviews</h3>
+            <div id="ud-interviews" style="max-height: 200px; overflow-y: auto; background: #f8fafc; border-radius: 6px; padding: 10px; border: 1px solid #e2e8f0; font-size: 0.95rem; color: #334155;"></div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 1.1rem; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 10px;">AI Chat History</h3>
+            <div id="ud-chat-history" style="max-height: 300px; overflow-y: auto; background: #f8fafc; border-radius: 6px; padding: 10px; border: 1px solid #e2e8f0; font-size: 0.95rem; color: #334155;"></div>
         </div>
 
         <div>
-            <h3 style="font-size: 1rem; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 10px;">Quiz Scores</h3>
-            <ul id="ud-quizzes" style="list-style: none; padding: 0; max-height: 120px; overflow-y: auto; background: #f8fafc; border-radius: 6px; padding: 10px; border: 1px solid #e2e8f0; font-size: 0.95rem; color: #334155;"></ul>
+            <h3 style="font-size: 1.1rem; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 10px;">Activity Logs</h3>
+            <div id="ud-activity" style="max-height: 200px; overflow-y: auto; background: #f8fafc; border-radius: 6px; padding: 10px; border: 1px solid #e2e8f0; font-size: 0.95rem; color: #334155;"></div>
         </div>
     </div>
 </div>
 
-<script src="auth-guard.js"></script>
 <script src="toast.js"></script>
 <script src="roadmap-data.js"></script>
+<script src="roadmap-data-override.js"></script>
 <script src="admin.js?v=4"></script>
 </body>
 </html>
