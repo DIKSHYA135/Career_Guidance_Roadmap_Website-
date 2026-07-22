@@ -254,14 +254,14 @@ document.addEventListener("DOMContentLoaded", () => {
             let html = '';
             currentModule.courses.slice(0, 3).forEach(course => {
                 html += `
-                    <a href="${course.url}" target="_blank" class="resource-link-card">
+                    <a href="${course.url}" class="resource-link-card">
                         <div style="display:flex; align-items:center; gap:0.8rem; min-width:0;">
                             <div class="resource-icon" style="color:var(--primary); background:var(--indigo-soft, rgba(79,70,229,0.1)); width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
                                 <i class="fas fa-play-circle"></i>
                             </div>
                             <span style="font-weight:600; font-size:0.9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${course.name}</span>
                         </div>
-                        <i class="fas fa-external-link-alt" style="color:var(--text-muted); font-size:0.8rem; flex-shrink:0;"></i>
+                        <i class="fas fa-chevron-right" style="color:var(--text-muted); font-size:0.8rem; flex-shrink:0;"></i>
                     </a>`;
             });
             recommendedContainer.innerHTML = html;
@@ -288,10 +288,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (timelineContainer) {
             if (completedModules && completedModules.length > 0) {
                 completedModules.forEach(modId => {
+                    const modTitle = typeof resolveModuleTitle === 'function' ? resolveModuleTitle(modId) : modId;
                     timelineContainer.insertAdjacentHTML('afterbegin', `
                         <div class="timeline-item">
                             <div class="timeline-dot"></div>
-                            <h4>Completed: ${modId}</h4>
+                            <h4>Completed: ${modTitle}</h4>
                             <p>You passed the assessment and leveled up your skills.</p>
                         </div>`);
                 });

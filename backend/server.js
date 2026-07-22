@@ -1182,10 +1182,32 @@ app.post('/api/user/save-path', authMiddleware, async (req, res) => {
                 message: 'Selected path is required'
             });
         }
+        const trimmedPath = selectedPath.trim();
+
+        const existingUser = await User.findById(req.user.userId).select('selectedPath');
+        if (!existingUser) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Switching to a genuinely different roadmap — wipe all progress tied to
+        // the old path so Dashboard, Progress, Skill Gap and Career Analytics only
+        // ever reflect the newly chosen roadmap, never leftover data from the last one.
+        const isSwitchingRoadmap = !!existingUser.selectedPath && existingUser.selectedPath !== trimmedPath;
+
+        const update = { selectedPath: trimmedPath };
+        if (isSwitchingRoadmap) {
+            update.completedModules = [];
+            update.completedLessons = [];
+            update.quizScores = {};
+            update.studiedLessons = {};
+            update.competencyScore = 0;
+            update.readinessScore = 0;
+            update.analyticsData = {};
+        }
 
         const updatedUser = await User.findByIdAndUpdate(
             req.user.userId,
-            { selectedPath: selectedPath.trim() },
+            { $set: update },
             { returnDocument: 'after' }
         );
 
@@ -1341,6 +1363,10 @@ app.get('/api/user/me', authMiddleware, async (req, res) => {
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
+        // Always recompute rather than trust the last-persisted value — keeps
+        // the Job Readiness Score accurate even if it went stale (e.g. leftover
+        // from before a roadmap switch) without waiting on a quiz/lesson event.
+        user.readinessScore = await recomputeAndSaveReadiness(req.user.userId);
         res.json({ success: true, user });
     } catch (error) {
         return serverError(res, 'Get Me Error', error);

@@ -4,6 +4,9 @@
    so they can be replaced with real API calls later.
    ========================================================= */
 
+// ── Demo accounts: every quiz answer is treated as correct, for demos ──
+const DEMO_ACCOUNT_EMAILS = ['mamta_sahu_a25@sunway.edu.np', 'mamtashahu2008@gmail.com'];
+
 // ── Quiz Data (will come from GET /api/quiz/:moduleId in production) ──
 const QUIZ_DATA = {
     "webDevelopment": {
@@ -10633,6 +10636,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const quizBodyEl       = document.getElementById('quiz-body');
         const nextBtnEl        = document.getElementById('btn-next-question');
         const statusEl         = document.getElementById('quiz-status');
+        const exitBtnEl        = document.getElementById('btn-exit-quiz');
+
+        if (exitBtnEl) {
+            exitBtnEl.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.location.href = isVerify ? 'skill-verification.html' : 'roadmap.html';
+            });
+        }
 
         if (moduleTitleEl) moduleTitleEl.textContent = 'Assessment Locked';
         if (timerContainerEl) timerContainerEl.style.display = 'none';
@@ -11033,8 +11044,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const selectedBtn = document.getElementById(`option-${index}`);
 
-        // --- DEMO BACKDOOR: force correct for mamta account ---
-        const isDemoAccount = (localStorage.getItem('xyverra_user_email') || '') === 'mamta_sahu_a25@sunway.edu.np';
+        // --- DEMO BACKDOOR: force correct for demo accounts ---
+        const isDemoAccount = DEMO_ACCOUNT_EMAILS.includes(localStorage.getItem('xyverra_user_email') || '');
         const effectivelyCorrect = isDemoAccount ? true : isCorrect;
 
         if (effectivelyCorrect) {
@@ -11089,7 +11100,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // --- BACKDOOR FOR DEMO ACCOUNT ---
         const userEmail = localStorage.getItem('xyverra_user_email') || '';
-        if (userEmail === 'mamta_sahu_a25@sunway.edu.np') {
+        if (DEMO_ACCOUNT_EMAILS.includes(userEmail)) {
             score = totalQuestions;
             pct = 100;
             passed = true;

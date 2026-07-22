@@ -163,6 +163,14 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', async () => {
             const path = btn.getAttribute('data-path');
 
+            // Switching to a different roadmap than the one already active? Wipe all
+            // locally cached progress so Dashboard/Progress/Skill Gap don't flash
+            // stale numbers from the old roadmap before the backend reset lands.
+            const previousPath = localStorage.getItem('xyverra_selected_path');
+            if (previousPath && previousPath !== path && typeof clearCachedRoadmapProgress === 'function') {
+                clearCachedRoadmapProgress();
+            }
+
             // Save to localStorage immediately
             localStorage.setItem('xyverra_selected_path', path);
             localStorage.setItem('xyverra_target_career', path);

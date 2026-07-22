@@ -681,6 +681,20 @@
 
 // ── Auto-load the premium modal system on every page ──────
 (function XyGuard() {
+    // ── Utility: wipe locally cached roadmap progress. Call this whenever the
+    // user switches to a different roadmap so Dashboard/Progress/Skill Gap/
+    // Career Analytics never flash stale numbers from the old roadmap while
+    // waiting for the backend's own reset (see /api/user/save-path) to land. ──
+    window.clearCachedRoadmapProgress = function() {
+        [
+            'completedModules', 'completedCourses', 'quizScores',
+            'xyverra_quiz_scores', 'xyverra_skill_score', 'xyverra_readiness_score',
+            'xyverra_last_celebrated', 'selectedStartModule', 'pendingStartModule',
+            'quizResultLevel', 'quizResultScore',
+            'xyverra_mandatory_quiz_state', 'xyverra_active_quiz'
+        ].forEach(key => localStorage.removeItem(key));
+    };
+
     // ── Pages that are always public (no guard) ──
     const PUBLIC_PAGES = ['landing.html', 'login.html', 'signup.html', 'index.html', ''];
 

@@ -169,6 +169,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Roadmap CTA
     const startBtn = document.getElementById('generate-roadmap-btn');
     startBtn.addEventListener('click', async () => {
+        // Switching to a different roadmap than the one already active? Wipe all
+        // locally cached progress so Dashboard/Progress/Skill Gap don't flash
+        // stale numbers from the old roadmap before the backend reset lands.
+        const previousPath = localStorage.getItem('xyverra_selected_path');
+        if (previousPath && previousPath !== career.targetPath && typeof clearCachedRoadmapProgress === 'function') {
+            clearCachedRoadmapProgress();
+        }
+
         localStorage.setItem('xyverra_selected_path', career.targetPath);
         localStorage.setItem('xyverra_target_career', career.title);
         localStorage.setItem('xyverra_onboarded', 'true');

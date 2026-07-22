@@ -80,9 +80,10 @@ window.viewUserDetails = async (userId) => {
                         : p.status === 'studied'
                         ? `<span style="background:#eff6ff;color:#2563eb;border-radius:4px;padding:1px 6px;font-size:0.75rem;font-weight:600;">Studied</span>`
                         : `<span style="background:#f1f5f9;color:#94a3b8;border-radius:4px;padding:1px 6px;font-size:0.75rem;font-weight:600;">${p.status}</span>`;
+                    const modTitle = typeof resolveModuleTitle === 'function' ? resolveModuleTitle(p.moduleId) : p.moduleId.replace(/_/g, ' ');
                     return `<li style="padding:5px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:8px;">
                         <i class="fas fa-book-open" style="color:#3b82f6;flex-shrink:0;"></i>
-                        <span style="flex:1;font-size:0.9rem;">${p.moduleId.replace(/_/g, ' ')}</span>
+                        <span style="flex:1;font-size:0.9rem;">${modTitle}</span>
                         ${statusBadge}
                         <span style="color:#94a3b8;font-size:0.78rem;white-space:nowrap;">${date}</span>
                     </li>`;
@@ -116,8 +117,9 @@ window.viewUserDetails = async (userId) => {
                             return `<li>${icon} Q${i+1}: ${a.questionText} <br> <em>Selected: ${a.selectedOption}</em></li>`;
                         }).join('') + `</ul>`;
                     }
+                    const modTitle = typeof resolveModuleTitle === 'function' ? resolveModuleTitle(q.moduleId) : q.moduleId;
                     return `<div style="padding: 10px; border-bottom: 1px solid #e2e8f0;">
-                        <strong>Module: ${q.moduleId}</strong> - Score: ${q.scorePercentage}% (${q.passed ? 'Passed' : 'Failed'})
+                        <strong>Module: ${modTitle}</strong> - Score: ${q.scorePercentage}% (${q.passed ? 'Passed' : 'Failed'})
                         <br><small>Date: ${new Date(q.createdAt).toLocaleString()}</small>
                         ${answersHtml}
                     </div>`;
@@ -1097,7 +1099,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const ctxCourseComp = document.getElementById('courseCompletionChart');
             if (ctxCourseComp && ctxCourseComp._chartInstance) {
-                ctxCourseComp._chartInstance.data.labels = top5.map(([id]) => id);
+                ctxCourseComp._chartInstance.data.labels = top5.map(([id]) =>
+                    typeof resolveModuleTitle === 'function' ? resolveModuleTitle(id) : id);
                 ctxCourseComp._chartInstance.data.datasets[0].data = top5.map(([, v]) => v);
                 ctxCourseComp._chartInstance.update();
             }
