@@ -36,7 +36,5 @@ const interviewSessionSchema = new mongoose.Schema({
 
 // Index for admin queries
 interviewSessionSchema.index({ createdAt: -1 });
-interviewSessionSchema.index({ jobRole: 1 });
 
 module.exports = mongoose.model('InterviewSession', interviewSessionSchema);
-

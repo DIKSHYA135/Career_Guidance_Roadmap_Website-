@@ -866,23 +866,19 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Initialize data
     fetchDashboardStats();
-    fetchUsers();
-    fetchSubscriptions();
-    fetchInterviews();
-    fetchChatLogs();
+    if (typeof fetchUsersManagement === 'function') fetchUsersManagement();
+    if (typeof fetchSubscriptions === 'function') fetchSubscriptions();
+    if (typeof fetchInterviewHistory === 'function') fetchInterviewHistory();
+    if (typeof fetchAIChatHistory === 'function') fetchAIChatHistory();
 
     // Set interval for dashboard stats to auto-refresh (polling)
-    setInterval(fetchDashboardStats, 10000); // Initial fetch
     const refreshData = () => {
         fetchDashboardStats();
-        fetchActivityLogs();
-        fetchUsers();
-        fetchSubscriptions();
-        fetchInterviews();
-        fetchChatLogs();
+        // Only poll lightweight data to prevent overwhelming backend
+        if (typeof fetchActivityLogs === 'function') fetchActivityLogs();
     };
 
-    const refreshIntervalId = setInterval(refreshData, 5000); // Poll every 5 seconds for real-time feel
+    const refreshIntervalId = setInterval(refreshData, 10000); // Poll every 10 seconds for real-time feel
     window.addEventListener('beforeunload', () => clearInterval(refreshIntervalId));
 
     // Chat logs search filter
