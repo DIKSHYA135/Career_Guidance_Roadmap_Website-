@@ -96,6 +96,11 @@ const userSchema = new mongoose.Schema({
         default: []
     },
 
+    completedRoadmaps: {
+        type: [String],
+        default: []
+    },
+
     quizScores: {
         type: Map,
         of: Number,

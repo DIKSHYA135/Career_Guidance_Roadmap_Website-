@@ -298,10 +298,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
             if (data.success) {
                 const stats = data.data;
-                document.getElementById('stat-total-users').textContent = stats.totalUsers.toLocaleString();
-                document.getElementById('stat-active-users').textContent = stats.activeUsersToday.toLocaleString();
-                document.getElementById('stat-premium-subs').textContent = stats.premiumSubs.toLocaleString();
-                document.getElementById('stat-ai-chats').textContent = stats.totalAiChats.toLocaleString();
+                document.getElementById('stat-total-users').textContent = stats.totalUsers;
+                document.getElementById('stat-active-users').textContent = stats.activeUsersToday;
+                document.getElementById('stat-premium-subs').textContent = stats.premiumSubs;
+                document.getElementById('stat-total-interviews').textContent = stats.totalInterviews;
+                document.getElementById('stat-revenue').textContent = 'Rs ' + (stats.revenue || 0).toLocaleString();
+                
+                // New stats
+                const aiStat = document.getElementById('stat-ai-conversations');
+                if (aiStat) aiStat.textContent = stats.totalAiConversations || 0;
+                
+                const intTodayStat = document.getElementById('stat-interviews-today');
+                if (intTodayStat) intTodayStat.textContent = stats.interviewsToday || 0;   document.getElementById('stat-ai-chats').textContent = stats.totalAiChats.toLocaleString();
                 
                 // If there are elements for these, update them
                 const elInterviews = document.getElementById('stat-interviews');
@@ -856,6 +864,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize and start polling
     initCharts();
     
+    // Initialize data
+    fetchDashboardStats();
+    fetchUsers();
+    fetchSubscriptions();
+    fetchInterviews();
+    fetchChatLogs();
+
+    // Set interval for dashboard stats to auto-refresh (polling)
+    setInterval(fetchDashboardStats, 10000); // Initial fetch
     const refreshData = () => {
         fetchDashboardStats();
         fetchActivityLogs();
@@ -865,7 +882,6 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchChatLogs();
     };
 
-    refreshData(); // Initial fetch
     const refreshIntervalId = setInterval(refreshData, 5000); // Poll every 5 seconds for real-time feel
     window.addEventListener('beforeunload', () => clearInterval(refreshIntervalId));
 

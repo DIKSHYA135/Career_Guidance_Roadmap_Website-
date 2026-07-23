@@ -157,7 +157,8 @@ document.addEventListener('DOMContentLoaded', () => {
             usageBar.classList.remove('warning', 'blocked');
         } else {
             premiumBadge.style.display = 'none';
-            usageText.textContent = `${Math.min(used, FREE_LIMIT)} of ${FREE_LIMIT} free questions used`;
+            const remaining = Math.max(0, FREE_LIMIT - used);
+            usageText.textContent = `Remaining AI Chats: ${remaining}/${FREE_LIMIT}`;
             usageDots.innerHTML = '';
             for (let i = 0; i < FREE_LIMIT; i++) {
                 const dot = document.createElement('span');
@@ -173,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sendBtn.disabled = blocked;
         upgradeInline.style.display = blocked ? 'flex' : 'none';
         chatInput.placeholder = blocked
-            ? 'Upgrade to Premium to keep chatting...'
+            ? 'You have reached your free AI chat limit. Redirecting to Premium...'
             : 'Type your message here...';
     };
 
@@ -336,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Hard block when limit reached
         if (limitReached()) {
-            openSubModal();
+            setTimeout(() => { window.location.href = 'subscription.html'; }, 500);
             return;
         }
 
@@ -368,7 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (serverData && serverData.blocked) {
             sending = false;
             renderUsage();
-            setTimeout(openSubModal, 200);
+            setTimeout(() => { window.location.href = 'subscription.html'; }, 1500);
             return;
         }
 
@@ -389,42 +390,17 @@ document.addEventListener('DOMContentLoaded', () => {
         sending = false;
         renderUsage();
 
-        // If that was the last free question, surface the upsell
+        // If that was the last free question, surface the upsell by redirecting
         if (limitReached()) {
-            setTimeout(openSubModal, 800);
+            setTimeout(() => { window.location.href = 'subscription.html'; }, 2000);
         }
     };
 
     /* ============================================================
-     * SUBSCRIPTION MODAL - MOCK PAYMENT FLOW
+     * SUBSCRIPTION REDIRECT
      * ============================================================ */
-    const openSubModal = () => {
-        subOfferView.style.display = 'block';
-        subSuccessView.style.display = 'none';
-        subSubscribeBtn.disabled = false;
-        subSubscribeBtn.innerHTML = '<i class="fas fa-bolt"></i> Subscribe Now - $9.99/mo';
-        subOverlay.classList.add('open');
-    };
-    const closeSubModal = () => subOverlay.classList.remove('open');
-
-    const doSubscribe = async () => {
-        subSubscribeBtn.disabled = true;
-        subSubscribeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing Payment...';
-
-        // Show mock payment processing
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
-        // Call backend to activate subscription
-        await subscribeBackend();
-
-        // Unlock locally regardless (mock mode)
-        localStorage.setItem(LS.sub, 'true');
-        setUsed(0);
-        renderUsage();
-
-        // Success view
-        subOfferView.style.display = 'none';
-        subSuccessView.style.display = 'block';
+    const handleUpgradeRedirect = () => {
+        window.location.href = 'subscription.html';
     };
 
     /* ============================================================
@@ -463,13 +439,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (clearHistoryBtn) clearHistoryBtn.addEventListener('click', clearHistory);
-    if (upgradeInlineBtn) upgradeInlineBtn.addEventListener('click', openSubModal);
-    if (subSubscribeBtn) subSubscribeBtn.addEventListener('click', doSubscribe);
-    if (subLaterBtn) subLaterBtn.addEventListener('click', closeSubModal);
-    if (subCloseBtn) subCloseBtn.addEventListener('click', closeSubModal);
-    if (subDoneBtn) subDoneBtn.addEventListener('click', () => { closeSubModal(); chatInput.focus(); });
-    if (subOverlay) subOverlay.addEventListener('click', (e) => { if (e.target === subOverlay) closeSubModal(); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSubModal(); });
+    if (upgradeInlineBtn) upgradeInlineBtn.addEventListener('click', handleUpgradeRedirect);
 
     /* ============================================================
      * INIT
@@ -478,6 +448,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadHistoryFromBackend().then(() => {
         renderInitialChat();
         renderUsage();
-        if (limitReached()) setTimeout(openSubModal, 800);
+        if (limitReached()) setTimeout(() => { window.location.href = 'subscription.html'; }, 1500);
     });
 });

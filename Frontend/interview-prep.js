@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentQuestionIndex = 0;
     let timerInterval = null;
     let timeLeft = 15 * 60; // 15 minutes
+    let sessionStartTime = null; // track real duration
 
     const populateSkills = () => {
         const skillsContainer = document.getElementById('int-skills-selector');
@@ -119,13 +120,18 @@ document.addEventListener('DOMContentLoaded', () => {
         startBtn.disabled = true;
 
         try {
+            // Collect selected interview type and difficulty if present
+            const selectedType = document.querySelector('.skill-tag.selected')?.textContent?.trim() || 'Mixed';
+            const difficultyEl = document.getElementById('int-difficulty-select');
+            const difficulty = difficultyEl ? difficultyEl.value : 'Intermediate';
+
             const res = await fetch('http://localhost:5000/api/interview/start', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ jobRole: targetCareer })
+                body: JSON.stringify({ jobRole: targetCareer, interviewType: selectedType, difficulty })
             });
             const data = await res.json();
             
@@ -140,6 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 qTotal.textContent = questions.length;
                 timeLeft = 15 * 60;
+                sessionStartTime = Date.now(); // record real start time
                 timerText.textContent = formatTime(timeLeft);
                 clearInterval(timerInterval);
                 timerInterval = setInterval(updateTimer, 1000);
@@ -213,11 +220,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const endSession = async () => {
         clearInterval(timerInterval);
-        
+        const durationSeconds = sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : 0;
+
         try {
             const res = await fetch(`http://localhost:5000/api/interview/${currentSessionId}/complete`, {
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ durationSeconds })
             });
             const data = await res.json();
             

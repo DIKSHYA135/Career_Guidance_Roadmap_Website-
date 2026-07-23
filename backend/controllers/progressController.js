@@ -3,7 +3,35 @@ const Quiz = require('../models/Quiz');
 const User = require('../models/User');
 const QuizAttempt = require('../models/QuizAttempt');
 const https = require('https');
-const { recomputeAndSaveReadiness } = require('../utils/readiness');
+const { recomputeAndSaveReadiness, resolveRoadmapPathKey } = require('../utils/readiness');
+const ROADMAP_DATA = require('../utils/roadmapData');
+
+async function checkAndMarkRoadmapCompletion(userId) {
+    const user = await User.findById(userId);
+    if (!user || !user.selectedPath) return user;
+
+    const matchedPathKey = resolveRoadmapPathKey(user.selectedPath);
+    if (!matchedPathKey) return user;
+
+    const pathData = ROADMAP_DATA[matchedPathKey];
+    if (!pathData || pathData.length === 0) return user;
+
+    // Check if every module's ID in the roadmap is in completedModules
+    const allCompleted = pathData.every(mod => user.completedModules.includes(mod.id));
+    
+    if (allCompleted && !user.completedRoadmaps.includes(matchedPathKey)) {
+        // Mark as completed and award XP
+        return await User.findByIdAndUpdate(
+            userId,
+            { 
+                $addToSet: { completedRoadmaps: matchedPathKey },
+                $inc: { experienceRank: 500 } // Bonus XP for roadmap completion
+            },
+            { new: true }
+        );
+    }
+    return user;
+}
 
 exports.markViewed = async (req, res) => {
     try {
@@ -57,15 +85,22 @@ exports.markLessonComplete = async (req, res) => {
             return res.status(400).json({ success: false, message: 'courseId is required' });
         }
 
-        await User.findByIdAndUpdate(
+        let updatedUser = await User.findByIdAndUpdate(
             userId,
             { $addToSet: { completedLessons: courseId } },
             { new: true }
         );
 
+        updatedUser = await checkAndMarkRoadmapCompletion(userId);
         const readinessScore = await recomputeAndSaveReadiness(userId);
 
-        res.json({ success: true, message: 'Lesson marked as completed', readinessScore });
+        res.json({ 
+            success: true, 
+            message: 'Lesson marked as completed', 
+            readinessScore,
+            completedRoadmaps: updatedUser.completedRoadmaps,
+            experienceRank: updatedUser.experienceRank
+        });
     } catch (err) {
         console.error('Mark Lesson Complete Error:', err);
         res.status(500).json({ success: false, message: 'Server error' });
@@ -88,7 +123,11 @@ exports.submitQuiz = async (req, res) => {
         const passed = scorePercentage >= passingScore;
 
         // Update Progress collection
+        // Track whether this is the FIRST TIME the user passes this quiz
+        // so we award XP exactly once per quiz (not on retakes).
         let progress = await Progress.findOne({ userId, moduleId });
+        const wasAlreadyCompleted = progress && progress.status === 'completed';
+
         if (!progress) {
             progress = new Progress({
                 userId,
@@ -119,33 +158,45 @@ exports.submitQuiz = async (req, res) => {
         });
         await attempt.save();
 
-        // If passed, update User.completedModules so /api/user/me returns it
+        // Update User document: quizScores always saved; completedModules only on pass
+        let userUpdateFields = { $set: { [`quizScores.${moduleId}`]: scorePercentage } };
         if (passed) {
-            await User.findByIdAndUpdate(
-                userId,
-                {
-                    $addToSet: { completedModules: moduleId },
-                    $set: { [`quizScores.${moduleId}`]: scorePercentage }
-                },
-                { new: true }
-            );
-        } else {
-            // Even if not passed, record the quiz score attempt
-            await User.findByIdAndUpdate(
-                userId,
-                { $set: { [`quizScores.${moduleId}`]: scorePercentage } },
-                { new: true }
-            );
+            userUpdateFields.$addToSet = { completedModules: moduleId };
         }
+        await User.findByIdAndUpdate(userId, userUpdateFields, { new: true });
+
+        // ── XP AWARD ──────────────────────────────────────────────────────────
+        // XP is awarded on EVERY quiz attempt, scaled directly by the score:
+        //   Max XP is 10 for a skill assessment.
+        // Uses atomic $inc to prevent race-condition double-counts.
+        const awardedXp = 1 + Math.floor((scorePercentage / 100) * 9);
+        let updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $inc: { experienceRank: awardedXp } },
+            { returnDocument: 'after' }
+        );
+        updatedUser = await checkAndMarkRoadmapCompletion(userId);
 
         const readinessScore = await recomputeAndSaveReadiness(userId);
 
-        res.json({ success: true, passed, score: scorePercentage, passingScore, readinessScore });
+        res.json({
+            success: true,
+            passed,
+            score: scorePercentage,
+            passingScore,
+            readinessScore,
+            xpAwarded: awardedXp,
+            experienceRank: updatedUser ? updatedUser.experienceRank : null,
+            completedRoadmaps: updatedUser ? updatedUser.completedRoadmaps : [],
+            isFirstPass: passed && !wasAlreadyCompleted
+        });
     } catch (err) {
         console.error('Submit Quiz Error:', err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
+
+
 
 
 exports.getProgress = async (req, res) => {

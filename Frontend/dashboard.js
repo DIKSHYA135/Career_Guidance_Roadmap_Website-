@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Fire-and-forget: merges server state into localStorage then re-renders.
     // Uses the same memoized fetch as roadmap.js (also loaded on this page for
     // the roadmap-preview widget) so only one network request is made, not two.
-    (function syncFromServer() {
+    function syncFromServer() {
         const token = localStorage.getItem('token');
         if (!token) return;
         const fetchMe = window.xyFetchUserMe || (t => fetch('http://localhost:5000/api/user/me', {
@@ -92,11 +92,17 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             if (typeof u.readinessScore === 'number')
                 localStorage.setItem('xyverra_readiness_score', String(u.readinessScore));
+            if (typeof u.experienceRank === 'number')
+                localStorage.setItem('xyverra_xp', String(u.experienceRank));
+            if (Array.isArray(u.completedRoadmaps))
+                localStorage.setItem('completedRoadmaps', JSON.stringify(u.completedRoadmaps));
             // Re-render stats with fresher data after server sync
             renderDashboardStats();
         })
         .catch(() => {});
-    })();
+    }
+    syncFromServer();
+
     function renderDashboardStats() {
         // ---- Compute stats ----
         const completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
@@ -130,7 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const quizCount = Object.keys(rawQuizScores).length;
         const avgQuiz = quizCount > 0 ? Object.values(rawQuizScores).reduce((a, b) => a + b, 0) / quizCount : 0;
     
-        const xp = (completedCount * 120) + (streak * 50);
+        const xp = parseInt(localStorage.getItem('xyverra_xp') || 0, 10);
         const xpPct = Math.min(100, (xp / 3000) * 100);
 
         // Job Readiness Score — canonical value computed & persisted server-side
@@ -326,4 +332,15 @@ document.addEventListener("DOMContentLoaded", () => {
     
     }
     renderDashboardStats();
+
+    // ── Real-time cross-page sync via storage events ──
+    const STAT_KEYS = new Set([
+        'xyverra_xp', 'xyverra_user_streak', 'xyverra_readiness_score',
+        'completedModules', 'xyverra_quiz_scores', 'completedRoadmaps'
+    ]);
+    window.addEventListener('storage', (e) => {
+        if (STAT_KEYS.has(e.key)) {
+            syncFromServer();
+        }
+    });
 });

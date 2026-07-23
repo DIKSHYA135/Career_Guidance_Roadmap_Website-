@@ -801,6 +801,46 @@
         sessionStorage.clear();
         window.location.replace('login.html');
     };
+
+    // ── Background Subscription Validation ──────────────────────────────
+    // Silently fetches the user's live subscription status from the DB.
+    // If the backend returns isPro: false (e.g., subscription was cancelled
+    // or expired), localStorage is immediately corrected.
+    // This prevents stale localStorage values from granting access after
+    // a cancellation, even without a page refresh.
+    (function syncSubscriptionStatus() {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (!token) return; // Not logged in
+
+        const API_BASE = (window.XYVERRA_API_BASE || 'http://localhost:5000').replace(/\/$/, '');
+
+        const doSync = () => {
+            fetch(API_BASE + '/api/user/me', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                if (!data || !data.success || !data.user) return;
+                const isPro = data.user.isPro === true;
+                // SECURITY: Always correct localStorage from server truth.
+                // If a user manually set xyverra_is_pro=true via DevTools,
+                // this call will reset it to false within seconds.
+                localStorage.setItem('xyverra_is_pro', isPro ? 'true' : 'false');
+                localStorage.setItem('chatSubscriptionActive', isPro ? 'true' : 'false');
+                // Update chat count from DB source of truth
+                if (typeof data.user.chatMessagesUsed === 'number') {
+                    localStorage.setItem('chatMessagesUsed', String(data.user.chatMessagesUsed));
+                }
+            })
+            .catch(() => { /* offline — keep using cached values */ });
+        };
+
+        // Run once on page load
+        doSync();
+        // Re-check every 5 minutes during long sessions (300,000 ms)
+        setInterval(doSync, 5 * 60 * 1000);
+    })();
+
 })();
 
 

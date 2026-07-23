@@ -2,6 +2,8 @@ const cron = require('node-cron');
 const User = require('../models/User');
 const EmailLog = require('../models/EmailLog');
 const nodemailer = require('nodemailer');
+const { isSubscriptionActive } = require('../utils/subscriptionUtils');
+
 // Re-using the logic from server.js for SMTP
 // In a real refactor, we would extract the transporter into a shared config file.
 
@@ -28,10 +30,7 @@ const initEmailService = () => {
             const proUsers = await User.find({ emailReportsEnabled: true }).populate('activeSubscription');
             
             for (const user of proUsers) {
-                const hasLegacySub = user.chatSubscriptionActive && (!user.chatSubscriptionExpiry || new Date(user.chatSubscriptionExpiry).getTime() > Date.now());
-                const hasNewSub = user.activeSubscription && user.activeSubscription.status === 'active' && new Date(user.activeSubscription.endDate).getTime() > Date.now();
-                
-                if (hasLegacySub || hasNewSub) {
+                if (isSubscriptionActive(user)) {
                     await sendWeeklyReport(transporter, user);
                 }
             }

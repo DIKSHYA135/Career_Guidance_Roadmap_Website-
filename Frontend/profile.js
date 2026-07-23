@@ -1,4 +1,4 @@
-// profile.js Ã¢â‚¬â€ all profile fields editable with validation, avatar upload, interests, goals
+// profile.js — all profile fields editable with validation, avatar upload, interests, goals
 document.addEventListener("DOMContentLoaded", async () => {
     const token = localStorage.getItem('token');
     const currentEmail = localStorage.getItem('xyverra_user_email');
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         'Product Management', 'Startups', 'Open Source'
     ];
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Toast helper (self-contained) Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Toast helper (self-contained) ──
     const showToast = (message, type = 'info') => {
         const container = document.getElementById('toast-container');
         if (!container) { return; }
@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
     try { userData.interests = JSON.parse(localStorage.getItem('xyverra_interests') || '[]'); } catch (e) {}
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Fetch Profile from Backend Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Fetch Profile from Backend ──
     const fetchUserProfile = async () => {
         try {
             const response = await fetch(`${API_BASE}/api/user/profile`, {
@@ -67,29 +67,31 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
             if (response.ok) {
                 const data = await response.json();
+                // /api/user/profile now returns data.user
+                const u = data.user || data;
                 userData = {
-                    name: data.name || userData.name,
-                    email: data.email || userData.email,
+                    name: u.name || userData.name,
+                    email: u.email || userData.email,
                     // Backend stores phoneNumber, frontend uses phone internally
-                    phone: (data.phoneNumber !== undefined && data.phoneNumber !== null) ? data.phoneNumber
-                         : (data.phone !== undefined && data.phone !== null) ? data.phone
+                    phone: (u.phoneNumber !== undefined && u.phoneNumber !== null) ? u.phoneNumber
+                         : (u.phone !== undefined && u.phone !== null) ? u.phone
                          : userData.phone,
-                    dob: data.dob || userData.dob,
-                    education: data.education !== undefined && data.education !== null ? data.education : userData.education,
+                    dob: u.dob || userData.dob,
+                    education: u.education !== undefined && u.education !== null ? u.education : userData.education,
                     // Backend stores profilePicture, frontend uses avatar internally
-                    avatar: data.profilePicture || data.avatar || userData.avatar,
-                    skills: data.skills || [],
-                    selectedPath: data.selectedPath || userData.selectedPath,
-                    selectedLevel: data.selectedLevel || userData.selectedLevel,
-                    createdAt: data.createdAt || null,
-                    interests: (data.interests && data.interests.length) ? data.interests
-                              : (data.careerInterests && data.careerInterests.length) ? data.careerInterests
+                    avatar: u.profilePicture || u.avatar || userData.avatar,
+                    skills: u.skills || [],
+                    selectedPath: u.selectedPath || userData.selectedPath,
+                    selectedLevel: u.selectedLevel || userData.selectedLevel,
+                    createdAt: u.createdAt || null,
+                    interests: (u.interests && u.interests.length) ? u.interests
+                              : (u.careerInterests && u.careerInterests.length) ? u.careerInterests
                               : userData.interests,
-                    careerGoal: data.careerGoal !== undefined ? data.careerGoal : userData.careerGoal,
-                    timeline: data.timeline !== undefined ? data.timeline : userData.timeline,
-                    weeklyHours: data.weeklyHours !== undefined ? data.weeklyHours : userData.weeklyHours,
-                    emailVerified: data.emailVerified || false,
-                    emailReportsEnabled: data.emailReportsEnabled || false
+                    careerGoal: u.careerGoal !== undefined ? u.careerGoal : userData.careerGoal,
+                    timeline: u.timeline !== undefined ? u.timeline : userData.timeline,
+                    weeklyHours: u.weeklyHours !== undefined ? u.weeklyHours : userData.weeklyHours,
+                    emailVerified: u.emailVerified || false,
+                    emailReportsEnabled: u.emailReportsEnabled || false
                 };
                 syncLocalStorage();
             } else {
@@ -122,7 +124,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     };
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Format DOB for display Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Format DOB for display ──
     const formatDOB = (dobStr) => {
         if (!dobStr) return '';
         try {
@@ -133,8 +135,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     };
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Render avatar (image or initials) into an element Ã¢â€â‚¬Ã¢â€â‚¬
-    const renderAvatarInto = (el, initials, asImg) => {
+    // ── Render avatar (image or initials) into an element ──
+    const renderAvatarInto = (el, initials) => {
         if (!el) return;
         if (userData.avatar) {
             el.innerHTML = `<img src="${userData.avatar}" alt="avatar">`;
@@ -143,12 +145,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     };
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Render Profile UI Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Render Profile UI ──
     const renderProfile = () => {
         const name = userData.name || 'User';
         const initials = name.trim().substring(0, 2).toUpperCase() || 'U';
 
-        // Avatar (large) Ã¢â‚¬â€ preserve the upload overlay
+        // Avatar (large) — preserve the upload overlay
         const avatarEl = document.getElementById('profile-avatar');
         if (avatarEl) {
             const overlay = '<div class="avatar-upload-overlay"><i class="fas fa-camera"></i></div>';
@@ -235,23 +237,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
 
-        // Stats Row
-        const xp = parseInt(localStorage.getItem('xyverra_xp') || '0', 10);
-        const streak = parseInt(localStorage.getItem('xyverra_user_streak') || '0', 10);
-        const score = parseInt(localStorage.getItem('xyverra_skill_score') || '0', 10);
-        let roadmapPct = 0;
-        try {
-            const completed = JSON.parse(localStorage.getItem('completedModules') || '[]');
-            roadmapPct = Math.min(Math.round((completed.length / 5) * 100), 100);
-        } catch (e) {}
-        const statXp = document.getElementById('stat-xp');
-        const statStreak = document.getElementById('stat-streak');
-        const statRoadmap = document.getElementById('stat-roadmap');
-        const statScore = document.getElementById('stat-score');
-        if (statXp) statXp.textContent = xp.toLocaleString();
-        if (statStreak) statStreak.textContent = streak;
-        if (statRoadmap) statRoadmap.textContent = `${roadmapPct}%`;
-        if (statScore) statScore.textContent = score;
+        // Stats Row: populated by fetchAndRenderStats() which fetches live data from the server.
+        // Values are NOT read from localStorage here to prevent stale data.
 
         // Interests
         const interestsContainer = document.getElementById('profile-interests-container');
@@ -331,7 +318,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     };
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Save to Backend Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Save to Backend ──
     const saveToServer = async (updates) => {
         try {
             const response = await fetch(`${API_BASE}/api/user/profile`, {
@@ -375,7 +362,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     };
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Validation helpers Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Validation helpers ──
     const setFieldError = (errId, inputId, msg) => {
         const errEl = document.getElementById(errId);
         const inputEl = inputId ? document.getElementById(inputId) : null;
@@ -407,10 +394,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         return null;
     };
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Pending avatar (data URL) before save Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Pending avatar (data URL) before save ──
     let pendingAvatar = undefined; // undefined = unchanged, '' = remove, string = new
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Build interest chips in modal Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Build interest chips in modal ──
     let modalInterests = [];
     const renderInterestChips = () => {
         const wrap = document.getElementById('edit-interests-chips');
@@ -438,7 +425,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         else prev.textContent = initials;
     };
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Open / close Edit Profile Modal Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Open / close Edit Profile Modal ──
     const editProfileModal = document.getElementById('edit-profile-modal');
 
     const openEditModal = () => {
@@ -485,7 +472,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (note) note.style.display = (e.target.value.trim().toLowerCase() !== (userData.email || '').toLowerCase()) ? 'block' : 'none';
     });
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Profile Picture: file pick (from modal button, hidden input, and avatar click) Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Profile Picture: file pick (from modal button, hidden input, and avatar click) ──
     const fileInput = document.getElementById('avatar-file-input');
 
     const handleFile = (file) => {
@@ -526,7 +513,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         updateAvatarPreview();
     });
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Save Profile Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Save Profile ──
     const saveProfileBtn = document.getElementById('save-profile-btn');
     saveProfileBtn?.addEventListener('click', async () => {
         const name = document.getElementById('edit-name').value.trim();
@@ -586,7 +573,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Change Password Modal Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Change Password Modal ──
     const changePasswordModal = document.getElementById('change-password-modal');
     const savePasswordBtn = document.getElementById('save-password-btn');
     const passwordAlert = document.getElementById('password-alert');
@@ -650,6 +637,107 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Initial Load Ã¢â€â‚¬Ã¢â€â‚¬
+    // ═══════════════════════════════════════════════════════════════
+    // STAT CARDS — Server-driven, live data only
+    // ═══════════════════════════════════════════════════════════════
+    //
+    // Root causes fixed:
+    //  - Total XP: was reading 'xyverra_xp' (only set on login). Now reads
+    //    'experienceRank' directly from /api/user/me response.
+    //  - Day Streak: was reading stale 'xyverra_user_streak'. Now reads
+    //    'dailyStreak' from DB.
+    //  - Roadmap Done: was using hardcoded `completedModules.length / 5`
+    //    (wrong formula, wrong divisor). Now matches against the user's actual
+    //    roadmap using ROADMAP_DATA, identical to Dashboard logic.
+    //  - Career Readiness Score: was reading 'xyverra_skill_score' (never
+    //    written anywhere!). Now reads 'readinessScore' recomputed server-side
+    //    by readiness.js via /api/user/me.
+    //
+    const fetchAndRenderStats = async () => {
+        try {
+            const resp = await fetch(`${API_BASE}/api/user/me`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!resp.ok) return;
+            const data = await resp.json();
+            if (!data.success || !data.user) return;
+            const u = data.user;
+
+            // — Sync localStorage so other pages that read it stay consistent —
+            if (typeof u.experienceRank === 'number') localStorage.setItem('xyverra_xp', String(u.experienceRank));
+            if (typeof u.dailyStreak === 'number')    localStorage.setItem('xyverra_user_streak', String(u.dailyStreak));
+            if (typeof u.readinessScore === 'number') localStorage.setItem('xyverra_readiness_score', String(u.readinessScore));
+            if (Array.isArray(u.completedModules))    localStorage.setItem('completedModules', JSON.stringify(u.completedModules));
+
+            // — Compute Roadmap Progress with the exact same logic as Dashboard —
+            let progressPct = 0;
+            const completedModules = Array.isArray(u.completedModules) ? u.completedModules : [];
+            const selectedPath = u.selectedPath || '';
+            let totalSteps = 12;
+            let completedCount = 0;
+
+            const matchedPathKey = (typeof ROADMAP_DATA !== 'undefined' && window.resolveRoadmapPathKey)
+                ? window.resolveRoadmapPathKey(selectedPath)
+                : selectedPath;
+
+            if (typeof ROADMAP_DATA !== 'undefined' && ROADMAP_DATA[matchedPathKey]) {
+                const pathData = ROADMAP_DATA[matchedPathKey];
+                totalSteps = pathData.length;
+                completedCount = pathData.filter(m => completedModules.includes(m.id)).length;
+            } else {
+                completedCount = completedModules.length;
+            }
+
+            progressPct = totalSteps > 0 ? Math.round((completedCount / totalSteps) * 100) : 0;
+
+            // — Populate the four cards —
+            const statXp      = document.getElementById('stat-xp');
+            const statStreak  = document.getElementById('stat-streak');
+            const statRoadmap = document.getElementById('stat-roadmap');
+            const statScore   = document.getElementById('stat-score');
+
+            if (statXp)      statXp.textContent      = (u.experienceRank || 0).toLocaleString();
+            if (statStreak)  statStreak.textContent   = u.dailyStreak || 0;
+            if (statRoadmap) statRoadmap.textContent  = progressPct + '%';
+            if (statScore)   statScore.textContent    = u.readinessScore || 0;
+
+        } catch (err) {
+            // Offline fallback: best-effort from localStorage
+            console.warn('Profile stats: server unreachable, using cached values.', err.message);
+            const statXp      = document.getElementById('stat-xp');
+            const statStreak  = document.getElementById('stat-streak');
+            const statRoadmap = document.getElementById('stat-roadmap');
+            const statScore   = document.getElementById('stat-score');
+            if (statXp)      statXp.textContent      = parseInt(localStorage.getItem('xyverra_xp') || '0', 10).toLocaleString();
+            if (statStreak)  statStreak.textContent   = parseInt(localStorage.getItem('xyverra_user_streak') || '0', 10);
+            if (statScore)   statScore.textContent    = parseInt(localStorage.getItem('xyverra_readiness_score') || '0', 10);
+            try {
+                // Try to derive progress if possible, otherwise fallback to 0%
+                if (statRoadmap) statRoadmap.textContent = '0%';
+            } catch (e) {}
+        }
+    };
+
+    // ── Real-time cross-page sync via storage events ──
+    // When the user completes a lesson/quiz on the Study or Roadmap page (in another
+    // tab or after navigating back), those pages write updated values to localStorage.
+    // The 'storage' event fires on all other open tabs so the Profile cards update
+    // immediately without a page refresh.
+    const STAT_KEYS = new Set([
+        'xyverra_xp', 'xyverra_user_streak', 'xyverra_readiness_score',
+        'completedModules', 'xyverra_quiz_scores'
+    ]);
+    window.addEventListener('storage', (e) => {
+        if (STAT_KEYS.has(e.key)) {
+            // Re-fetch from server to always display the authoritative DB value
+            fetchAndRenderStats();
+        }
+    });
+
+    // ── Initial Load ──
+    // fetchUserProfile renders the profile card/text data immediately.
+    // fetchAndRenderStats is called separately (and in parallel) so the stat
+    // cards are populated with live server values as soon as /api/user/me responds.
     await fetchUserProfile();
+    fetchAndRenderStats();
 });
