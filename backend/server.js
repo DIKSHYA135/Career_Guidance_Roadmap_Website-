@@ -12,10 +12,16 @@ const jwt = require('jsonwebtoken');
 const { Resend } = require('resend');
 const nodemailer = require('nodemailer');
 const { body, validationResult } = require('express-validator');
-const testRoutes = require('./routes/testRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+
+const subscriptionRoutes = require('./routes/subscriptionRoutes');
+const progressRoutes = require('./routes/progressRoutes');
 const interviewRoutes = require('./routes/interviewRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const testRoutes = require('./routes/testRoutes');
+const { recomputeAndSaveReadiness, getReadinessLabel } = require('./utils/readiness');
+const { isSubscriptionActive } = require('./utils/subscriptionUtils');
 const Notification = require('./models/Notification');
 const emailService = require('./services/emailService');
 const User = require('./models/User');
@@ -24,8 +30,7 @@ const Subscription = require('./models/Subscription');
 const Transaction = require('./models/Transaction');
 const ActivityLog = require('./models/ActivityLog');
 const authMiddleware = require('./middleware/authMiddleware');
-const adminRoutes = require('./routes/adminRoutes');
-const { recomputeAndSaveReadiness, getReadinessLabel } = require('./utils/readiness');
+
 
 // Admin middleware — only allows users with isAdmin flag
 const adminMiddleware = async (req, res, next) => {
@@ -180,12 +185,14 @@ app.use('/api/', apiLimiter);
 app.use('/api/subscription', require('./routes/subscriptionRoutes'));
 app.use('/api/progress', require('./routes/progressRoutes'));
 app.use('/api/interview', interviewRoutes);
+app.use('/api/ai-chat', require('./routes/aiChatRoutes'));
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/admin', authMiddleware, adminMiddleware, adminRoutes);
 
 // Dev/Test route to reset a user's subscription back to free tier.
 app.use('/api/test', testRoutes);
+
 
 
 // ==========================
@@ -258,17 +265,7 @@ function computeStreak(currentStreak, lastLoginDate, now) {
     return newStreak;
 }
 
-// Returns true if the user currently has an active (non-expired) chat subscription.
-function isSubscriptionActive(user) {
-    const hasLegacySub = user.chatSubscriptionActive && 
-        (!user.chatSubscriptionExpiry || new Date(user.chatSubscriptionExpiry).getTime() > Date.now());
-        
-    const hasNewSub = user.activeSubscription && 
-        user.activeSubscription.status === 'active' && 
-        new Date(user.activeSubscription.endDate).getTime() > Date.now();
 
-    return hasLegacySub || hasNewSub;
-}
 
 // Build the standard user payload returned to clients (never includes password).
 function buildUserPayload(user) {
@@ -281,10 +278,13 @@ function buildUserPayload(user) {
         skills: user.skills,
         competencyScore: user.competencyScore,
         experienceRank: user.experienceRank,
+        readinessScore: user.readinessScore || 0,
         dailyStreak: user.dailyStreak,
         lastActivePage: user.lastActivePage,
         quizScores: user.quizScores,
         completedModules: user.completedModules,
+        completedRoadmaps: user.completedRoadmaps || [],
+        completedLessons: user.completedLessons || [],
         onboardingCompleted: user.onboardingCompleted || false,
         interests: user.interests || [],
         emailVerified: user.emailVerified || false,
@@ -967,15 +967,14 @@ User Context:
 - Current Level: ${userContext.selectedLevel || 'Not specified'}
 - Skills: ${(userContext.skills || []).join(', ') || 'Not specified'}
 
-Your role:
-1. Provide specific, actionable career guidance
-2. Suggest learning resources, roadmaps, and timelines
-3. Help with interview prep, portfolio building, and job searching
-4. Be encouraging, professional, and concise
-5. Always relate advice to their specific career path when possible
-6. Format responses with **bold** for key terms and - bullet points for lists
+CRITICAL INSTRUCTIONS:
+1. You MUST ONLY answer questions related to the following topics: career guidance, skills, learning paths, job roles, resumes, interview preparation, certifications, career roadmaps, education, internships, and professional development.
+2. If the user asks about ANYTHING else (e.g., movies, politics, jokes, math homework, general coding unrelated to career, random conversations, general trivia), you MUST politely refuse.
+3. If you refuse, you MUST reply with this exact phrase and nothing else:
+"I'm Xyverra's Career Mentor AI. I can only help with career guidance, learning paths, skills, resumes, interviews, and professional growth. Please ask a career-related question."
+4. Do not hallucinate or attempt to answer unrelated prompts.
 
-Keep responses concise (2-4 paragraphs max). Be warm, encouraging, and practical.`;
+When answering valid questions, be encouraging, professional, and concise. Format responses with **bold** for key terms and - bullet points for lists.`;
 
     const messages = [
         { role: 'system', content: systemPrompt },
@@ -1342,14 +1341,14 @@ app.post('/api/user/save-skills', authMiddleware, async (req, res) => {
 // ==========================
 // GET PROFILE
 // ==========================
+
 app.get('/api/user/profile', authMiddleware, async (req, res) => {
     try {
-        const user = await User.findById(req.user.userId)
-            .select('-password -emailVerificationOTP -emailVerificationExpiry');
+        const user = await User.findById(req.user.userId).populate('activeSubscription');
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
-        res.json({ success: true, user });
+        res.json({ success: true, user: buildUserPayload(user) });
     } catch (error) {
         return serverError(res, 'Get Profile Error', error);
     }
@@ -1358,8 +1357,7 @@ app.get('/api/user/profile', authMiddleware, async (req, res) => {
 // Alias: /api/user/me → same as /api/user/profile (used by dashboard.js)
 app.get('/api/user/me', authMiddleware, async (req, res) => {
     try {
-        const user = await User.findById(req.user.userId)
-            .select('-password -emailVerificationOTP -emailVerificationExpiry');
+        const user = await User.findById(req.user.userId).populate('activeSubscription');
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
@@ -1367,7 +1365,7 @@ app.get('/api/user/me', authMiddleware, async (req, res) => {
         // the Job Readiness Score accurate even if it went stale (e.g. leftover
         // from before a roadmap switch) without waiting on a quiz/lesson event.
         user.readinessScore = await recomputeAndSaveReadiness(req.user.userId);
-        res.json({ success: true, user });
+        res.json({ success: true, user: buildUserPayload(user) });
     } catch (error) {
         return serverError(res, 'Get Me Error', error);
     }
@@ -1449,7 +1447,8 @@ app.post('/api/user/save-quiz', authMiddleware, async (req, res) => {
         user.quizScores.set(quizKey, score);
 
         // Atomic XP increment to avoid race conditions — apply via $inc after save
-        const xpGain = 50 + Math.floor(score / 2);
+        // Scaled to a max of 10 XP for a skill assessment
+        const xpGain = Math.round((score / 100) * 10);
 
         // Re-calculate competency score (average of all quizzes with score >= 80)
         let totalScore = 0;

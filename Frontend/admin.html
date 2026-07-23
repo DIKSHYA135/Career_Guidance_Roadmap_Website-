@@ -72,6 +72,14 @@
             <i class="fas fa-crown"></i> Premium
         </a>
 
+        <div class="nav-section-label">AI & Interviews</div>
+        <a href="#" class="nav-link" data-target="panel-interview-history">
+            <i class="fas fa-microphone-lines"></i> Interview History
+        </a>
+        <a href="#" class="nav-link" data-target="panel-ai-chat-history">
+            <i class="fas fa-comments"></i> AI Chat History
+        </a>
+
         <div class="nav-section-label">System</div>
         <a href="#" class="nav-link" data-target="panel-settings">
             <i class="fas fa-gear"></i> Settings
@@ -158,6 +166,24 @@
                 <div class="stat-details">
                     <h3>Revenue (NPR)</h3>
                     <p class="val" id="stat-revenue">—</p>
+                </div>
+            </div>
+            <div class="glass-card stat-card">
+                <div class="stat-icon" style="background:var(--color-yellow-bg,#fef3c7);color:#d97706;">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>AI Conversations</h3>
+                    <p class="val" id="stat-ai-conversations">—</p>
+                </div>
+            </div>
+            <div class="glass-card stat-card">
+                <div class="stat-icon" style="background:#ede9fe;color:#7c3aed;">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>Interviews Today</h3>
+                    <p class="val" id="stat-interviews-today">—</p>
                 </div>
             </div>
         </div>
@@ -743,6 +769,113 @@
             <h3 style="font-size: 1.1rem; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 10px;">Activity Logs</h3>
             <div id="ud-activity" style="max-height: 200px; overflow-y: auto; background: #f8fafc; border-radius: 6px; padding: 10px; border: 1px solid #e2e8f0; font-size: 0.95rem; color: #334155;"></div>
         </div>
+    </div>
+</div>
+
+<!-- ── INTERVIEW HISTORY PANEL ── -->
+<div id="panel-interview-history" class="admin-panel">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Interview History</h1>
+            <p class="page-subtitle">All mock interview sessions across the platform.</p>
+        </div>
+    </div>
+    <div class="glass-card">
+        <div class="toolbar" style="flex-wrap:wrap;gap:0.75rem;">
+            <div class="search-box">
+                <i class="fas fa-magnifying-glass"></i>
+                <input type="text" id="int-search" placeholder="Search by name or email…">
+            </div>
+            <select id="int-filter-type" class="btn btn-outline btn-sm" style="padding:0.45rem 0.75rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-surface);color:var(--text);">
+                <option value="">All Types</option>
+                <option value="Technical">Technical</option>
+                <option value="HR">HR</option>
+                <option value="Behavioral">Behavioral</option>
+                <option value="Mixed">Mixed</option>
+            </select>
+            <select id="int-filter-status" class="btn btn-outline btn-sm" style="padding:0.45rem 0.75rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-surface);color:var(--text);">
+                <option value="">All Statuses</option>
+                <option value="completed">Completed</option>
+                <option value="in-progress">In Progress</option>
+                <option value="abandoned">Abandoned</option>
+            </select>
+            <input type="date" id="int-filter-date" class="btn btn-outline btn-sm" style="padding:0.45rem 0.75rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-surface);color:var(--text);">
+            <button class="btn btn-primary btn-sm" id="int-apply-filters"><i class="fas fa-filter"></i> Apply</button>
+        </div>
+        <div class="table-container" style="margin-top:1rem;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Job Role</th>
+                        <th>Type</th>
+                        <th>Difficulty</th>
+                        <th>Score</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="int-history-tbody">
+                    <tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--text-muted);"><i class="fas fa-spinner fa-spin"></i>&nbsp; Loading…</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="int-pagination" style="display:flex;justify-content:center;gap:0.5rem;margin-top:1rem;"></div>
+    </div>
+</div>
+
+<!-- ── AI CHAT HISTORY PANEL ── -->
+<div id="panel-ai-chat-history" class="admin-panel">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">AI Chat History</h1>
+            <p class="page-subtitle">All AI counselor conversations logged from the platform.</p>
+        </div>
+    </div>
+    <div class="glass-card">
+        <div class="toolbar" style="flex-wrap:wrap;gap:0.75rem;">
+            <div class="search-box">
+                <i class="fas fa-magnifying-glass"></i>
+                <input type="text" id="chat-search" placeholder="Search by name or email…">
+            </div>
+            <select id="chat-filter-tier" class="btn btn-outline btn-sm" style="padding:0.45rem 0.75rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-surface);color:var(--text);">
+                <option value="">All Tiers</option>
+                <option value="free">Free</option>
+                <option value="pro">Pro</option>
+            </select>
+            <input type="date" id="chat-filter-date" class="btn btn-outline btn-sm" style="padding:0.45rem 0.75rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-surface);color:var(--text);">
+            <button class="btn btn-primary btn-sm" id="chat-apply-filters"><i class="fas fa-filter"></i> Apply</button>
+        </div>
+        <div class="table-container" style="margin-top:1rem;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Tier</th>
+                        <th>Messages</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="chat-history-tbody">
+                    <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted);"><i class="fas fa-spinner fa-spin"></i>&nbsp; Loading…</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="chat-pagination" style="display:flex;justify-content:center;gap:0.5rem;margin-top:1rem;"></div>
+    </div>
+</div>
+
+<!-- ── TRANSCRIPT MODALS ── -->
+<div id="transcript-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;overflow-y:auto;">
+    <div style="background:var(--bg-surface);max-width:720px;margin:2rem auto;border-radius:var(--radius-xl);padding:2rem;position:relative;">
+        <button onclick="document.getElementById('transcript-modal').style.display='none'" style="position:absolute;top:1rem;right:1rem;background:transparent;border:none;font-size:1.4rem;cursor:pointer;color:var(--text-muted);"><i class="fas fa-times"></i></button>
+        <h2 id="transcript-modal-title" style="margin-bottom:1.5rem;font-size:1.25rem;">Transcript</h2>
+        <div id="transcript-modal-body" style="max-height:65vh;overflow-y:auto;"></div>
     </div>
 </div>
 

@@ -1,27 +1,29 @@
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { isSubscriptionActive } = require('../utils/subscriptionUtils');
 
 const proAuthMiddleware = async (req, res, next) => {
     try {
-        const user = await User.findById(req.user.userId).populate('activeSubscription');
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({ success: false, message: 'Authentication required' });
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.userId).populate('activeSubscription');
         
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
-        // We check if the user has an active subscription either via activeSubscription 
-        // or the legacy chatSubscriptionActive field.
-        const hasLegacySub = user.chatSubscriptionActive && 
-            (!user.chatSubscriptionExpiry || new Date(user.chatSubscriptionExpiry).getTime() > Date.now());
-            
-        const hasNewSub = user.activeSubscription && 
-            user.activeSubscription.status === 'active' && 
-            new Date(user.activeSubscription.endDate).getTime() > Date.now();
-
-        if (!hasLegacySub && !hasNewSub) {
+        // Live check against the database
+        if (!isSubscriptionActive(user)) {
+            // Include isPro in the response so the frontend knows it was revoked
             return res.status(403).json({ 
                 success: false, 
-                message: 'This feature requires a Pro subscription.',
-                requiresPro: true 
+                requiresPro: true,
+                isPro: false,
+                message: 'Active Xyverra Pro subscription required'
             });
         }
 

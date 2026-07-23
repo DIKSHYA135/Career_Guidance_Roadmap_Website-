@@ -7,9 +7,16 @@ const interviewSessionSchema = new mongoose.Schema({
         required: true,
         index: true
     },
-    jobRole: {
+    jobRole: { type: String, required: true, index: true },
+    interviewType: {
         type: String,
-        required: true
+        enum: ['Technical', 'HR', 'Behavioral', 'Mixed'],
+        default: 'Mixed'
+    },
+    difficulty: {
+        type: String,
+        enum: ['Beginner', 'Intermediate', 'Advanced'],
+        default: 'Intermediate'
     },
     questionsAsked: [{
         question: String,
@@ -17,14 +24,17 @@ const interviewSessionSchema = new mongoose.Schema({
         aiFeedback: String,
         score: Number
     }],
-    overallScore: {
-        type: Number,
-        default: 0
-    },
-    completed: {
-        type: Boolean,
-        default: false
+    overallScore: { type: Number, default: 0 },
+    durationSeconds: { type: Number, default: 0 },
+    startedAt: { type: Date, default: Date.now },
+    status: {
+        type: String,
+        enum: ['in-progress', 'completed', 'abandoned'],
+        default: 'in-progress'
     }
 }, { timestamps: true });
+
+// Index for admin queries
+interviewSessionSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model('InterviewSession', interviewSessionSchema);

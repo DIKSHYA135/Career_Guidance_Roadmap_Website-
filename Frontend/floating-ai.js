@@ -1,9 +1,15 @@
 /* =========================================================
    floating-ai.js
-   Injects a floating AI Counselor widget into the page
+   Injects a floating AI Counselor widget into the page.
+   Every conversation is persisted to the database via
+   /api/ai-chat/* endpoints for admin oversight.
    ========================================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
+    const API_BASE = 'http://localhost:5000';
+    let conversationId = null;
+    let isProcessing = false;
+
     // 1. Inject HTML and CSS
     const widgetHTML = `
         <!-- Floating AI Button -->
@@ -16,13 +22,16 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="ai-chat-header">
                 <div>
                     <i class="fas fa-robot"></i>
-                    <span>XYVEERA Assistant</span>
+                    <span>XYVERRA Assistant</span>
                 </div>
-                <button id="ai-chat-close"><i class="fas fa-times"></i></button>
+                <div style="display:flex;gap:0.5rem;align-items:center;">
+                    <span id="ai-chat-status" style="font-size:0.7rem;background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:20px;">Online</span>
+                    <button id="ai-chat-close"><i class="fas fa-times"></i></button>
+                </div>
             </div>
             <div class="ai-chat-body" id="ai-chat-body">
                 <div class="ai-message ai">
-                    Hi! I'm your learning companion. Do you have any questions about this module or your roadmap?
+                    Hi! I'm your Xyverra AI Career Counselor. Ask me anything about your roadmap, career path, or skills!
                 </div>
             </div>
             <div class="ai-chat-footer">
@@ -103,48 +112,56 @@ document.addEventListener('DOMContentLoaded', () => {
             
             .ai-chat-body {
                 flex: 1;
-                padding: 1rem;
                 overflow-y: auto;
+                padding: 1rem;
                 display: flex;
                 flex-direction: column;
-                gap: 1rem;
-                background: var(--bg-surface-solid);
+                gap: 0.75rem;
             }
+            
             .ai-message {
-                max-width: 85%;
-                padding: 0.8rem 1rem;
-                border-radius: var(--radius-lg);
+                padding: 0.75rem 1rem;
+                border-radius: 12px;
                 font-size: 0.9rem;
-                line-height: 1.4;
-            }
-            .ai-message.ai {
-                background: var(--bg-surface);
-                border: 1px solid var(--border);
-                align-self: flex-start;
-                border-bottom-left-radius: 4px;
+                line-height: 1.5;
+                max-width: 88%;
+                word-wrap: break-word;
             }
             .ai-message.user {
-                background: var(--primary);
+                background: linear-gradient(135deg, var(--primary), var(--accent));
                 color: white;
                 align-self: flex-end;
                 border-bottom-right-radius: 4px;
             }
-            
+            .ai-message.ai {
+                background: var(--bg-card, #f8fafc);
+                color: var(--text, #1e293b);
+                align-self: flex-start;
+                border-bottom-left-radius: 4px;
+                border: 1px solid var(--border, #e2e8f0);
+            }
+            .ai-message.thinking {
+                opacity: 0.6;
+                font-style: italic;
+            }
+
             .ai-chat-footer {
-                padding: 1rem;
+                padding: 0.75rem 1rem;
                 border-top: 1px solid var(--border);
                 display: flex;
                 gap: 0.5rem;
-                background: var(--bg-surface);
+                align-items: center;
             }
             .ai-chat-footer input {
                 flex: 1;
-                padding: 0.8rem 1rem;
+                padding: 0.6rem 0.9rem;
                 border: 1px solid var(--border);
-                border-radius: var(--radius-full);
+                border-radius: 20px;
+                font-size: 0.9rem;
                 outline: none;
+                background: var(--bg-input, #f8fafc);
+                color: var(--text);
                 transition: border-color 0.2s;
-                font-family: inherit;
             }
             .ai-chat-footer input:focus { border-color: var(--primary); }
             .ai-chat-footer button {
@@ -158,57 +175,132 @@ document.addEventListener('DOMContentLoaded', () => {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                transition: transform 0.2s;
+                transition: transform 0.2s, opacity 0.2s;
             }
             .ai-chat-footer button:hover { transform: scale(1.05); }
+            .ai-chat-footer button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
         </style>
     `;
 
     document.body.insertAdjacentHTML('beforeend', widgetHTML);
 
-    // 2. Add Logic
-    const btn = document.getElementById('ai-floating-btn');
-    const chat = document.getElementById('ai-floating-chat');
-    const closeBtn = document.getElementById('ai-chat-close');
-    const sendBtn = document.getElementById('ai-chat-send');
-    const input = document.getElementById('ai-chat-input');
-    const body = document.getElementById('ai-chat-body');
+    // 2. Elements
+    const btn       = document.getElementById('ai-floating-btn');
+    const chat      = document.getElementById('ai-floating-chat');
+    const closeBtn  = document.getElementById('ai-chat-close');
+    const sendBtn   = document.getElementById('ai-chat-send');
+    const input     = document.getElementById('ai-chat-input');
+    const body      = document.getElementById('ai-chat-body');
+    const statusEl  = document.getElementById('ai-chat-status');
 
-    btn.addEventListener('click', () => {
+    // 3. Toggle open/close
+    btn.addEventListener('click', async () => {
         chat.classList.toggle('active');
-        if (chat.classList.contains('active')) input.focus();
+        if (chat.classList.contains('active')) {
+            input.focus();
+            if (!conversationId) await startConversation();
+        }
     });
 
-    closeBtn.addEventListener('click', () => chat.classList.remove('active'));
+    closeBtn.addEventListener('click', async () => {
+        chat.classList.remove('active');
+        if (conversationId) await endConversation();
+    });
 
-    function sendMessage() {
+    // 4. Start a conversation on the backend
+    async function startConversation() {
+        const token = localStorage.getItem('token');
+        if (!token) return; // Not logged in — widget still works but won't log
+
+        try {
+            const res = await fetch(`${API_BASE}/api/ai-chat/start`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+            });
+            const data = await res.json();
+            if (data.success) conversationId = data.conversationId;
+        } catch (e) {
+            console.warn('AI chat: could not start conversation (offline?)');
+        }
+    }
+
+    async function endConversation() {
+        const token = localStorage.getItem('token');
+        if (!token || !conversationId) return;
+        try {
+            await fetch(`${API_BASE}/api/ai-chat/end`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ conversationId })
+            });
+            conversationId = null;
+        } catch (e) { /* silent */ }
+    }
+
+    // 5. Send message
+    async function sendMessage() {
+        if (isProcessing) return;
         const text = input.value.trim();
         if (!text) return;
 
-        // User message
-        body.insertAdjacentHTML('beforeend', \`<div class="ai-message user">\${text}</div>\`);
+        // Append user message
+        appendMessage(text, 'user');
         input.value = '';
+        isProcessing = true;
+        sendBtn.disabled = true;
+        statusEl.textContent = 'Thinking…';
+
+        // Show typing indicator
+        const thinkingId = 'think-' + Date.now();
+        body.insertAdjacentHTML('beforeend',
+            `<div class="ai-message ai thinking" id="${thinkingId}"><i class="fas fa-ellipsis-h"></i></div>`);
         body.scrollTop = body.scrollHeight;
 
-        // Mock AI thinking
-        setTimeout(() => {
-            const aiId = 'msg-' + Date.now();
-            body.insertAdjacentHTML('beforeend', \`<div class="ai-message ai" id="\${aiId}"><i class="fas fa-ellipsis-h" style="animation: pulse 1s infinite;"></i></div>\`);
-            body.scrollTop = body.scrollHeight;
+        const token = localStorage.getItem('token');
 
-            // Mock AI response
-            setTimeout(() => {
-                const aiMsg = document.getElementById(aiId);
-                if (aiMsg) {
-                    aiMsg.innerHTML = "That's a great question! I'm here to help you understand the concepts in your roadmap. Could you specify which part you are struggling with?";
-                    body.scrollTop = body.scrollHeight;
-                }
-            }, 1200);
-        }, 500);
+        try {
+            let aiText = null;
+
+            if (token && conversationId) {
+                // Real API call with persistence
+                const res = await fetch(`${API_BASE}/api/ai-chat/message`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ conversationId, message: text })
+                });
+                const data = await res.json();
+                if (data.success) aiText = data.response;
+            }
+
+            // Fallback if not logged in or API error
+            if (!aiText) {
+                aiText = "I'm here to help with your career journey! For personalized guidance, please make sure you're logged in.";
+            }
+
+            const thinkingEl = document.getElementById(thinkingId);
+            if (thinkingEl) thinkingEl.remove();
+            appendMessage(aiText, 'ai');
+
+        } catch (err) {
+            const thinkingEl = document.getElementById(thinkingId);
+            if (thinkingEl) thinkingEl.remove();
+            appendMessage("Sorry, I'm having trouble connecting right now. Please try again in a moment.", 'ai');
+        } finally {
+            isProcessing = false;
+            sendBtn.disabled = false;
+            statusEl.textContent = 'Online';
+        }
+    }
+
+    function appendMessage(text, sender) {
+        body.insertAdjacentHTML('beforeend', `<div class="ai-message ${sender}">${escapeHtml(text)}</div>`);
+        body.scrollTop = body.scrollHeight;
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
 
     sendBtn.addEventListener('click', sendMessage);
-    input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
-    });
+    input.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
 });

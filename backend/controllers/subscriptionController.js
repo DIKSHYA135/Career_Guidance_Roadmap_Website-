@@ -205,9 +205,14 @@ exports.cancelSubscription = async (req, res) => {
         subscription.status = 'cancelled';
         await subscription.save();
 
+        // Clear ALL subscription flags on the user.
+        // This is critical: clearing chatSubscriptionExpiry prevents the legacy
+        // isSubscriptionActive check from still granting access for the remainder
+        // of the original billing period after a manual cancellation.
         await User.findByIdAndUpdate(req.user.userId, {
             chatSubscriptionActive: false,
-            activeSubscription: null
+            activeSubscription: null,
+            chatSubscriptionExpiry: null
         });
 
         res.json({ success: true, message: 'Subscription successfully cancelled' });

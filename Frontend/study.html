@@ -274,11 +274,17 @@
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
             if (!token || !completionKey) return;
             try {
-                await fetch('http://localhost:5000/api/progress/mark-lesson-complete', {
+                const res = await fetch('http://localhost:5000/api/progress/mark-lesson-complete', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                     body: JSON.stringify({ courseId: completionKey })
                 });
+                const data = await res.json();
+                if (data && data.success) {
+                    if (typeof data.readinessScore === 'number') localStorage.setItem('xyverra_readiness_score', String(data.readinessScore));
+                    if (typeof data.experienceRank === 'number') localStorage.setItem('xyverra_xp', String(data.experienceRank));
+                    if (Array.isArray(data.completedRoadmaps)) localStorage.setItem('completedRoadmaps', JSON.stringify(data.completedRoadmaps));
+                }
             } catch (e) {
                 console.warn('Failed to persist lesson completion to server:', e);
             }

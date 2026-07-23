@@ -11125,6 +11125,30 @@ document.addEventListener("DOMContentLoaded", () => {
                 const data = await res.json();
                 if (data.success) {
                     passed = data.passed;
+
+                    // ── Sync XP to localStorage immediately ──────────────────
+                    // The backend awards XP on first pass and returns the new
+                    // experienceRank. Writing it here keeps the Profile and
+                    // Dashboard stat cards in sync without a page refresh.
+                    if (typeof data.experienceRank === 'number') {
+                        localStorage.setItem('xyverra_xp', String(data.experienceRank));
+                    }
+                    if (typeof data.readinessScore === 'number') {
+                        localStorage.setItem('xyverra_readiness_score', String(data.readinessScore));
+                    }
+                    if (Array.isArray(data.completedRoadmaps)) {
+                        localStorage.setItem('completedRoadmaps', JSON.stringify(data.completedRoadmaps));
+                    }
+                    // Show XP earned notification on EVERY attempt now
+                    if (data.xpAwarded > 0) {
+                        const xpMsg = `+${data.xpAwarded} XP earned! 🎉`;
+                        // Use the global toast if available, else console.log
+                        if (typeof window.showToast === 'function') {
+                            window.showToast(xpMsg, 'success');
+                        } else {
+                            console.info(xpMsg);
+                        }
+                    }
                 }
             } catch (err) {
                 console.error('Error submitting quiz to backend:', err);
