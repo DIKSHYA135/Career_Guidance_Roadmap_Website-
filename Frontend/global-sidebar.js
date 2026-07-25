@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Call server logout endpoint (non-blocking) before clearing state
         const token = localStorage.getItem('token');
         if (token) {
-            fetch('http://localhost:5000/api/auth/logout', {
+            fetch((window.XYVERRA_CONFIG?.API_BASE || 'http://localhost:5000') + '/api/auth/logout', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
             }).catch(() => {});

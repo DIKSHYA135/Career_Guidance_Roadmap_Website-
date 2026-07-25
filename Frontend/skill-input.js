@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function syncToBackend(path, level) {
         const token = localStorage.getItem('token');
         if (!token) return;
-        fetch('http://localhost:5000/api/user/save-onboarding', {
+        fetch((window.XYVERRA_CONFIG?.API_BASE || 'http://localhost:5000') + '/api/user/save-onboarding', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({

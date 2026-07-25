@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // network request instead of two independent, redundant ones.
     window.xyFetchUserMe = window.xyFetchUserMe || function(token) {
         if (!window.__xyMePromise) {
-            window.__xyMePromise = fetch('http://localhost:5000/api/user/me', {
+            window.__xyMePromise = fetch((window.XYVERRA_CONFIG?.API_BASE || 'http://localhost:5000') + '/api/user/me', {
                 headers: { 'Authorization': 'Bearer ' + token }
             }).then(r => r.ok ? r.json() : null).catch(() => null);
         }

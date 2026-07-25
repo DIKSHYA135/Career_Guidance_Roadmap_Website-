@@ -210,7 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (progressBar) progressBar.style.width = `${progress}%`;
             }, 100);
 
-            const response = await fetch("http://localhost:5000/api/auth/login", {
+            const response = await fetch((window.XYVERRA_CONFIG?.API_BASE || 'http://localhost:5000') + "/api/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password: cleanPassword }),

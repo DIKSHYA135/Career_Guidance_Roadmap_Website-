@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    const API_BASE = 'http://localhost:5000';
+    const API_BASE = (window.XYVERRA_CONFIG?.API_BASE || 'http://localhost:5000');
 
     // Master list of selectable interests
     const INTEREST_OPTIONS = [

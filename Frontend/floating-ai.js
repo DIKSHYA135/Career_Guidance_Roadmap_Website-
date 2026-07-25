@@ -6,7 +6,7 @@
    ========================================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
-    const API_BASE = 'http://localhost:5000';
+    const API_BASE = (window.XYVERRA_CONFIG?.API_BASE || 'http://localhost:5000');
     let conversationId = null;
     let isProcessing = false;
 

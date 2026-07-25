@@ -6,7 +6,7 @@
 (function NotificationSystem() {
     'use strict';
 
-    const API_BASE  = 'http://localhost:5000/api/notifications';
+    const API_BASE  = (window.XYVERRA_CONFIG?.API_BASE || 'http://localhost:5000') + '/api/notifications';
     const POLL_MS   = 60_000; // refresh every 60 seconds
     const TYPE_ICONS = {
         success: 'fas fa-check-circle',

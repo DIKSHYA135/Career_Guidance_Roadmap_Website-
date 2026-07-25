@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     if (token) {
         try {
-            const res = await fetch('http://localhost:5000/api/user/me', {
+            const res = await fetch((window.XYVERRA_CONFIG?.API_BASE || 'http://localhost:5000') + '/api/user/me', {
                 headers: { 'Authorization': 'Bearer ' + token }
             });
             if (res.ok) {

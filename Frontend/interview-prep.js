@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    const API_BASE = (window.XYVERRA_CONFIG?.API_BASE || 'http://localhost:5000');
     let targetCareer = localStorage.getItem('xyverra_selected_path') || 'General Software Engineering';
     document.getElementById('int-career-goal').textContent = targetCareer;
 
@@ -64,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const fetchHistory = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/interview/history', {
+            const res = await fetch(`${API_BASE}/api/interview/history`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -125,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const difficultyEl = document.getElementById('int-difficulty-select');
             const difficulty = difficultyEl ? difficultyEl.value : 'Intermediate';
 
-            const res = await fetch('http://localhost:5000/api/interview/start', {
+            const res = await fetch(`${API_BASE}/api/interview/start`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -193,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const qId = questions[currentQuestionIndex]._id;
-            await fetch(`http://localhost:5000/api/interview/${currentSessionId}/answer`, {
+            await fetch(`${API_BASE}/api/interview/${currentSessionId}/answer`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -223,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const durationSeconds = sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : 0;
 
         try {
-            const res = await fetch(`http://localhost:5000/api/interview/${currentSessionId}/complete`, {
+            const res = await fetch(`${API_BASE}/api/interview/${currentSessionId}/complete`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ durationSeconds })

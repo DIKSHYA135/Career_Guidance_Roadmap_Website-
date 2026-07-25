@@ -13,7 +13,8 @@ function getReadinessLabel(score) {
 window.viewUserDetails = async (userId) => {
     try {
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-        const res = await fetch(`http://localhost:5000/api/admin/user/${userId}/detailed`, {
+        const _adminBase = (window.XYVERRA_CONFIG?.API_BASE || 'http://localhost:5000');
+        const res = await fetch(`${_adminBase}/api/admin/user/${userId}/detailed`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
@@ -209,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('admin-initial').textContent = adminName.charAt(0).toUpperCase();
 
     const token = localStorage.getItem('token');
-    const API_URL = 'http://localhost:5000/api/admin';
+    const API_URL = (window.XYVERRA_CONFIG?.API_BASE || 'http://localhost:5000') + '/api/admin';
 
     // Navigation Logic
     const navLinks = document.querySelectorAll('.nav-link[data-target]');

@@ -25,7 +25,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('an-career-target').textContent = targetCareer;
 
     try {
-        const res = await fetch('http://localhost:5000/api/analytics/dashboard', {
+        const API_BASE = (window.XYVERRA_CONFIG?.API_BASE || 'http://localhost:5000');
+        const res = await fetch(`${API_BASE}/api/analytics/dashboard`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();

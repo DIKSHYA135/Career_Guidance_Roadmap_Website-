@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function syncFromServer() {
         const token = localStorage.getItem('token');
         if (!token) return;
-        const fetchMe = window.xyFetchUserMe || (t => fetch('http://localhost:5000/api/user/me', {
+        const fetchMe = window.xyFetchUserMe || (t => fetch((window.XYVERRA_CONFIG?.API_BASE || 'http://localhost:5000') + '/api/user/me', {
             headers: { 'Authorization': 'Bearer ' + t }
         }).then(r => r.ok ? r.json() : null).catch(() => null));
         fetchMe(token)

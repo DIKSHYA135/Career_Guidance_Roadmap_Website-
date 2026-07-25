@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 // Determine API base URL
                 const IS_DEV = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-                const API_BASE = IS_DEV ? 'http://localhost:5000' : 'https://api.xyverra.com';
+                const API_BASE = IS_DEV ? 'http://localhost:5000' : (window.XYVERRA_CONFIG?.API_BASE || 'http://localhost:5000');
 
                 const response = await fetch(`${API_BASE}/api/leads/subscribe`, {
                     method: 'POST',
