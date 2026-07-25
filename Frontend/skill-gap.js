@@ -26,7 +26,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('sg-last-updated').textContent = today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
     try {
-        const userRes = await fetch('http://localhost:5000/api/user/me', {
+        const API_BASE = (window.XYVERRA_CONFIG?.API_BASE || 'http://localhost:5000');
+        const userRes = await fetch(`${API_BASE}/api/user/me`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const userData = await userRes.json();
@@ -49,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function fetchSkillGapData(token, targetCareer) {
     try {
-        const res = await fetch('http://localhost:5000/api/progress/skill-gap', {
+        const res = await fetch(`${(window.XYVERRA_CONFIG?.API_BASE || 'http://localhost:5000')}/api/progress/skill-gap`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const result = await res.json();

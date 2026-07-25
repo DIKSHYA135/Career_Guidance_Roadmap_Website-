@@ -179,7 +179,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── Try AI-powered recommendation ──
         if (token) {
             try {
-                const res = await fetch('http://localhost:5000/api/ai/recommend-career', {
+                const _base = (window.XYVERRA_CONFIG?.API_BASE || 'http://localhost:5000');
+                const res = await fetch(`${_base}/api/ai/recommend-career`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -221,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── Persist to backend so results survive across devices and are admin-visible ──
         if (token) {
             try {
-                await fetch('http://localhost:5000/api/user/save-career-assessment', {
+                await fetch(`${_base}/api/user/save-career-assessment`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({

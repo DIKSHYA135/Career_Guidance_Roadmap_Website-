@@ -812,7 +812,7 @@
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (!token) return; // Not logged in
 
-        const API_BASE = (window.XYVERRA_API_BASE || 'http://localhost:5000').replace(/\/$/, '');
+        const API_BASE = (window.XYVERRA_CONFIG?.API_BASE || window.XYVERRA_API_BASE || 'http://localhost:5000').replace(/\/$/, '');
 
         const doSync = () => {
             fetch(API_BASE + '/api/user/me', {

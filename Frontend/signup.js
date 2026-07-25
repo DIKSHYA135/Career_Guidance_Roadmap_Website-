@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const nameInput = document.getElementById('signup-name');
     const emailInput = document.getElementById('signup-email');
     const passwordInput = document.getElementById('signup-password');
+    const API_BASE = (window.XYVERRA_CONFIG?.API_BASE || 'http://localhost:5000');
     const confirmInput = document.getElementById('signup-confirm');
     const submitBtn = document.getElementById('signup-btn');
     const btnLabel = document.getElementById('btn-label');
@@ -34,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
             otpEmailDisplay.textContent = storedEmail;
 
             // Auto-send OTP on load
-            fetch('http://localhost:5000/api/auth/send-otp', {
+            fetch(`${API_BASE}/api/auth/send-otp`, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -260,7 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             try {
                 const payload = { name, email, password, skills };
-                const apiUrl = 'http://localhost:5000/api/auth/register';
+                const apiUrl = `${API_BASE}/api/auth/register`;
 
                 const response = await fetch(apiUrl, {
                     method: 'POST',
@@ -294,7 +295,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         
                         // Automatically trigger sending OTP
                         try {
-                            const otpResponse = await fetch('http://localhost:5000/api/auth/send-otp', {
+                            const otpResponse = await fetch(`${API_BASE}/api/auth/send-otp`, {
                                 method: 'POST',
                                 headers: { 
                                     'Content-Type': 'application/json',
@@ -381,7 +382,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch('http://localhost:5000/api/auth/verify-otp', {
+                const response = await fetch(`${API_BASE}/api/auth/verify-otp`, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
@@ -416,7 +417,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 btnResendOtp.textContent = 'Resending...';
                 try {
                     const token = localStorage.getItem('token');
-                    const response = await fetch('http://localhost:5000/api/auth/send-otp', {
+                    const response = await fetch(`${API_BASE}/api/auth/send-otp`, {
                         method: 'POST',
                         headers: { 
                             'Content-Type': 'application/json',

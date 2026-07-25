@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * CONFIG & STATE
      * ============================================================ */
     const FREE_LIMIT = 3;
-    const API_BASE = (window.XYVERRA_API_BASE || 'http://localhost:5000').replace(/\/$/, '');
+    const API_BASE = (window.XYVERRA_CONFIG?.API_BASE || window.XYVERRA_API_BASE || 'http://localhost:5000').replace(/\/$/, '');
 
     const LS = {
         used: 'chatMessagesUsed',

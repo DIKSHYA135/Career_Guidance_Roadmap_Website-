@@ -11111,7 +11111,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (token && originalModuleId) {
             try {
                 const userPath = localStorage.getItem('xyverra_selected_path') || originalModuleId;
-                const res = await fetch('http://localhost:5000/api/progress/submit-quiz', {
+                const res = await fetch((window.XYVERRA_CONFIG?.API_BASE || 'http://localhost:5000') + '/api/progress/submit-quiz', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                     body: JSON.stringify({ 

@@ -188,12 +188,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (token) {
             try {
-                await fetch('http://localhost:5000/api/user/save-path', {
+                const _base = (window.XYVERRA_CONFIG?.API_BASE || 'http://localhost:5000');
+                await fetch(`${_base}/api/user/save-path`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                     body: JSON.stringify({ selectedPath: career.targetPath })
                 });
-                await fetch('http://localhost:5000/api/user/save-onboarding', {
+                await fetch(`${_base}/api/user/save-onboarding`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                     body: JSON.stringify({ selectedLevel: 'Beginner' })
