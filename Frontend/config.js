@@ -1,15 +1,16 @@
 /* ==========================================================
    config.js — Xyverra API Configuration
-   Load this as the FIRST script on every HTML page.
-   Change ONLY this file to switch between dev and production.
+   Automatically switches between local dev and production.
    ========================================================== */
 
-window.XYVERRA_CONFIG = {
-    // ── Development (localhost) ──────────────────────────────────
-    // API_BASE: 'http://localhost:5000',
+const _isLocal = window.location.hostname === 'localhost' ||
+                 window.location.hostname === '127.0.0.1' ||
+                 window.location.protocol === 'file:';
 
-    // ── Production (update this after deploying backend to Render) ──
-    API_BASE: 'http://localhost:5000'  // ← Replace with your Render URL before deploying
+window.XYVERRA_CONFIG = {
+    API_BASE: _isLocal
+        ? 'http://localhost:5000'                                   // Local development
+        : 'https://career-guidance-roadmap-website.onrender.com'   // Production (Render)
 };
 
 // Convenience getter used by all JS files
